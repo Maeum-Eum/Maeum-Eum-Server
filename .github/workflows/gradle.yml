@@ -3,7 +3,7 @@ name: Deploy to Amazon EC2
 on:
   push:
     branches:
-      - main #브랜치명
+      - deploy #브랜치명
 
 env:
   AWS_REGION: ap-northeast-2 #리전
