@@ -27,9 +27,9 @@ jobs:
 
       # (2) application.yml 설정
       - uses : actions/checkout@v3
-      - run: touch ./src/main/resources/application.yml
-      - run: echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
-      - run: cat ./src/main/resources/application.yml
+      - run: touch ./Maeum-Eum/src/main/resources/application.yml
+      - run: echo "${{ secrets.APPLICATION_YML }}" > ./Maeum-Eum/src/main/resources/application.yml
+      - run: cat ./Maeum-Eum/src/main/resources/application.yml
 
       # (3) gradlew 권한 추가
       - name: Run chmod to make gradlew executable
