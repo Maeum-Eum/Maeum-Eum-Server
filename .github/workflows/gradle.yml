@@ -27,6 +27,7 @@ jobs:
 
       # (2) application.yml 설정
       - uses : actions/checkout@v3
+      - run: mkdir -p ./Maeum-Eum/src/main/resources
       - run: touch ./Maeum-Eum/src/main/resources/application.yml
       - run: echo "${{ secrets.APPLICATION_YML }}" > ./Maeum-Eum/src/main/resources/application.yml
       - run: cat ./Maeum-Eum/src/main/resources/application.yml
