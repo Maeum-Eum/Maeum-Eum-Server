@@ -45,7 +45,7 @@ jobs:
 
       # (5) Gradle build (Test 제외)
       - name: Build with Gradle
-        run: .gradlew clean build --exclude-task test 
+        run: ./gradlew clean build --exclude-task test 
         env:
           working-directory: ./Maeum-Eum 
         
