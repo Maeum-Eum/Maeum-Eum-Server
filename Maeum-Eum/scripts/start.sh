@@ -11,7 +11,7 @@ NOW=$(date +%c)
 
 # build 파일 복사
 echo "[$NOW] > $JAR 파일 복사" >> $DEPLOY_LOG
-cp $PROJECT_ROOT/build/libs/*.jar $JAR
+cp $PROJECT_ROOT/build/libs/Maeum-Eum-0.0.1-SNAPSHOT.jar $JAR
 
 # jar 파일 실행
 echo "[$NOW] > $JAR 파일 실행" >> $DEPLOY_LOG

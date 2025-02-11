@@ -2,7 +2,6 @@
 
 PROJECT_ROOT=/home/ec2-user/Maeum-Eum
 JAR="$PROJECT_ROOT/application.jar"
-
 DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
 
 NOW=$(date +%c)
