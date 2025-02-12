@@ -26,8 +26,8 @@ public class Resume {
     private Long resumeId;
 
     @OneToOne
-    @JoinColumn(nullable = false)
-    private Caregiver caregiverId;
+    @JoinColumn(nullable = false , name = "caregiver_id")
+    private Caregiver caregiver;
 
     @Column(nullable = false)
     private boolean hasVehicle;

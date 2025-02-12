@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 
+import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

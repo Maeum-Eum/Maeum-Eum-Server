@@ -1,6 +1,6 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
-import com.five.Maeum_Eum.entity.user.caregiver.CareGiver;
+import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,5 +24,5 @@ public class SavedElders {
 
     @ManyToOne
     @JoinColumn(name = "caregiver_id", nullable = false)
-    private CareGiver caregiver;
+    private Caregiver caregiver;
 }
