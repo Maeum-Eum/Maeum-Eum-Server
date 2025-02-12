@@ -1,6 +1,6 @@
 package com.five.Maeum_Eum.entity.center;
 
-import com.five.Maeum_Eum.entity.manager.Manager;
+import com.five.Maeum_Eum.entity.user.manager.Manager;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

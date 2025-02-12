@@ -1,4 +1,4 @@
-package com.five.Maeum_Eum.entity.manager;
+package com.five.Maeum_Eum.entity.user.manager;
 
 import com.five.Maeum_Eum.entity.center.Center;
 import jakarta.persistence.*;
