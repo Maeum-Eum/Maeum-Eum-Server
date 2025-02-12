@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.entity.center;
 
+import com.five.Maeum_Eum.entity.manager.Manager;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -44,4 +47,7 @@ public class Center {
 
     @Column(nullable = false, length = 11)
     private String centerCode;
+
+    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Manager> contents = new ArrayList<>();
 }
