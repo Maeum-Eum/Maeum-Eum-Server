@@ -2,15 +2,12 @@ package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.converter.StringListConverter;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

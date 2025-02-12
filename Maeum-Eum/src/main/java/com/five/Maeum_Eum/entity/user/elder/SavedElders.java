@@ -2,13 +2,10 @@ package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.entity.user.caregiver.CareGiver;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
