@@ -3,7 +3,10 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 import com.five.Maeum_Eum.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -13,6 +16,9 @@ import java.util.List;
 @Entity
 @Table(name = "resume")
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Resume {
 
     @Id

@@ -3,7 +3,10 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,6 +15,9 @@ import java.util.List;
 @Entity
 @Table(name = "caregiver")
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Caregiver {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

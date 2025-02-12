@@ -1,10 +1,16 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "certificate")
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Certificate {
 
     @Id

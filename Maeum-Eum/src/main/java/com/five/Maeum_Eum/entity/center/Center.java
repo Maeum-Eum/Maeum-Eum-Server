@@ -1,13 +1,19 @@
 package com.five.Maeum_Eum.entity.center;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
 @Entity
 @Table(name = "center")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Center {
 
     @Id
