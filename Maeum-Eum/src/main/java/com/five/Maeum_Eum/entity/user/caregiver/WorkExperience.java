@@ -25,6 +25,10 @@ public class WorkExperience {
 
     private LocalDate endDate;
 
+    @ManyToOne
+    @JoinColumn(name = "caregiver_id")
+    private Caregiver caregiver;
+
     @OneToOne
     @JoinColumn(name = "center_id")
     private Center center;

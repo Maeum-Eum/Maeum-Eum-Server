@@ -28,16 +28,10 @@ public class Caregiver {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String loginId;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private LocalDate birth;
-
-    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -56,6 +50,10 @@ public class Caregiver {
 
     @Column(nullable = false)
     private boolean hasCaregiverCertificate;
+
+    // 한줄 소개
+    @Column(nullable = false)
+    private String introduction;
 
     // 자격증
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
