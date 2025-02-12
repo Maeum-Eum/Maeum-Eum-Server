@@ -75,12 +75,12 @@ public class Resume {
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String mobility;
+    private List<String> mobility;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String daily;
+    private List<String> daily;
 
     @Column(nullable = false)
     private int elderRank;
