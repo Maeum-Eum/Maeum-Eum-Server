@@ -1,0 +1,38 @@
+package com.five.Maeum_Eum.dto.user.register.request;
+
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ManagerRegiDTO {
+    @NotBlank
+    @Size(min = 1, max = 32)
+    @Pattern(regexp = "^[a-zA-Z0-9]+$")
+    private String id;
+
+    @NotBlank
+    @Size(min = 10, max = 100)
+    @Pattern(regexp = "^(?=(.*[A-Za-z].*[0-9])|(?=.*[A-Za-z].*[@$!%*?&])|(?=.*[0-9].*[@$!%*?&])).{10,}$")
+    private String password;
+
+    @NotBlank
+    @Size(min = 1, max = 32)
+    @Pattern(regexp = "^[a-zA-Z0-9가-힣@$!%*?&]{1,32}$")
+    private String name;
+
+    @NotBlank
+    @Pattern(regexp = "^(010-?\\d{4}-?\\d{4})$")
+    private String phone;
+
+    @NotBlank
+    private String address;
+
+    @NotNull
+    private Boolean hasCar;
+}
