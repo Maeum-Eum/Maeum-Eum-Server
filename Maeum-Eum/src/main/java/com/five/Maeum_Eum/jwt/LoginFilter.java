@@ -59,24 +59,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             CaregiverUserDetails details = (CaregiverUserDetails) authResult.getPrincipal();
             id = details.getUsername();
         }
-/*
-        UserDTO user = memberRepository.findByUserid(id).get().toUserDTO();
-        RegistrationMessageDTO message = RegistrationMessageDTO.builder()
-                .status("success")
-                .user(user)
-                .build();
-        String body = (new ObjectMapper()).writeValueAsString(message);
-*/
+
         tokenService.issueToken(response,id, role);
         tokenService.deleteRefreshTokenByDate();
         response.setStatus(200);
-        //response.getWriter().write(body);
 
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         super.unsuccessfulAuthentication(request, response, failed);
-        response.setStatus(401);
+        response.setStatus(400);
+        response.getWriter().write("{\n"
+                + "\t\"status\": 401,\n"
+                + "\t\"error\": \"InvalidInput\",\n"
+                + "\t\"message\": \"아이디 혹은 비밀번호가 잘못되었습니다\"\n}");
     }
 }

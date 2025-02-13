@@ -77,6 +77,7 @@ public class JWTFilter extends OncePerRequestFilter {
     private void setBody(HttpServletResponse response,String str) throws IOException {
         response.getWriter().write("{\n"
                 + "\t\"status\": 401,\n"
+                + "\t\"error\": \"InvalidToken\",\n"
                 + "\t\"message\": \"" + str + "\"\n}");
     }
 

@@ -16,36 +16,31 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaregiverRegiDTO {
-    @NotBlank(message = "ID is blank")
-    @Size(min = 1, max = 32, message = "아이디는 최대 32자까지 가능합니다")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "invalid ID")
+    @NotBlank
+    @Size(min = 1, max = 32)
+    @Pattern(regexp = "^[a-zA-Z0-9]+$")
     private String id;
 
-    @NotBlank(message = "PW is blank")
-    @Size(min = 10, max = 100, message = "PW must be at least 10")
-    @Pattern(regexp = "^(?=(.*[A-Za-z].*[0-9])|(?=.*[A-Za-z].*[@$!%*?&])|(?=.*[0-9].*[@$!%*?&])).{10,}$", message = "invalid PW")
+    @NotBlank
+    @Size(min = 10, max = 100)
+    @Pattern(regexp = "^(?=(.*[A-Za-z].*[0-9])|(?=.*[A-Za-z].*[@$!%*?&])|(?=.*[0-9].*[@$!%*?&])).{10,}$")
     private String password;
 
-    @NotBlank(message = "name is blank")
-    @Size(min = 1, max = 32, message = "name can not be more than 32")
-    @Pattern(regexp = "^[a-zA-Z0-9가-힣@$!%*?&]{1,32}$", message = "Number, Korean, Alphabet are only available")
+    @NotBlank
+    @Size(min = 1, max = 32)
+    @Pattern(regexp = "^[a-zA-Z0-9가-힣@$!%*?&]{1,32}$")
     private String name;
-
-    @NotBlank(message = "email is blank")
-    @Email(message = "invalid email")
-    private String email;
 
     @NotBlank
     private String phone;
 
     private String address;
 
-    @NotBlank
-    private Boolean hasCar;
-
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    private String center;
 
     private String introduction;
 
