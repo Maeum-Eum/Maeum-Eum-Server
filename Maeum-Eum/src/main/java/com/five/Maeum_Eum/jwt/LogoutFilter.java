@@ -34,6 +34,10 @@ public class LogoutFilter extends GenericFilterBean {
         String refresh = request.getHeader("X-Refresh-Token");
         if (!tokenService.validateRefreshToken(response, refresh)) {
             response.setStatus(400);
+            response.getWriter().write("{\n"
+                    + "\t\"status\": 401,\n"
+                    + "\t\"error\": \"InvalidToken\",\n"
+                    + "\t\"message\": \"유효하지 않은 refresh 토큰입니다\"\n}");
             return;
         }
 
