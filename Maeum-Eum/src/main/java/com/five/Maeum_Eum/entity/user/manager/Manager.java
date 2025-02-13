@@ -39,12 +39,13 @@ public class Manager {
     private List<ManagerContact> managerContacts = new ArrayList<>();
 
     @Builder
-    public Manager(String name , String phoneNumber, String loginId, String password, boolean hasCar) {
+    public Manager(String name , String phoneNumber, String loginId, String password, boolean hasCar, Center center) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.loginId = loginId;
         this.password = password;
         this.hasCar = hasCar;
+        this.center = center;
     }
 
 }
