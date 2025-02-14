@@ -26,7 +26,7 @@ public class ManagerContact extends BaseTimeEntity {
     private ApprovalStatus approvalStatus;
 
     @Column(nullable = false)
-    private int wage; // 건 별인지 , 시급인지 , 월급인지에 따라 다름
+    private int wage; // 건 별인지 , 시급인지 , 월급 , 일급인지에 따라 다름
 
     @Column(length = 1024)
     private String message; // 관리자 -> 요양보호소
@@ -70,7 +70,8 @@ public class ManagerContact extends BaseTimeEntity {
     public enum WageType{
         HOURLY,   // 시급
         SALARY,   // 월급
-        PER_CASE // 건 당
+        PER_CASE, // 건 당
+        DAILY // 일급
     }
 
 }

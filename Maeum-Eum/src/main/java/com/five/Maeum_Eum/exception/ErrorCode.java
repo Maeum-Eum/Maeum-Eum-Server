@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     // User
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
+
+    //Manager
+    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "관리자가 아닌 사용자입니다.");
+
 
     private final HttpStatus status;
     private final String message;
