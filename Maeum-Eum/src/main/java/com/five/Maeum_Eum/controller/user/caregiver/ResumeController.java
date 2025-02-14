@@ -4,6 +4,7 @@ import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
+import com.five.Maeum_Eum.entity.user.caregiver.Certificate;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
 import com.five.Maeum_Eum.exception.ErrorResponse;
@@ -29,7 +30,7 @@ public class ResumeController {
     private final JWTUtil jwtUtil;
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_GIVERGIVER')")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> resume(@RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7).trim();
@@ -66,7 +67,7 @@ public class ResumeController {
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
                     .work(experience.getWork())
-                    .centerName(experience.getCenter().getCenterName())
+                    .centerName(experience.getCenter() != null ? experience.getCenter().getCenterName() : null)
                     .build();
 
             experienceDTOList.add(dto);
@@ -99,7 +100,7 @@ public class ResumeController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_GIVERGIVER')")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> saveResume(@RequestHeader("Authorization") String authHeader, @RequestBody ResumeSaveDTO resumeSaveDTO) {
 
         String token = authHeader.substring(7).trim();
@@ -114,12 +115,29 @@ public class ResumeController {
                             .build());
         }
 
+        if(findCaregiver.isResumeRegistered())
+        {
+            // 이미 저장되어 있었던 이력서라면 ... ?
+            return ResponseEntity
+                    .status(400)
+                    .body(ErrorResponse.builder()
+                            .code("Resume Already Registered")
+                            .status(HttpStatus.BAD_REQUEST)
+                            .message("이미 저장되어 있는 이력서입니다.")
+                            .build());
+        }
+
+        Certificate certificate = Certificate.builder()
+                .certificateCode(resumeSaveDTO.getCertificateCode())
+                .certificateRank(1)
+                .certificateType(Certificate.CertificateType.CARE_GIVER)
+                .build();
+
         // 이력서 저장
         Resume resume = Resume.builder()
-                .resumeId(findCaregiver.getResume().getResumeId())
-                .certificate(findCaregiver.getResume().getCertificate())
+                .certificate(certificate)
                 .caregiver(findCaregiver)
-                .daily(findCaregiver.getResume().getDaily())
+                .daily(resumeSaveDTO.getDaily())
                 .elderRank(resumeSaveDTO.getElderRank())
                 .hasDementiaTraining(resumeSaveDTO.getHasDementiaTraining())
                 .hasVehicle(resumeSaveDTO.getHasVehicle())

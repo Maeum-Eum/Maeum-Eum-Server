@@ -3,15 +3,13 @@ package com.five.Maeum_Eum.dto.user.caregiver.resume.request;
 
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 public class ResumeSaveDTO {

@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Certificate {
 
     private CertificateType certificateType;

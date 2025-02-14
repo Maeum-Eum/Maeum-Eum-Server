@@ -1,6 +1,5 @@
 package com.five.Maeum_Eum.service.user.caregiver;
 
-import com.five.Maeum_Eum.dto.user.caregiver.mypage.CaregiverMypageDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,10 +25,10 @@ public class CaregiverMypageController {
     private final JWTUtil jwtUtil;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> mypage(@RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7).trim();
-        if(!jwtUtil.getRole(token).equals("ROLE_CAREGIVER")) return ResponseEntity.badRequest().build();
         Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
         if(findCaregiver == null) {
             return ResponseEntity
@@ -53,10 +54,10 @@ public class CaregiverMypageController {
     }
 
     @PostMapping("/job-open")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> jobopen(@RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7).trim();
-        if(!jwtUtil.getRole(token).equals("ROLE_CAREGIVER")) return ResponseEntity.badRequest().build();
         Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
         if(findCaregiver == null) {
             return ResponseEntity

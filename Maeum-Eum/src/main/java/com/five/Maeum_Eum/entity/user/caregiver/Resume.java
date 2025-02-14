@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.jdbc.Work;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class Resume extends BaseTimeEntity {
     private Long resumeId;
 
     @OneToOne
-    @JoinColumn(nullable = false , name = "caregiver_id")
+    @JoinColumn(nullable = false, name = "caregiver_id")
     private Caregiver caregiver;
 
     @Column(nullable = false)
@@ -79,7 +78,7 @@ public class Resume extends BaseTimeEntity {
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = GenericListConverter.class)
     private List<String> toileting;
-    
+
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = GenericListConverter.class)

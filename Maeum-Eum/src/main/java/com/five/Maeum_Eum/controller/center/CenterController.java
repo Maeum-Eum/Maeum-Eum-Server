@@ -30,7 +30,8 @@ public class CenterController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> searchCenter(@RequestParam String name) {
+    public ResponseEntity<Object> searchCenter(@RequestParam("name") String name) {
+
         Center center = centerRepository.findByCenterName(name).orElse(null);
 
         if(center == null) {
