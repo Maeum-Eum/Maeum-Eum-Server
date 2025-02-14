@@ -80,7 +80,7 @@ public class SecurityConfig {
         security.formLogin(auth -> auth.disable());
         security.httpBasic(auth -> auth.disable());
         security.authorizeHttpRequests(auth -> auth
-                .requestMatchers(exceptURL).permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated());
         security.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         security.addFilterAt(new LoginFilter(manager(configuration), tokenService, managerRepository, caregiverRepository), UsernamePasswordAuthenticationFilter.class)

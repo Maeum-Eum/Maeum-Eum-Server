@@ -57,11 +57,6 @@ public class Caregiver {
     @Column(columnDefinition = "POINT SRID 4326")
     private Point location;
 
-    // 자격증
-    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
-    @Size(max = 3)
-    private List<Certificate> certificates = new ArrayList<>();
-
     // 이력서
     @OneToOne(mappedBy = "caregiver", cascade = CascadeType.ALL)
     private Resume resume;
@@ -77,7 +72,6 @@ public class Caregiver {
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContact = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
@@ -86,7 +80,12 @@ public class Caregiver {
         IDLE, MATCHING, MATCHED
     }
 
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkExperience> experience;
+
     public void toggleJobOpenState(){
         this.isJobOpen = !this.isJobOpen;
     }
+
+    public void setResumeRegistered(boolean resumeRegistered) { this.isResumeRegistered = resumeRegistered; }
 }

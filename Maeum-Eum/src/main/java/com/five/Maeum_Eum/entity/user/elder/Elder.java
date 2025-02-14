@@ -1,6 +1,8 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
+import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;

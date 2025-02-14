@@ -1,10 +1,10 @@
-package com.five.Maeum_Eum.dto.user.caregiver.resume.request;
+package com.five.Maeum_Eum.dto.user.caregiver.resume.response;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
@@ -13,13 +13,12 @@ import java.time.LocalDate;
 @Getter
 public class ExperienceDTO {
 
-    // 시작일
+    @NotNull
     private LocalDate startDate;
-    // 종료일
+    @NotNull
     private LocalDate endDate;
-    // 근무지 센터 ID
-    private Integer centerId;
-    // 직무
+    @NotBlank
+    private String centerName;
     @NotBlank
     private String work;
 }

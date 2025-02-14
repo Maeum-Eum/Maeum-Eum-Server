@@ -22,8 +22,13 @@ public class CaregiverService {
         return caregiverRepository.findByLoginId(loginId).orElse(null);
     }
 
-    public void registerResume(Resume resume) {
+    public void registerResume(Caregiver caregiver, Resume resume) {
 
+        caregiver.setResumeRegistered(true);
         resumeRepository.save(resume);
+    }
+
+    public void toggleJobOpenState(Caregiver caregiver) {
+        caregiver.toggleJobOpenState();
     }
 }

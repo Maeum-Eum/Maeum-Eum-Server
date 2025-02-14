@@ -1,6 +1,5 @@
 package com.five.Maeum_Eum.dto.user.caregiver.resume.response;
 
-import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ExperienceDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

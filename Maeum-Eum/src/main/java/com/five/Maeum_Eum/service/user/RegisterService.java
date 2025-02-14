@@ -83,8 +83,6 @@ public class RegisterService {
                 .center(center)
                 .build();
 
-
-
         caregiverRepository.save(caregiver);
         workExperienceRepository.save(workExperience);
 
