@@ -55,6 +55,7 @@ public class ManagerContact extends BaseTimeEntity {
     @JoinColumn(name = "elder_id")
     private Elder elder;
 
+    private boolean negotiable;
 
     @Builder
     public ManagerContact(ApprovalStatus approvalStatus , int wage , String message , List<String> workRequirement , WageType wageType , String phoneNumber){
