@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
@@ -73,6 +74,10 @@ public class Caregiver {
     // 관리자 연락
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContact = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
     // 매칭 상태
     public enum JobState {

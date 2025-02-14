@@ -1,10 +1,14 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.converter.StringListConverter;
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
+import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -59,6 +63,12 @@ public class Elder {
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
     private String daily;
+
+    @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagerContact> managerContacts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
 
 }
