@@ -10,6 +10,7 @@ import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.WorkExperienceRepository;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
+import com.five.Maeum_Eum.service.center.KakaoAddressService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class RegisterService {
     private final CenterRepository centerRepository;
     private final WorkExperienceRepository workExperienceRepository;
     private final BCryptPasswordEncoder encoder;
+    private final KakaoAddressService kakaoAddressService;
 
     public boolean registerManager(ManagerRegiDTO regiDTO) {
 
@@ -66,6 +68,7 @@ public class RegisterService {
                 .password(encoder.encode(regiDTO.getPassword()))
                 .phoneNumber(regiDTO.getPhone())
                 .address(regiDTO.getAddress())
+                .location(kakaoAddressService.getCoordinates(regiDTO.getAddress()))
                 .jobState(Caregiver.JobState.IDLE)
                 .isJobOpen(false)
                 .hasCaregiverCertificate(false)

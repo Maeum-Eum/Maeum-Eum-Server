@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +54,14 @@ public class Caregiver {
     @Column
     private String introduction;
 
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point location;
+
+    // 자격증
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
+    @Size(max = 3)
+    private List<Certificate> certificates = new ArrayList<>();
+
     // 이력서
     @OneToOne(mappedBy = "caregiver", cascade = CascadeType.ALL)
     private Resume resume;
@@ -66,6 +76,10 @@ public class Caregiver {
     // 관리자 연락
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContact = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
     // 매칭 상태
     public enum JobState {
