@@ -5,6 +5,7 @@ import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class Elder {
 
     @Column(nullable = false)
     private String elderAddress;
+
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point location;
 
     @Column(nullable = false)
     private int elderRank;

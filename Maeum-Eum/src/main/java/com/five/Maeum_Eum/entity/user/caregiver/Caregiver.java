@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public class Caregiver {
     // 한줄 소개
     @Column(nullable = false)
     private String introduction;
+
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point location;
 
     // 자격증
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
