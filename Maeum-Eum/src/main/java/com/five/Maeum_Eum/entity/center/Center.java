@@ -52,6 +52,13 @@ public class Center {
     @Column(columnDefinition = "POINT SRID 4326")
     private Point location;
 
+    @Column(nullable = false)
+    private boolean hasCar;
+
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Manager> contents = new ArrayList<>();
+
+    public void registerManager(boolean hasCar) {
+        this.hasCar = hasCar;
+    }
 }
