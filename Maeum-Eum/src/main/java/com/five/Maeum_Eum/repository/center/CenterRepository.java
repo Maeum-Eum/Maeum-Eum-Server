@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface CenterRepository extends JpaRepository<Center, Long> {
     Optional<Center> findByAddress(String Address);
+    Optional<Center> findByCenterName(String centerName);
 }

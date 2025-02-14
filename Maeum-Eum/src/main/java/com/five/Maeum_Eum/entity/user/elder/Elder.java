@@ -1,6 +1,6 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
-import com.five.Maeum_Eum.converter.StringListConverter;
+import com.five.Maeum_Eum.converter.GenericListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,26 +39,23 @@ public class Elder {
     @Column(nullable = false)
     private Boolean elder_family;
 
-
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private String meal;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private String toileting;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private String mobility;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private String daily;
-
-
 }

@@ -32,4 +32,6 @@ public class WorkExperience {
     @OneToOne
     @JoinColumn(name = "center_id")
     private Center center;
+
+    private String work;
 }

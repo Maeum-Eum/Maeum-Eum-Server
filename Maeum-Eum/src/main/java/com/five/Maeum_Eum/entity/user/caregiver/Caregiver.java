@@ -3,13 +3,11 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Caregiver {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +30,6 @@ public class Caregiver {
     private String loginId;
 
     private String password;
-
-    private String email;
 
     @Column(nullable = false)
     private String phoneNumber;
@@ -52,17 +49,15 @@ public class Caregiver {
     private boolean hasCaregiverCertificate;
 
     // 한줄 소개
-    @Column(nullable = false)
+    @Column
     private String introduction;
-
-    // 자격증
-    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
-    @Size(max = 3)
-    private List<Certificate> certificates = new ArrayList<>();
 
     // 이력서
     @OneToOne(mappedBy = "caregiver", cascade = CascadeType.ALL)
     private Resume resume;
+
+    @Column(nullable = false)
+    private boolean isResumeRegistered;
 
     // 저장한 어르신
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
@@ -75,5 +70,9 @@ public class Caregiver {
     // 매칭 상태
     public enum JobState {
         IDLE, MATCHING, MATCHED
+    }
+
+    public void toggleJobOpenState(){
+        this.isJobOpen = !this.isJobOpen;
     }
 }
