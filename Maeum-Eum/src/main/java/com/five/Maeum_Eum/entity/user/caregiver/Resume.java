@@ -4,10 +4,7 @@ import com.five.Maeum_Eum.common.BaseTimeEntity;
 import com.five.Maeum_Eum.converter.GenericListConverter;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -27,36 +24,30 @@ public class Resume extends BaseTimeEntity {
     @JoinColumn(nullable = false, name = "caregiver_id")
     private Caregiver caregiver;
 
-    @Column(nullable = false)
     private Boolean hasVehicle;
 
     @Enumerated(EnumType.STRING)
     private DemantiaTraining hasDementiaTraining;
 
-    @Column(nullable = false)
     private int wage;
 
-    @Column(nullable = false)
     @Convert(converter = GenericListConverter.class)
     private List<String> workTimeSlot;
 
-    @Column(nullable = false)
     private Boolean negotiableTime;
 
-    @Column(nullable = false)
     private Boolean petPreferred;
 
-    @Column(nullable = false)
     private Boolean familyPreferred;
 
     private String introduction;
 
-    private String profileImage;
+    @Setter
+    private String profileImage = "/images/logo.png";
 
     @Embedded
     private Certificate certificate;
 
-    @Column(nullable = false)
     @Convert(converter = GenericListConverter.class)
     private List<String> workDay;
 
@@ -90,7 +81,6 @@ public class Resume extends BaseTimeEntity {
     @Convert(converter = GenericListConverter.class)
     private List<String> daily;
 
-    @Column(nullable = false)
     @Convert(converter = GenericListConverter.class)
     private List<Integer> elderRank;
 
