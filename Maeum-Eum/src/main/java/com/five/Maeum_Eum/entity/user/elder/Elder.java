@@ -45,7 +45,8 @@ public class Elder {
     private Boolean elder_pet;
 
     @Column(nullable = false)
-    private Boolean elder_family;
+    @Enumerated(EnumType.STRING)
+    private ElderFamily elder_family;
 
 
     @Lob
