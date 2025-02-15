@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ElderRepository extends JpaRepository<Elder, Long> {
+    long countByElderName(String elderName);
 }
