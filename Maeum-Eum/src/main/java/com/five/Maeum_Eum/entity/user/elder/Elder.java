@@ -45,28 +45,29 @@ public class Elder {
     private Boolean elder_pet;
 
     @Column(nullable = false)
-    private Boolean elder_family;
+    @Enumerated(EnumType.STRING)
+    private ElderFamily elder_family;
 
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String meal;
+    private List<String> meal;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String toileting;
+    private List<String> toileting;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String mobility;
+    private List<String> mobility;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringListConverter.class)
-    private String daily;
+    private List<String> daily;
 
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContacts = new ArrayList<>();
