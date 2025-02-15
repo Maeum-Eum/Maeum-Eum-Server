@@ -2,6 +2,7 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 
 import com.five.Maeum_Eum.common.BaseTimeEntity;
 import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,7 @@ public class Resume extends BaseTimeEntity {
     private Caregiver caregiver;
 
     @Column(nullable = false)
-    private boolean hasVehicle;
+    private Boolean hasVehicle;
 
     @Enumerated(EnumType.STRING)
     private DemantiaTraining hasDementiaTraining;
@@ -40,13 +41,13 @@ public class Resume extends BaseTimeEntity {
     private List<String> workTimeSlot;
 
     @Column(nullable = false)
-    private boolean negotiableTime;
+    private Boolean negotiableTime;
 
     @Column(nullable = false)
-    private boolean petPreferred;
+    private Boolean petPreferred;
 
     @Column(nullable = false)
-    private boolean familyPreferred;
+    private Boolean familyPreferred;
 
     private String introduction;
 
@@ -91,7 +92,7 @@ public class Resume extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Convert(converter = GenericListConverter.class)
-    private List<Long> elderRank;
+    private List<Integer> elderRank;
 
     @Enumerated(EnumType.STRING)
     private PreferredGender preferredGender;
@@ -102,5 +103,35 @@ public class Resume extends BaseTimeEntity {
 
     public enum DemantiaTraining {
         UNKNOWN, COMPLETE, NOT_COMPLETE
+    }
+
+    public void updateResume(ResumeSaveDTO resumeSaveDTO) {
+        this.jobPosition = resumeSaveDTO.getJobPosition();
+
+        // 자격증
+        Certificate dto = Certificate.builder()
+                .certificateType(Certificate.CertificateType.CARE_GIVER)
+                .certificateRank(1)
+                .certificateCode(resumeSaveDTO.getCertificateCode())
+                .build();
+
+        this.certificate = dto;
+
+        this.hasDementiaTraining = resumeSaveDTO.getHasDementiaTraining();
+        this.hasVehicle = resumeSaveDTO.getHasVehicle();
+        this.workPlace = resumeSaveDTO.getWorkPlace();
+        this.workDay = resumeSaveDTO.getWorkDay();
+        this.workTimeSlot = resumeSaveDTO.getWorkTimeSlot();
+        this.negotiableTime = resumeSaveDTO.getIsNegotiableTime();
+        this.wage = resumeSaveDTO.getWage();
+        this.elderRank = resumeSaveDTO.getElderRank();
+        this.meal = resumeSaveDTO.getMeal();
+        this.toileting = resumeSaveDTO.getToileting();
+        this.mobility = resumeSaveDTO.getMobility();
+        this.daily = resumeSaveDTO.getDaily();
+        this.preferredGender = resumeSaveDTO.getPreferredGender();
+        this.familyPreferred = resumeSaveDTO.getIsFamilyPreferred();
+        this.introduction = resumeSaveDTO.getIntroduction();
+        this.profileImage = resumeSaveDTO.getProfileImage();
     }
 }

@@ -20,7 +20,7 @@ public class ExperienceDTO {
     @NotNull
     private LocalDate endDate;
     @NotBlank
-    private String centerName;
+    private String centerId;
     @NotBlank
     private String work;
 }

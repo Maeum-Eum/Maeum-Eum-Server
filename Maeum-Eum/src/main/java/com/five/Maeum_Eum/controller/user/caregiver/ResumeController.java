@@ -7,11 +7,14 @@ import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Certificate;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
+import com.five.Maeum_Eum.exception.CustomException;
+import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.exception.ErrorResponse;
 import com.five.Maeum_Eum.jwt.JWTUtil;
-import com.five.Maeum_Eum.repository.caregiver.WorkExperienceRepository;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
+import com.five.Maeum_Eum.service.user.caregiver.WorkExperienceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,39 +23,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/caregiver/resume")
 public class ResumeController {
 
-    private final WorkExperienceRepository workExperienceRepository;
     private final CaregiverService caregiverService;
     private final JWTUtil jwtUtil;
+    private final WorkExperienceService workExperienceService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> resume(@RequestHeader("Authorization") String authHeader) {
 
+
         String token = authHeader.substring(7).trim();
         Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
         if(findCaregiver == null) {
-            return ResponseEntity
-                    .status(400)
-                    .body(ErrorResponse.builder()
-                            .code("Caregiver Not Found")
-                            .status(HttpStatus.BAD_REQUEST)
-                            .message("유저 정보를 가져오지 못했습니다.")
-                            .build());
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
         }
 
         if(!findCaregiver.isResumeRegistered()) {
-            return ResponseEntity
-                    .status(400)
-                    .body(ErrorResponse.builder()
-                            .code("Resume Not Registered")
-                            .status(HttpStatus.BAD_REQUEST)
-                            .message("이력서가 아직 존재하지 않는 유저입니다.")
-                            .build());
+            throw new CustomException(ErrorCode.RESUME_NOT_REGISTERED, "이력서가 존재하지 않는 유저입니다.");
         }
 
         Resume resume = findCaregiver.getResume();
@@ -67,7 +60,7 @@ public class ResumeController {
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
                     .work(experience.getWork())
-                    .centerName(experience.getCenter() != null ? experience.getCenter().getCenterName() : null)
+                    .centerId(experience.getCenter() != null ? experience.getCenter().getCenterId().toString() : null)
                     .build();
 
             experienceDTOList.add(dto);
@@ -77,11 +70,11 @@ public class ResumeController {
                 .jobPosition(resume.getJobPosition())
                 .certificateCode(resume.getCertificate().getCertificateCode())
                 .hasDementiaTraining(resume.getHasDementiaTraining())
-                .hasVehicle(resume.isHasVehicle())
+                .hasVehicle(resume.getHasVehicle())
                 .workPlace(resume.getWorkPlace())
                 .workDay(resume.getWorkDay())
                 .workTimeSlot(resume.getWorkTimeSlot())
-                .isNegotiableTime(resume.isNegotiableTime())
+                .isNegotiableTime(resume.getNegotiableTime())
                 .wage(resume.getWage())
                 .expectedSalary(salary)
                 .elderRank(resume.getElderRank())
@@ -90,7 +83,7 @@ public class ResumeController {
                 .mobility(resume.getMobility())
                 .daily(resume.getDaily())
                 .preferredGender(resume.getPreferredGender())
-                .isFamilyPreferred(resume.isFamilyPreferred())
+                .isFamilyPreferred(resume.getFamilyPreferred())
                 .experience(experienceDTOList)
                 .introduction(resume.getIntroduction())
                 .profileImage(resume.getProfileImage())
@@ -106,24 +99,19 @@ public class ResumeController {
         String token = authHeader.substring(7).trim();
         Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
         if(findCaregiver == null) {
-            return ResponseEntity
-                    .status(400)
-                    .body(ErrorResponse.builder()
-                            .code("Caregiver Not Found")
-                            .status(HttpStatus.BAD_REQUEST)
-                            .message("유저 정보를 가져오지 못했습니다.")
-                            .build());
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
         }
 
         if(findCaregiver.isResumeRegistered())
         {
-            // 이미 저장되어 있었던 이력서라면 ... ?
+            caregiverService.updateResume(findCaregiver.getResume(), resumeSaveDTO);
+            workExperienceService.saveAll(findCaregiver, resumeSaveDTO);
             return ResponseEntity
-                    .status(400)
+                    .status(200)
                     .body(ErrorResponse.builder()
-                            .code("Resume Already Registered")
-                            .status(HttpStatus.BAD_REQUEST)
-                            .message("이미 저장되어 있는 이력서입니다.")
+                            .code("Resume Modified Successfully")
+                            .status(HttpStatus.OK)
+                            .message("이력서 수정 완료")
                             .build());
         }
 
@@ -142,7 +130,8 @@ public class ResumeController {
                 .hasDementiaTraining(resumeSaveDTO.getHasDementiaTraining())
                 .hasVehicle(resumeSaveDTO.getHasVehicle())
                 .introduction(resumeSaveDTO.getIntroduction())
-                .petPreferred(resumeSaveDTO.getIsFamilyPreferred())
+                .petPreferred(resumeSaveDTO.getIsPetPreferred())
+                .familyPreferred(resumeSaveDTO.getIsFamilyPreferred())
                 .negotiableTime(resumeSaveDTO.getIsNegotiableTime())
                 .jobPosition(resumeSaveDTO.getJobPosition())
                 .meal(resumeSaveDTO.getMeal())
@@ -156,20 +145,7 @@ public class ResumeController {
                 .workTimeSlot(resumeSaveDTO.getWorkTimeSlot())
                 .build();
 
-        // 경력사항 저장
-        List<WorkExperience> experienceList = new ArrayList<>();
-        if (resumeSaveDTO.getExperience() != null) {
-            for (ExperienceDTO dto : resumeSaveDTO.getExperience()) {
-                WorkExperience exp = WorkExperience.builder()
-                        .startDate(dto.getStartDate())
-                        .endDate(dto.getEndDate())
-                        .work(dto.getWork())
-                        .build();
-                experienceList.add(exp);
-            }
-        }
-
-        workExperienceRepository.saveAll(experienceList);
+        workExperienceService.saveAll(findCaregiver, resumeSaveDTO);
         caregiverService.registerResume(findCaregiver, resume);
 
         return ResponseEntity

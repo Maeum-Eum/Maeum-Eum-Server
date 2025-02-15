@@ -33,7 +33,7 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final ListPath<String, StringPath> daily = this.<String, StringPath>createList("daily", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Long, NumberPath<Long>> elderRank = this.<Long, NumberPath<Long>>createList("elderRank", Long.class, NumberPath.class, PathInits.DIRECT2);
+    public final ListPath<Integer, NumberPath<Integer>> elderRank = this.<Integer, NumberPath<Integer>>createList("elderRank", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final BooleanPath familyPreferred = createBoolean("familyPreferred");
 

@@ -36,7 +36,7 @@ public class ResumeSaveDTO {
     @NotNull
     private Integer wage;
     @NotNull
-    private List<Long> elderRank;
+    private List<Integer> elderRank;
     @NotNull
     private List<String> meal;
     @NotNull
@@ -49,6 +49,8 @@ public class ResumeSaveDTO {
     private Resume.PreferredGender preferredGender;
     @NotNull
     private Boolean isFamilyPreferred;
+    @NotNull
+    private Boolean isPetPreferred;
     @NotNull
     private List<ExperienceDTO> experience;
     @NotBlank

@@ -20,9 +20,9 @@ public class QElder extends EntityPathBase<Elder> {
 
     public static final QElder elder = new QElder("elder");
 
-    public final StringPath daily = createString("daily");
+    public final ListPath<String, StringPath> daily = this.<String, StringPath>createList("daily", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final BooleanPath elder_family = createBoolean("elder_family");
+    public final EnumPath<ElderFamily> elder_family = createEnum("elder_family", ElderFamily.class);
 
     public final BooleanPath elder_pet = createBoolean("elder_pet");
 
@@ -44,11 +44,11 @@ public class QElder extends EntityPathBase<Elder> {
 
     public final ListPath<com.five.Maeum_Eum.entity.user.manager.ManagerContact, com.five.Maeum_Eum.entity.user.manager.QManagerContact> managerContacts = this.<com.five.Maeum_Eum.entity.user.manager.ManagerContact, com.five.Maeum_Eum.entity.user.manager.QManagerContact>createList("managerContacts", com.five.Maeum_Eum.entity.user.manager.ManagerContact.class, com.five.Maeum_Eum.entity.user.manager.QManagerContact.class, PathInits.DIRECT2);
 
-    public final StringPath meal = createString("meal");
+    public final ListPath<String, StringPath> meal = this.<String, StringPath>createList("meal", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final StringPath mobility = createString("mobility");
+    public final ListPath<String, StringPath> mobility = this.<String, StringPath>createList("mobility", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final StringPath toileting = createString("toileting");
+    public final ListPath<String, StringPath> toileting = this.<String, StringPath>createList("toileting", String.class, StringPath.class, PathInits.DIRECT2);
 
     public QElder(String variable) {
         super(Elder.class, forVariable(variable));

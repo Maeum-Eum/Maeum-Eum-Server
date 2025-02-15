@@ -24,7 +24,7 @@ public class QServiceSlot extends EntityPathBase<ServiceSlot> {
 
     public final QElder elder;
 
-    public final NumberPath<Integer> serviceSlotDay = createNumber("serviceSlotDay", Integer.class);
+    public final EnumPath<DayOfWeek> serviceSlotDay = createEnum("serviceSlotDay", DayOfWeek.class);
 
     public final TimePath<java.time.LocalTime> serviceSlotEnd = createTime("serviceSlotEnd", java.time.LocalTime.class);
 

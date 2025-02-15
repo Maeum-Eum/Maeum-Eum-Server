@@ -20,7 +20,7 @@ public class ResumeResponseDTO {
     private Boolean isNegotiableTime;
     private Integer wage;
     private Integer expectedSalary;
-    private List<Long> elderRank;
+    private List<Integer> elderRank;
     private List<String> meal;
     private List<String> toileting;
     private List<String> mobility;

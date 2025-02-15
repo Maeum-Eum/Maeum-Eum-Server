@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Certificate {
 
+    @Enumerated(value = EnumType.STRING)
     private CertificateType certificateType;
 
     private int certificateRank;
