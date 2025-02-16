@@ -25,10 +25,10 @@ public class Center {
     @Column(nullable = false)
     private Long centerId;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private String centerName;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String address;
 
     @Column(nullable = false)
@@ -40,13 +40,10 @@ public class Center {
     @Column(nullable = false)
     private String detailAddress;
 
-    @Column(nullable = false, length = 5)
+    @Column(nullable = false)
     private String zipCode;
 
-    @Column(length = 3)
-    private String field8;
-
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false)
     private String centerCode;
 
     @Column(columnDefinition = "POINT SRID 4326")

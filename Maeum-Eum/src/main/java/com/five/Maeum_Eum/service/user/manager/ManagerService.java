@@ -1,6 +1,5 @@
 package com.five.Maeum_Eum.service.user.manager;
 
-
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.exception.CustomException;
@@ -13,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional

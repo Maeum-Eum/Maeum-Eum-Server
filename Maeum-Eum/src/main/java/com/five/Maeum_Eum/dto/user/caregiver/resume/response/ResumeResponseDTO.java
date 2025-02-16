@@ -19,7 +19,6 @@ public class ResumeResponseDTO {
     private List<String> workTimeSlot;
     private Boolean isNegotiableTime;
     private Integer wage;
-    private Integer expectedSalary;
     private List<Integer> elderRank;
     private List<String> meal;
     private List<String> toileting;
