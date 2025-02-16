@@ -5,8 +5,10 @@ import com.five.Maeum_Eum.dto.center.response.CenterDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.exception.ErrorResponse;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
+import com.five.Maeum_Eum.service.center.CenterService;
 import com.five.Maeum_Eum.service.center.KakaoAddressService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ public class CenterController {
 
     private final KakaoAddressService kakaoAddressService;
     private final CenterRepository centerRepository;
+    private final CenterService centerService;
 
     @PostMapping
     public ResponseEntity<Object> get(@RequestBody AddressDTO addressDTO) {
@@ -52,5 +55,13 @@ public class CenterController {
                 .build();
 
         return ResponseEntity.ok(dto);
+    }
+
+
+    /*관리자가 소속된 센터 조회*/
+    @GetMapping("/{centerId}")
+    public ResponseEntity<CenterDTO> getCenterInfo(@PathVariable("centerId") Long centerId){
+        CenterDTO centerDTO = centerService.getCenterInfo(centerId);
+        return ResponseEntity.ok(centerDTO);
     }
 }
