@@ -19,7 +19,8 @@ public class ManagerController {
 
     // 관리자 마이페이지
     @GetMapping("/mypage")
-    public ResponseEntity<ManagerBasicDto> getManagerMypage(@RequestHeader("Authorization") String token){
+    public ResponseEntity<ManagerBasicDto> getManagerMypage(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7).trim();
          ManagerBasicDto managerBasicDto = managerService.getManagerBasicInfo(token);
          return ResponseEntity.status(HttpStatus.OK)
                  .body(managerBasicDto);

@@ -10,6 +10,7 @@ import com.five.Maeum_Eum.repository.manager.ManagerBookmarkRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ManagerService {
 
     private final JWTUtil jwtUtil;
@@ -37,7 +39,7 @@ public class ManagerService {
 
     // 관리자의 기본 정보 조회
     public ManagerBasicDto getManagerBasicInfo(String token) {
-        if(findRole(token) != "ROLE_MANAGER"){ // 사용자가 관리자 역할이 아닐 때
+        if(!findRole(token).equals("ROLE_MANAGER")){ // 사용자가 관리자 역할이 아닐 때
             throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
         }
 

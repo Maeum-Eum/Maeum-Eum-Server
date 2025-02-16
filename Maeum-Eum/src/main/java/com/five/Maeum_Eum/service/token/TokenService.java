@@ -20,7 +20,7 @@ public class TokenService {
 
     public void issueToken(HttpServletResponse response, String id, String role) {
 
-        String access = jwtUtil.createJwt(id, "access", role,1000 * 60 * 10L);
+        String access = jwtUtil.createJwt(id, "access", role,1000 * 60 * 60 * 1L);
         String refresh = jwtUtil.createJwt(id, "refresh", role,1000 * 60 * 60 * 24L);
 
         response.addHeader("Authorization", "Bearer " + access);

@@ -21,6 +21,16 @@ public record ManagerBasicDto(
                 sentContacts,
                 bookmarks
         );
+    }
 
+    public static ManagerBasicDto of(Manager manager , Center center){
+        return  new ManagerBasicDto(
+                manager.getManagerId(),
+                manager.getName(),
+                manager.getPhoneNumber(),
+                center.getCenterId(),
+                0,
+                0
+        );
     }
 }
