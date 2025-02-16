@@ -1,13 +1,10 @@
 package com.five.Maeum_Eum.dto.user.register.request;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManagerRegiDTO {

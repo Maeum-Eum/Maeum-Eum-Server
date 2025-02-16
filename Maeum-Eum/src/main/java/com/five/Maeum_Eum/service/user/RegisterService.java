@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.service.user;
 
+import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.dto.user.register.request.CaregiverRegiDTO;
 import com.five.Maeum_Eum.dto.user.register.request.ManagerRegiDTO;
 import com.five.Maeum_Eum.entity.center.Center;
@@ -31,13 +32,14 @@ public class RegisterService {
     private final BCryptPasswordEncoder encoder;
     private final KakaoAddressService kakaoAddressService;
 
-    public boolean registerManager(ManagerRegiDTO regiDTO) {
+
+    public ManagerBasicDto registerManager(ManagerRegiDTO regiDTO) {
 
         if (managerRepository.existsByLoginId(regiDTO.getId()) || caregiverRepository.existsByLoginId(regiDTO.getId())) {
-            return false;
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
         for (ConstraintViolation<ManagerRegiDTO> violation : Validation.buildDefaultValidatorFactory().getValidator().validate(regiDTO)) {
-            return false;
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
         // 센터 조회 후 차량 보유 여부 변경
@@ -45,19 +47,21 @@ public class RegisterService {
         if (center == null) { throw new CustomException(ErrorCode.CENTER_NOT_FOUND);
         }
         center.registerManager(regiDTO.getHasCar());
+        centerRepository.save(center);
 
         Manager manager = Manager.builder()
                 .loginId(regiDTO.getId())
                 .name(regiDTO.getName())
                 .password(encoder.encode(regiDTO.getPassword()))
-                .hasCar(regiDTO.getHasCar())
                 .center(center)
                 .phoneNumber(regiDTO.getPhone())
                 .build();
 
         managerRepository.save(manager);
 
-        return true;
+        ManagerBasicDto managerBasicDto = ManagerBasicDto.of(manager , center);
+
+        return managerBasicDto;
     }
 
     public boolean registerCaregiver(CaregiverRegiDTO regiDTO) {
