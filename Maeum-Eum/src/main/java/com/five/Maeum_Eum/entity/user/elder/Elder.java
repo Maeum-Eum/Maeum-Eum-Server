@@ -1,6 +1,6 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
-import com.five.Maeum_Eum.converter.StringListConverter;
+import com.five.Maeum_Eum.converter.GenericListConverter;
 import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
@@ -45,28 +45,28 @@ public class Elder {
     private Boolean elder_pet;
 
     @Column(nullable = false)
-    private Boolean elder_family;
-
-
-    @Lob
-    @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
-    private String meal;
+    @Enumerated(EnumType.STRING)
+    private ElderFamily elder_family;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
-    private String toileting;
+    @Convert(converter = GenericListConverter.class)
+    private List<String> meal;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
-    private String mobility;
+    @Convert(converter = GenericListConverter.class)
+    private List<String> toileting;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
-    private String daily;
+    @Convert(converter = GenericListConverter.class)
+    private List<String> mobility;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    @Convert(converter = GenericListConverter.class)
+    private List<String> daily;
 
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContacts = new ArrayList<>();

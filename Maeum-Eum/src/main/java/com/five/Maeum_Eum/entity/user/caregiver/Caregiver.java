@@ -4,14 +4,12 @@ import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Caregiver {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +32,6 @@ public class Caregiver {
     private String loginId;
 
     private String password;
-
-    private String email;
 
     @Column(nullable = false)
     private String phoneNumber;
@@ -54,20 +51,18 @@ public class Caregiver {
     private boolean hasCaregiverCertificate;
 
     // 한줄 소개
-    @Column(nullable = false)
+    @Column
     private String introduction;
 
     @Column(columnDefinition = "POINT SRID 4326")
     private Point location;
 
-    // 자격증
-    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
-    @Size(max = 3)
-    private List<Certificate> certificates = new ArrayList<>();
-
     // 이력서
     @OneToOne(mappedBy = "caregiver", cascade = CascadeType.ALL)
     private Resume resume;
+
+    @Column(nullable = false)
+    private boolean isResumeRegistered;
 
     // 저장한 어르신
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL)
@@ -77,7 +72,6 @@ public class Caregiver {
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContact = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
@@ -85,4 +79,13 @@ public class Caregiver {
     public enum JobState {
         IDLE, MATCHING, MATCHED
     }
+
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkExperience> experience;
+
+    public void toggleJobOpenState(){
+        this.isJobOpen = !this.isJobOpen;
+    }
+
+    public void setResumeRegistered(boolean resumeRegistered) { this.isResumeRegistered = resumeRegistered; }
 }

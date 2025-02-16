@@ -24,7 +24,8 @@ public class ServiceSlot {
     private Elder elder;
 
     @Column(nullable = false)
-    private int serviceSlotDay;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek serviceSlotDay;
 
     @Column(nullable = false)
     private LocalTime serviceSlotStart;

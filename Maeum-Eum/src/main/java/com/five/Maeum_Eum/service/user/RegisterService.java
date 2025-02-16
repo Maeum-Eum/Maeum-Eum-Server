@@ -6,6 +6,8 @@ import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
+import com.five.Maeum_Eum.exception.CustomException;
+import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.WorkExperienceRepository;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
@@ -38,12 +40,18 @@ public class RegisterService {
             return false;
         }
 
+        // 센터 조회 후 차량 보유 여부 변경
+        Center center = centerRepository.findByAddress(regiDTO.getAddress()).orElse(null);
+        if (center == null) { throw new CustomException(ErrorCode.CENTER_NOT_FOUND);
+        }
+        center.registerManager(regiDTO.getHasCar());
+
         Manager manager = Manager.builder()
                 .loginId(regiDTO.getId())
                 .name(regiDTO.getName())
                 .password(encoder.encode(regiDTO.getPassword()))
                 .hasCar(regiDTO.getHasCar())
-                .center(centerRepository.findByAddress(regiDTO.getAddress()).orElse(null))
+                .center(center)
                 .phoneNumber(regiDTO.getPhone())
                 .build();
 
@@ -82,8 +90,6 @@ public class RegisterService {
                 .endDate(regiDTO.getEndDate())
                 .center(center)
                 .build();
-
-
 
         caregiverRepository.save(caregiver);
         workExperienceRepository.save(workExperience);

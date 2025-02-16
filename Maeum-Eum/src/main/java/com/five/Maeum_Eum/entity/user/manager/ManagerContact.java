@@ -1,7 +1,7 @@
 package com.five.Maeum_Eum.entity.user.manager;
 
 import com.five.Maeum_Eum.common.BaseTimeEntity;
-import com.five.Maeum_Eum.converter.StringListConverter;
+import com.five.Maeum_Eum.converter.GenericListConverter;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import jakarta.persistence.*;
@@ -33,7 +33,7 @@ public class ManagerContact extends BaseTimeEntity {
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> workRequirement;
 
     @Column(nullable = false)

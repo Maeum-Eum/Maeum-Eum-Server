@@ -1,16 +1,11 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 
-import com.five.Maeum_Eum.converter.StringListConverter;
+import com.five.Maeum_Eum.common.BaseTimeEntity;
+import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,84 +14,78 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Resume {
+public class Resume extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resumeId;
 
     @OneToOne
-    @JoinColumn(nullable = false , name = "caregiver_id")
+    @JoinColumn(nullable = false, name = "caregiver_id")
     private Caregiver caregiver;
 
-    @Column(nullable = false)
-    private boolean hasVehicle;
+    private Boolean hasVehicle;
 
     @Enumerated(EnumType.STRING)
     private DemantiaTraining hasDementiaTraining;
 
-    @Column(nullable = false)
-    @Min(value = 13000, message = "최소 시급은 13000원 입니다.")
     private int wage;
 
-    @Column(nullable = false)
-    private int workDay;
+    @Convert(converter = GenericListConverter.class)
+    private List<String> workTimeSlot;
 
-    @Enumerated(EnumType.STRING)
-    private WorkTimeSlot workTimeSlot;
+    private Boolean negotiableTime;
 
-    @Column(nullable = false)
-    private boolean isNegotiableTime;
+    private Boolean petPreferred;
 
-    @Column(nullable = false)
-    private boolean isPetPreferred;
-
-    @Column(nullable = false)
-    private boolean isFamilyPreferred;
+    private Boolean familyPreferred;
 
     private String introduction;
 
-    private String profileImage;
+    @Setter
+    private String profileImage = "/images/logo.png";
+
+    @Embedded
+    private Certificate certificate;
+
+    @Convert(converter = GenericListConverter.class)
+    private List<String> workDay;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> workPlace;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> jobPosition;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> meal;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> toileting;
-    
+
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> mobility;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = GenericListConverter.class)
     private List<String> daily;
 
-    @Column(nullable = false)
-    private int elderRank;
+    @Convert(converter = GenericListConverter.class)
+    private List<Integer> elderRank;
 
     @Enumerated(EnumType.STRING)
     private PreferredGender preferredGender;
-
-    public enum WorkTimeSlot {
-        MORNING, AFTERNOON, EVENING
-    }
 
     public enum PreferredGender {
         EVERY, MALE, FEMALE
@@ -106,9 +95,33 @@ public class Resume {
         UNKNOWN, COMPLETE, NOT_COMPLETE
     }
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    public void updateResume(ResumeSaveDTO resumeSaveDTO) {
+        this.jobPosition = resumeSaveDTO.getJobPosition();
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+        // 자격증
+        Certificate dto = Certificate.builder()
+                .certificateType(Certificate.CertificateType.CARE_GIVER)
+                .certificateRank(1)
+                .certificateCode(resumeSaveDTO.getCertificateCode())
+                .build();
+
+        this.certificate = dto;
+
+        this.hasDementiaTraining = resumeSaveDTO.getHasDementiaTraining();
+        this.hasVehicle = resumeSaveDTO.getHasVehicle();
+        this.workPlace = resumeSaveDTO.getWorkPlace();
+        this.workDay = resumeSaveDTO.getWorkDay();
+        this.workTimeSlot = resumeSaveDTO.getWorkTimeSlot();
+        this.negotiableTime = resumeSaveDTO.getIsNegotiableTime();
+        this.wage = resumeSaveDTO.getWage();
+        this.elderRank = resumeSaveDTO.getElderRank();
+        this.meal = resumeSaveDTO.getMeal();
+        this.toileting = resumeSaveDTO.getToileting();
+        this.mobility = resumeSaveDTO.getMobility();
+        this.daily = resumeSaveDTO.getDaily();
+        this.preferredGender = resumeSaveDTO.getPreferredGender();
+        this.familyPreferred = resumeSaveDTO.getIsFamilyPreferred();
+        this.introduction = resumeSaveDTO.getIntroduction();
+        this.profileImage = resumeSaveDTO.getProfileImage();
+    }
 }
