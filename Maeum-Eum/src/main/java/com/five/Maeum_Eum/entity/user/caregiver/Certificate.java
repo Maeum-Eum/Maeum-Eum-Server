@@ -5,30 +5,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "certificate")
+@Embeddable
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Certificate {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long certificateId;
-
-    @ManyToOne
-    @JoinColumn(name = "caregiver_id", nullable = false)
-    private Caregiver caregiver;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private CertificateType certificateType;
 
-    @Column(nullable = false)
     private int certificateRank;
 
-    @Column(nullable = false)
     private String certificateCode;
 
     public enum CertificateType {

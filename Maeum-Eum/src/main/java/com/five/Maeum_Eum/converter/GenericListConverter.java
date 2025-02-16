@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 
 @Converter
-public class StringListConverter implements AttributeConverter<List<String>, String> {
+public class GenericListConverter<T> implements AttributeConverter<List<T>, String> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(List<String> attribute) {
+    public String convertToDatabaseColumn(List<T> attribute) {
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (Exception e) {
@@ -20,12 +20,11 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String dbData) {
+    public List<T> convertToEntityAttribute(String dbData) {
         try {
-            return objectMapper.readValue(dbData, new TypeReference<List<String>>() {});
+            return objectMapper.readValue(dbData, new TypeReference<>() {});
         } catch (Exception e) {
             throw new RuntimeException("JSON reading error", e);
         }
     }
 }
-

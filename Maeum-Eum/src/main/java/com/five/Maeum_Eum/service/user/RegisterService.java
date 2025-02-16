@@ -1,15 +1,19 @@
 package com.five.Maeum_Eum.service.user;
 
+import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.dto.user.register.request.CaregiverRegiDTO;
 import com.five.Maeum_Eum.dto.user.register.request.ManagerRegiDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
+import com.five.Maeum_Eum.exception.CustomException;
+import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.WorkExperienceRepository;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
+import com.five.Maeum_Eum.service.center.KakaoAddressService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import lombok.RequiredArgsConstructor;
@@ -26,28 +30,38 @@ public class RegisterService {
     private final CenterRepository centerRepository;
     private final WorkExperienceRepository workExperienceRepository;
     private final BCryptPasswordEncoder encoder;
+    private final KakaoAddressService kakaoAddressService;
 
-    public boolean registerManager(ManagerRegiDTO regiDTO) {
+
+    public ManagerBasicDto registerManager(ManagerRegiDTO regiDTO) {
 
         if (managerRepository.existsByLoginId(regiDTO.getId()) || caregiverRepository.existsByLoginId(regiDTO.getId())) {
-            return false;
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
         for (ConstraintViolation<ManagerRegiDTO> violation : Validation.buildDefaultValidatorFactory().getValidator().validate(regiDTO)) {
-            return false;
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
+
+        // 센터 조회 후 차량 보유 여부 변경
+        Center center = centerRepository.findByAddress(regiDTO.getAddress()).orElse(null);
+        if (center == null) { throw new CustomException(ErrorCode.CENTER_NOT_FOUND);
+        }
+        center.registerManager(regiDTO.getHasCar());
+        centerRepository.save(center);
 
         Manager manager = Manager.builder()
                 .loginId(regiDTO.getId())
                 .name(regiDTO.getName())
                 .password(encoder.encode(regiDTO.getPassword()))
-                .hasCar(regiDTO.getHasCar())
-                .center(centerRepository.findByAddress(regiDTO.getAddress()).orElse(null))
+                .center(center)
                 .phoneNumber(regiDTO.getPhone())
                 .build();
 
         managerRepository.save(manager);
 
-        return true;
+        ManagerBasicDto managerBasicDto = ManagerBasicDto.of(manager , center);
+
+        return managerBasicDto;
     }
 
     public boolean registerCaregiver(CaregiverRegiDTO regiDTO) {
@@ -66,6 +80,7 @@ public class RegisterService {
                 .password(encoder.encode(regiDTO.getPassword()))
                 .phoneNumber(regiDTO.getPhone())
                 .address(regiDTO.getAddress())
+                .location(kakaoAddressService.getCoordinates(regiDTO.getAddress()))
                 .jobState(Caregiver.JobState.IDLE)
                 .isJobOpen(false)
                 .hasCaregiverCertificate(false)
@@ -79,8 +94,6 @@ public class RegisterService {
                 .endDate(regiDTO.getEndDate())
                 .center(center)
                 .build();
-
-
 
         caregiverRepository.save(caregiver);
         workExperienceRepository.save(workExperience);

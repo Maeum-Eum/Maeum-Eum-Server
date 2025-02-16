@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,12 +43,22 @@ public class Center {
     @Column(nullable = false, length = 5)
     private String zipCode;
 
-    @Column(nullable = false, length = 3)
+    @Column(length = 3)
     private String field8;
 
     @Column(nullable = false, length = 11)
     private String centerCode;
 
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point location;
+
+    @Column(nullable = false)
+    private boolean hasCar;
+
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Manager> contents = new ArrayList<>();
+
+    public void registerManager(boolean hasCar) {
+        this.hasCar = hasCar;
+    }
 }
