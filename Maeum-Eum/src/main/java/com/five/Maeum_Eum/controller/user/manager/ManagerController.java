@@ -1,18 +1,22 @@
 package com.five.Maeum_Eum.controller.user.manager;
 
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.CaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ContactResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import com.five.Maeum_Eum.service.user.manager.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/manager")
@@ -77,6 +81,15 @@ public class ManagerController {
         String token = extractToken(authHeader);
         String response = managerService.deleteBookmark(token , bookmarkId);
         return ResponseEntity.ok(response);
+    }
+
+
+    /* 연락 보낸 대기 목록 */
+    @GetMapping("contact")
+    public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name) {
+        String token = extractToken(authHeader);
+        List<CaregiverDto> caregiverDtoList = managerService.getContactList(token , name , ApprovalStatus.PENDING);
+        return ResponseEntity.ok(caregiverDtoList);
     }
 
 
