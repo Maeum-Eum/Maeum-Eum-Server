@@ -1,16 +1,10 @@
 package com.five.Maeum_Eum.entity.user.manager;
 
 import com.five.Maeum_Eum.common.BaseTimeEntity;
-import com.five.Maeum_Eum.converter.GenericListConverter;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.*;
 
 @Entity
 @Getter
@@ -29,7 +23,10 @@ public class ManagerContact extends BaseTimeEntity {
     private int wage; // 건 별인지 , 시급인지 , 월급 , 일급인지에 따라 다름
 
     @Column(length = 1024)
-    private String message; // 관리자 -> 요양보호소
+    private String messageFromManager; // 관리자 -> 요양보호소
+
+    @Column(length = 1024)
+    private String messageFromCaregiver; // 관리자 -> 요양보호소
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -40,7 +37,10 @@ public class ManagerContact extends BaseTimeEntity {
     private WageType wageType;
 
     @Column(length = 20)
-    private String phoneNumber;
+    private String managerPhoneNumber; // 관리자 핸드폰
+
+    @Column(length = 20)
+    private String caregiverPhoneNumber; // 요양복지사 핸드폰
 
     @ManyToOne
     @JoinColumn(name = "caregiver_id")
@@ -57,13 +57,13 @@ public class ManagerContact extends BaseTimeEntity {
     private boolean negotiable;
 
     @Builder
-    public ManagerContact(ApprovalStatus approvalStatus , int wage , String message , String workRequirement , WageType wageType , String phoneNumber){
+    public ManagerContact(ApprovalStatus approvalStatus , int wage , String messageFromManager, String workRequirement , WageType wageType , String managerPhoneNumber){
         this.approvalStatus = approvalStatus;
         this.wage = wage;
-        this.message = message;
+        this.messageFromManager = messageFromManager;
         this.workRequirement = workRequirement;
         this.wageType = wageType;
-        this.phoneNumber = phoneNumber;
+        this.managerPhoneNumber = managerPhoneNumber;
     }
 
     public enum WageType{
@@ -71,6 +71,16 @@ public class ManagerContact extends BaseTimeEntity {
         SALARY,   // 월급
         PER_CASE, // 건 당
         DAILY // 일급
+    }
+
+    public void approve(String message, String phone){
+        approvalStatus = ApprovalStatus.APPROVED;
+        messageFromManager = message;
+        caregiverPhoneNumber = phone;
+    }
+
+    public void reject() {
+        approvalStatus = ApprovalStatus.REJECTED;
     }
 
 }
