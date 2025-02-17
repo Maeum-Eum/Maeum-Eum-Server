@@ -19,6 +19,9 @@ public enum ErrorCode {
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "관리자가 아닌 사용자입니다."),
     CONTACT_NOT_FOUND(HttpStatus.NOT_FOUND, "매칭 요청이 존재하지 않습니다"),
 
+    // Manager Bookmark
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND , "해당하는 북마크를 찾을 수 없습니다."),
+
 
     CENTER_NOT_FOUND(HttpStatus.NOT_FOUND, "센터가 존재하지 않습니다."),
     INVALID_ROLE(HttpStatus.UNAUTHORIZED, "해당 경로에 대한 권한이 없습니다."),

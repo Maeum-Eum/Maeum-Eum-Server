@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) { // 스프링단에서 cors 설정
         registry.addMapping("/**")
-                .allowedOriginPatterns("http://localhost:", apiUrl)
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "FETCH")
                 .allowedHeaders("*")
                 .allowCredentials(true)
