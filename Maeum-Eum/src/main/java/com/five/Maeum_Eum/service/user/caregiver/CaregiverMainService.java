@@ -9,11 +9,13 @@ import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
+import com.five.Maeum_Eum.repository.elder.SavedEldersRepository;
 import com.five.Maeum_Eum.repository.elder.ServiceSlotRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
@@ -35,6 +37,7 @@ public class CaregiverMainService {
     private final CaregiverRepository caregiverRepository;
     private final ServiceSlotRepository serviceSlotRepository;
     private final ManagerContactRepository managerContactRepository;
+    private final SavedEldersRepository savedEldersRepository;
 
     // n km내 매칭 요청 리스트
     public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable) {
@@ -69,6 +72,7 @@ public class CaregiverMainService {
                 .build();
     }
 
+    // 매칭 자세히 보기
     public DetailContactDTO getDetail(long id) {
 
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -117,6 +121,7 @@ public class CaregiverMainService {
 
     }
 
+    // 요청 수락
     public ContactAcceptDTO accept(ContactAcceptDTO acceptDTO, Long id) {
 
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -140,7 +145,8 @@ public class CaregiverMainService {
                 .build();
     }
 
-    public boolean pending(Long id) {
+    // 요청 거절
+    public boolean reject(Long id) {
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
         Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
         if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -161,6 +167,34 @@ public class CaregiverMainService {
         return true;
     }
 
+    // 요청 북마크
+    public void bookmark(Long id) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        ManagerContact contact = managerContactRepository.findById(id).orElse(null);
+        if (contact == null || !contact.getApprovalStatus().equals(ApprovalStatus.PENDING)) { throw new CustomException(ErrorCode.CONTACT_NOT_FOUND); }
+
+        if (!contact.getCaregiver().equals(caregiver)) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+        Elder elder = contact.getElder();
+        SavedElders savedElders = savedEldersRepository.findByElderAndCaregiver(elder, caregiver).orElse(null);
+
+        if (savedElders != null) {
+            savedEldersRepository.delete(savedElders);
+        }
+        else {
+            savedElders = SavedElders.builder()
+                    .caregiver(caregiver)
+                    .elder(elder).build();
+            savedEldersRepository.save(savedElders);
+        }
+
+    }
 
     private String getTitle(Elder elder, String requirement) {
         String title = null;
@@ -185,12 +219,14 @@ public class CaregiverMainService {
 
     private SimpleContactDTO toDTO(ManagerContact contact) { // list에 넣을 dto로 변환
         Elder elder = contact.getElder();
+        Caregiver caregiver = contact.getCaregiver();
 
         return SimpleContactDTO.builder().contactId(contact.getContactId())
                 .center(contact.getManager().getCenter().getCenterName())
                 .createdAt(contact.getCreatedAt())
                 .wage(contact.getWage())
                 .negotiable(contact.isNegotiable())
+                .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
                 .title(getTitle(elder, contact.getWorkRequirement()))
                 .build();
     }

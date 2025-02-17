@@ -18,5 +18,6 @@ public class SimpleContactDTO {
     private LocalDateTime createdAt;
     private Integer wage;
     private Boolean negotiable;
+    private Boolean bookmarked;
 
 }

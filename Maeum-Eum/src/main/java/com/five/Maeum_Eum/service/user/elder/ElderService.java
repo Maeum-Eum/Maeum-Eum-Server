@@ -65,6 +65,7 @@ public class ElderService {
                 .elderBirth(dto.getBirth())
                 .elderAddress(dto.getAddress())
                 .elderRank(dto.getRank())
+                .negotiable(dto.getNegotiable())
                 .meal(dto.getMeal())
                 .mobility(dto.getMobility())
                 .toileting(dto.getToileting())

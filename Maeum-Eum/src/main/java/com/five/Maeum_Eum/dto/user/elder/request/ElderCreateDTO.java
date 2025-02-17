@@ -38,5 +38,6 @@ public class ElderCreateDTO {
     private String family;
     @NotBlank
     private String pet;
+    private Boolean negotiable;
 
 }
