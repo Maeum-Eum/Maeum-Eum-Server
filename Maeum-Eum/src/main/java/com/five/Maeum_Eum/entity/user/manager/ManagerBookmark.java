@@ -5,6 +5,7 @@ import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,13 @@ public class ManagerBookmark extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "elder_id")
     private Elder elder;
+
+    @Builder
+    public ManagerBookmark(Manager manager , Elder elder , Caregiver caregiver){
+        this.manager = manager;
+        this.elder = elder;
+        this.caregiver = caregiver;
+    }
 
 
 }
