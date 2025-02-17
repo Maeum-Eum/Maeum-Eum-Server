@@ -48,6 +48,10 @@ public class Elder {
     @Enumerated(EnumType.STRING)
     private ElderFamily elder_family;
 
+
+    @Column
+    private boolean negotiable;
+
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = GenericListConverter.class)

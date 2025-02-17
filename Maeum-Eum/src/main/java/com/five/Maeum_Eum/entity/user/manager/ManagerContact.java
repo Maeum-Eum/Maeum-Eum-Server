@@ -20,7 +20,7 @@ public class ManagerContact extends BaseTimeEntity {
     private ApprovalStatus approvalStatus;
 
     @Column(nullable = false)
-    private int wage; // 건 별인지 , 시급인지 , 월급 , 일급인지에 따라 다름
+    private int wage; // 시급만
 
     @Column(length = 1024)
     private String messageFromManager; // 관리자 -> 요양보호소
@@ -28,13 +28,8 @@ public class ManagerContact extends BaseTimeEntity {
     @Column(length = 1024)
     private String messageFromCaregiver; // 관리자 -> 요양보호소
 
-    @Lob
-    @Column(columnDefinition = "LONGTEXT")
+    @Column
     private String workRequirement;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private WageType wageType;
 
     @Column(length = 20)
     private String managerPhoneNumber; // 관리자 핸드폰
@@ -54,24 +49,20 @@ public class ManagerContact extends BaseTimeEntity {
     @JoinColumn(name = "elder_id")
     private Elder elder;
 
+
     private boolean negotiable;
 
     @Builder
-    public ManagerContact(ApprovalStatus approvalStatus , int wage , String messageFromManager, String workRequirement , WageType wageType , String managerPhoneNumber){
+    public ManagerContact(ApprovalStatus approvalStatus , int wage , String messageFromManager, String messageFromCaregiver,String workRequirement  , String managerPhoneNumber , boolean negotiable){
         this.approvalStatus = approvalStatus;
         this.wage = wage;
         this.messageFromManager = messageFromManager;
+        this.messageFromCaregiver = messageFromCaregiver;
         this.workRequirement = workRequirement;
-        this.wageType = wageType;
         this.managerPhoneNumber = managerPhoneNumber;
+        this.negotiable = negotiable;
     }
 
-    public enum WageType{
-        HOURLY,   // 시급
-        SALARY,   // 월급
-        PER_CASE, // 건 당
-        DAILY // 일급
-    }
 
     public void approve(String message, String phone){
         approvalStatus = ApprovalStatus.APPROVED;
@@ -81,6 +72,18 @@ public class ManagerContact extends BaseTimeEntity {
 
     public void reject() {
         approvalStatus = ApprovalStatus.REJECTED;
+    }
+
+    public void setManager(Manager manager) {
+        this.manager = manager;
+    }
+
+    public void setCaregiver(Caregiver caregiver) {
+        this.caregiver = caregiver;
+    }
+
+    public void setElder(Elder elder) {
+        this.elder = elder;
     }
 
 }
