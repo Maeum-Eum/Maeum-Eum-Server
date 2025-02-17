@@ -18,7 +18,7 @@ public class ElderController {
     @PostMapping("/create")
     public ResponseEntity<Object> create(@RequestBody ElderCreateDTO dto) {
         if(elderService.createElder(dto)) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(dto);
         }
 
         throw new CustomException(ErrorCode.INVALID_INPUT);
