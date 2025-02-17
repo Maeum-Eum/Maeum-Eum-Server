@@ -46,4 +46,9 @@ public class Manager {
         this.center = center;
     }
 
+    /* 센터 변경 */
+    public void changeCenter(Center nCenter){
+        this.center = nCenter;
+    }
+
 }
