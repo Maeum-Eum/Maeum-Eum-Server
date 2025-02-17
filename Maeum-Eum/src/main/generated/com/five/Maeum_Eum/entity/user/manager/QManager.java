@@ -24,8 +24,6 @@ public class QManager extends EntityPathBase<Manager> {
 
     public final com.five.Maeum_Eum.entity.center.QCenter center;
 
-    public final BooleanPath hasCar = createBoolean("hasCar");
-
     public final StringPath loginId = createString("loginId");
 
     public final ListPath<ManagerContact, QManagerContact> managerContacts = this.<ManagerContact, QManagerContact>createList("managerContacts", ManagerContact.class, QManagerContact.class, PathInits.DIRECT2);

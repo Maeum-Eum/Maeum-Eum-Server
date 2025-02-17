@@ -2,6 +2,7 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 
 import com.five.Maeum_Eum.common.BaseTimeEntity;
 import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.converter.WorkPlaceListConverter;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,8 +54,8 @@ public class Resume extends BaseTimeEntity {
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = GenericListConverter.class)
-    private List<String> workPlace;
+    @Convert(converter = WorkPlaceListConverter.class)
+    private List<WorkPlace> workPlace;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")

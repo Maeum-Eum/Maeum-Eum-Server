@@ -32,7 +32,7 @@ public class CaregiverRegiDTO {
     @Size(min = 1, max = 32)
     @Pattern(regexp = "^[a-zA-Z0-9가-힣@$!%*?&]{1,32}$")
     private String name;
-
+    
     @NotBlank
     private String phone;
 

@@ -24,11 +24,6 @@ import java.util.List;
 public class ManagerContactQueryDsl {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public void findContactsByTimeSlot(Caregiver caregiver) {
-
-
-    }
-
     public Page<ManagerContact> findContactsByFieldAndCenterWithinDistance(String pointWKT,
                                                                    double distanceValue,
                                                                    Pageable pageable,
