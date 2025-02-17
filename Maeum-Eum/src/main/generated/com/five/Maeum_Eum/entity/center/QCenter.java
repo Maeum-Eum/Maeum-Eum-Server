@@ -34,11 +34,15 @@ public class QCenter extends EntityPathBase<Center> {
 
     public final StringPath detailAddress = createString("detailAddress");
 
+    public final StringPath finalGrade = createString("finalGrade");
+
     public final BooleanPath hasCar = createBoolean("hasCar");
 
     public final DatePath<java.time.LocalDate> installationTime = createDate("installationTime", java.time.LocalDate.class);
 
     public final ComparablePath<org.locationtech.jts.geom.Point> location = createComparable("location", org.locationtech.jts.geom.Point.class);
+
+    public final StringPath oneLineIntro = createString("oneLineIntro");
 
     public final StringPath zipCode = createString("zipCode");
 

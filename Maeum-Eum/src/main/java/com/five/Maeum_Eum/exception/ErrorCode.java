@@ -17,7 +17,7 @@ public enum ErrorCode {
 
     //Manager
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "관리자가 아닌 사용자입니다."),
-
+    CONTACT_NOT_FOUND(HttpStatus.NOT_FOUND, "매칭 요청이 존재하지 않습니다"),
 
 
     CENTER_NOT_FOUND(HttpStatus.NOT_FOUND, "센터가 존재하지 않습니다."),

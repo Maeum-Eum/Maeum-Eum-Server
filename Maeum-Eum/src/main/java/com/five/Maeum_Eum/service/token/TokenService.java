@@ -6,6 +6,7 @@ import com.five.Maeum_Eum.repository.token.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;

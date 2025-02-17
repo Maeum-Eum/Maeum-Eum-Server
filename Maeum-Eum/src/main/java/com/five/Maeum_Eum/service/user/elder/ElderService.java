@@ -47,11 +47,8 @@ public class ElderService {
         }
 
         // family 필드 변환
-        ElderFamily family;
-        if (dto.getFamily().equals("관계없어요")) family = ElderFamily.NO_FAMILY;
-        else if (dto.getFamily().equals("집에 없어요")) family = ElderFamily.NOT_IN_HOME;
-        else if (dto.getFamily().equals("집에 있어요")) family = ElderFamily.IN_HOME;
-        else throw new CustomException(ErrorCode.INVALID_INPUT);
+        ElderFamily family = ElderFamily.fromValue(dto.getFamily());
+        if (family == null) throw new CustomException(ErrorCode.INVALID_INPUT);
 
 
         // 주소 -> 좌표 변환
@@ -68,6 +65,10 @@ public class ElderService {
                 .elderBirth(dto.getBirth())
                 .elderAddress(dto.getAddress())
                 .elderRank(dto.getRank())
+                .meal(dto.getMeal())
+                .mobility(dto.getMobility())
+                .toileting(dto.getToileting())
+                .daily(dto.getDaily())
                 .elder_family(family)
                 .elder_pet(dto.getPet().equals("있어요"))
                 .location(location)
