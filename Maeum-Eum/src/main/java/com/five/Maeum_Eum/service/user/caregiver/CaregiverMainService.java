@@ -2,12 +2,14 @@ package com.five.Maeum_Eum.service.user.caregiver;
 
 import com.five.Maeum_Eum.common.PageResponse;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactAcceptDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.DetailContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
@@ -75,7 +77,11 @@ public class CaregiverMainService {
         }
 
         ManagerContact contact = managerContactRepository.findById(id).orElse(null);
-        if (contact == null) { throw new CustomException(ErrorCode.CONTACT_NOT_FOUND); }
+        if (contact == null || !contact.getApprovalStatus().equals(ApprovalStatus.PENDING)) { throw new CustomException(ErrorCode.CONTACT_NOT_FOUND); }
+
+        if (!contact.getCaregiver().equals(caregiver)) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
 
         Center center = contact.getManager().getCenter();
         CenterDTO centerDTO = CenterDTO.builder()
@@ -101,7 +107,7 @@ public class CaregiverMainService {
         return DetailContactDTO.builder()
                 .contactId(contact.getContactId())
                 .center(centerDTO)
-                .message(contact.getMessage())
+                .message(contact.getMessageFromManager())
                 .title(getTitle(contact.getElder(), contact.getWorkRequirement()))
                 .createdAt(contact.getCreatedAt())
                 .wage(contact.getWage())
@@ -110,6 +116,51 @@ public class CaregiverMainService {
                 .build();
 
     }
+
+    public ContactAcceptDTO accept(ContactAcceptDTO acceptDTO, Long id) {
+
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        ManagerContact contact = managerContactRepository.findById(id).orElse(null);
+        if (contact == null) { throw new CustomException(ErrorCode.CONTACT_NOT_FOUND); }
+
+        if (!contact.getCaregiver().equals(caregiver)) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+        contact.approve(acceptDTO.getMessage(), acceptDTO.getPhone());
+        managerContactRepository.save(contact);
+
+
+        return ContactAcceptDTO.builder()
+                .phone(contact.getManagerPhoneNumber())
+                .build();
+    }
+
+    public boolean pending(Long id) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        ManagerContact contact = managerContactRepository.findById(id).orElse(null);
+        if (contact == null || !contact.getApprovalStatus().equals(ApprovalStatus.PENDING)) { throw new CustomException(ErrorCode.CONTACT_NOT_FOUND); }
+
+        if (!contact.getCaregiver().equals(caregiver)) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+
+        contact.reject();
+        managerContactRepository.save(contact);
+
+
+        return true;
+    }
+
 
     private String getTitle(Elder elder, String requirement) {
         String title = null;
