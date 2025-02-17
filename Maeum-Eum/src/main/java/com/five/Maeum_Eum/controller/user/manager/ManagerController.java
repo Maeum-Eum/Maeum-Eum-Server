@@ -2,6 +2,10 @@ package com.five.Maeum_Eum.controller.user.manager;
 
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
+import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
+import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
+import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
+import com.five.Maeum_Eum.dto.user.manager.response.ContactResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import com.five.Maeum_Eum.service.user.manager.ManagerService;
@@ -49,6 +53,31 @@ public class ManagerController {
     }
 
 
+    /* 관리자가 요양보호사에게 연락하기*/
+    @PostMapping("/{caregiverId}")
+    public ResponseEntity<ContactResDto> contactCaregiver(@RequestHeader("Authorization") String authHeader , @PathVariable("caregiverId")Long caregiverId ,@RequestBody ContactReqDto contactReqDto ){
+        String token = extractToken(authHeader);
+        ContactResDto contactDto = managerService.contactToCaregiver(token , caregiverId , contactReqDto);
+        return ResponseEntity.ok(contactDto);
+
+    }
+
+    /* 요양보호사 북마크하기 */
+    @PostMapping("/bookmark")
+    public ResponseEntity<BookmarkResDto> bookmarkCaregiver(@RequestHeader("Authorization") String authHeader , @RequestBody BookmarkReqDto dto){
+        String token = extractToken(authHeader);
+        BookmarkResDto resDto = managerService.bookmarkCaregiver(token , dto);
+        return ResponseEntity.ok(resDto);
+    }
+
+
+    /* 요양보호사 북마크 취소 */
+    @DeleteMapping("/bookmark/{bookmarkId}")
+    public ResponseEntity<String> deleteBookmark(@RequestHeader("Authorization") String authHeader , @PathVariable("bookmarkId")Long bookmarkId){
+        String token = extractToken(authHeader);
+        String response = managerService.deleteBookmark(token , bookmarkId);
+        return ResponseEntity.ok(response);
+    }
 
 
 
