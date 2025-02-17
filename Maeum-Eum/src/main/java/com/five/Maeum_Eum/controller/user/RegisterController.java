@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.controller.user;
 
 import com.five.Maeum_Eum.dto.user.login.request.UserLoginDTO;
+import com.five.Maeum_Eum.dto.user.login.response.UserInfoDTO;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.dto.user.register.request.CaregiverRegiDTO;
 import com.five.Maeum_Eum.dto.user.register.request.ManagerRegiDTO;
@@ -13,6 +14,7 @@ import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +46,7 @@ public class RegisterController {
                         .build());
     }
 
+    // 프로필 최초 업로드 ( 사용자가 생성되기 전이므로 인증 절차가 없습니다 )
     @PostMapping("/caregiver/register/{caregiver}")
     public ResponseEntity<Object> uploadProfile(@PathVariable String caregiver,
                                                 @RequestParam("profileImage") MultipartFile file) throws IllegalAccessException {
@@ -55,6 +58,7 @@ public class RegisterController {
         return ResponseEntity.ok().build();
     }
 
+    // id 중복 검사
     @PostMapping("/validateID")
     public ResponseEntity<Object> validateDuple(@RequestBody UserLoginDTO dto) {
 
@@ -71,5 +75,15 @@ public class RegisterController {
         else {
             return ResponseEntity.status(200).body(dto);
         }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<Object> getUserInfo() {
+
+        String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
+        return ResponseEntity.ok(UserInfoDTO.builder()
+                .role(role)
+                .build());
+
     }
 }
