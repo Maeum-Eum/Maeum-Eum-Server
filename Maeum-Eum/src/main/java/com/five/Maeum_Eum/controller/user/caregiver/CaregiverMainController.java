@@ -1,9 +1,8 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
 import com.five.Maeum_Eum.common.PageResponse;
-import com.five.Maeum_Eum.dto.user.manager.response.ToCaregiverDTO;
-import com.five.Maeum_Eum.exception.CustomException;
-import com.five.Maeum_Eum.exception.ErrorResponse;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.DetailContactDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverMainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +23,13 @@ public class CaregiverMainController {
     @GetMapping("/list")
     public ResponseEntity<Object> getList(@PageableDefault(size = 5) Pageable pageable,
                                                  @RequestParam Double range) {
-        PageResponse<ToCaregiverDTO> body = caregiverMainService.getPages(range, pageable);
+        PageResponse<SimpleContactDTO> body = caregiverMainService.getPages(range, pageable);
+        return ResponseEntity.ok().body(body);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getDetail(@RequestParam Long contactId) {
+        DetailContactDTO body = caregiverMainService.getDetail(contactId);
         return ResponseEntity.ok().body(body);
     }
 }

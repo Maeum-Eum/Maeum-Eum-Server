@@ -1,7 +1,5 @@
-package com.five.Maeum_Eum.dto.user.manager.response;
+package com.five.Maeum_Eum.dto.user.caregiver.main.response;
 
-import com.five.Maeum_Eum.entity.user.elder.Elder;
-import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ToCaregiverDTO {
+public class SimpleContactDTO {
     private Long contactId;
     private String center;
     private String title;
