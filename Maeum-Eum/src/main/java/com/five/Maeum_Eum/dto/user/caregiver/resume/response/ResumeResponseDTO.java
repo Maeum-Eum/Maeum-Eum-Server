@@ -10,6 +10,9 @@ import java.util.List;
 @Builder
 @Getter
 public class ResumeResponseDTO {
+    private Long caregiverId;
+    private Long resumeId;
+    private String title;
     private List<String> jobPosition;
     private String certificateCode;
     private Resume.DemantiaTraining hasDementiaTraining;

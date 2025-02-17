@@ -1,10 +1,14 @@
 package com.five.Maeum_Eum.service.user.caregiver;
 
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
+import com.five.Maeum_Eum.jwt.JWTUtil;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.ResumeRepository;
 import com.five.Maeum_Eum.service.aws.S3Uploader;
@@ -12,6 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -21,6 +30,8 @@ public class CaregiverService {
     private final CaregiverRepository caregiverRepository;
     private final ResumeRepository resumeRepository;
     private final S3Uploader s3Uploader;
+    private final JWTUtil jwtUtil;
+
 
     public Caregiver findCaregiverByLoginId(String loginId) {
 
@@ -32,6 +43,10 @@ public class CaregiverService {
         resumeRepository.save(resume);
     }
 
+    // token으로  사용자 role 알아내기
+    private String findRole(String token){
+        return jwtUtil.getRole(token);
+    }
     public void toggleJobOpenState(Caregiver caregiver) {
         caregiver.toggleJobOpenState();
     }
@@ -76,4 +91,115 @@ public class CaregiverService {
         resume.setProfileImage("");
         return "프로필 사진 제거 성공";
     }
+
+
+    /*요양보호사가 자신의 이력서 조회 */
+    public ResumeResponseDTO getMyResume(String token){
+
+        Caregiver findCaregiver = findCaregiverByLoginId(jwtUtil.getId(token));
+        if(findCaregiver == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
+        }
+
+        if(!findCaregiver.isResumeRegistered()) {
+            throw new CustomException(ErrorCode.RESUME_NOT_REGISTERED, "이력서가 존재하지 않는 유저입니다.");
+        }
+
+        Resume resume = findCaregiver.getResume();
+
+        ResumeResponseDTO responseDTO = makeResponse(findCaregiver , resume);
+
+        return responseDTO;
+    }
+
+    /* 관리자가 특정 요양 보호사의 이력서 조회 */
+    public  ResumeResponseDTO getCaregiverResume(String token, Long caregiverId) {
+        if(!findRole(token).equals("ROLE_MANAGER")){ // 사용자가 관리자 역할이 아닐 때
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        Caregiver caregiver = caregiverRepository.findById(caregiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Resume resume = resumeRepository.findByCaregiverId(caregiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESUME_NOT_REGISTERED));
+
+        ResumeResponseDTO responseDTO = makeResponse(caregiver , resume);
+
+        return responseDTO;
+
+    }
+
+
+    /* 이력서 제목 만들기 */
+    private String makeTitle(Resume resume){
+        List<String> workDay = resume.getWorkDay();
+        String middleWorkDay = workDay.stream()
+                .collect(Collectors.joining("/"));
+
+        String position = resume.getJobPosition().get(0); // Job position
+
+        List<String> combinedList = new ArrayList<>();
+        combinedList.addAll(resume.getToileting());
+        combinedList.addAll(resume.getMeal());
+        combinedList.addAll(resume.getDaily());
+        combinedList.addAll(resume.getMobility());
+
+        Collections.shuffle(combinedList); // 랜덤하게 섞기
+
+        List<String> randomTwo = combinedList.subList(0, 2);
+
+        String randomTwoString = String.join(" ", randomTwo);
+
+        String result = "[" + middleWorkDay + "]" + position + "- " + randomTwoString;
+        return result;
+    }
+
+
+    /* 이력서 응답 DTO 만들기 */
+    private ResumeResponseDTO makeResponse(Caregiver caregiver , Resume resume){
+
+        List<ExperienceDTO> experienceDTOList = new ArrayList<>();
+        for(WorkExperience experience : caregiver.getExperience()){
+
+            ExperienceDTO dto = ExperienceDTO.builder()
+                    .startDate(experience.getStartDate())
+                    .endDate(experience.getEndDate())
+                    .work(experience.getWork())
+                    .centerId(experience.getCenter() != null ? experience.getCenter().getCenterId().toString() : null)
+                    .build();
+
+            experienceDTOList.add(dto);
+        }
+
+        String title = makeTitle(resume);
+
+        ResumeResponseDTO responseDTO = ResumeResponseDTO.builder()
+                .caregiverId(caregiver.getCaregiverId())
+                .resumeId(resume.getResumeId())
+                .title(title)
+                .jobPosition(resume.getJobPosition())
+                .certificateCode(resume.getCertificate().getCertificateCode())
+                .hasDementiaTraining(resume.getHasDementiaTraining())
+                .hasVehicle(resume.getHasVehicle())
+                .workPlace(resume.getWorkPlace())
+                .workDay(resume.getWorkDay())
+                .workTimeSlot(resume.getWorkTimeSlot())
+                .isNegotiableTime(resume.getNegotiableTime())
+                .wage(resume.getWage())
+                .elderRank(resume.getElderRank())
+                .meal(resume.getMeal())
+                .toileting(resume.getToileting())
+                .mobility(resume.getMobility())
+                .daily(resume.getDaily())
+                .preferredGender(resume.getPreferredGender())
+                .isFamilyPreferred(resume.getFamilyPreferred())
+                .experience(experienceDTOList)
+                .introduction(resume.getIntroduction())
+                .profileImage(resume.getProfileImage())
+                .build();
+
+        return responseDTO;
+    }
+
 }

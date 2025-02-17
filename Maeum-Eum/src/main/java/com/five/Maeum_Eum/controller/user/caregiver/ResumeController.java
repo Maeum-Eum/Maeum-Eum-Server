@@ -52,60 +52,23 @@ public class ResumeController {
         return ResponseEntity.ok(response);
     }
 
+
+    /* 요양보호사가 자신의 이력서 조회 */
     @GetMapping
     @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> resume(@RequestHeader("Authorization") String authHeader) {
 
-
         String token = authHeader.substring(7).trim();
-        Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
-        if(findCaregiver == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
-        }
 
-        if(!findCaregiver.isResumeRegistered()) {
-            throw new CustomException(ErrorCode.RESUME_NOT_REGISTERED, "이력서가 존재하지 않는 유저입니다.");
-        }
-
-        Resume resume = findCaregiver.getResume();
-        List<ExperienceDTO> experienceDTOList = new ArrayList<>();
-        for(WorkExperience experience : findCaregiver.getExperience()){
-
-            ExperienceDTO dto = ExperienceDTO.builder()
-                    .startDate(experience.getStartDate())
-                    .endDate(experience.getEndDate())
-                    .work(experience.getWork())
-                    .centerId(experience.getCenter() != null ? experience.getCenter().getCenterId().toString() : null)
-                    .build();
-
-            experienceDTOList.add(dto);
-        }
-
-        ResumeResponseDTO responseDTO = ResumeResponseDTO.builder()
-                .jobPosition(resume.getJobPosition())
-                .certificateCode(resume.getCertificate().getCertificateCode())
-                .hasDementiaTraining(resume.getHasDementiaTraining())
-                .hasVehicle(resume.getHasVehicle())
-                .workPlace(resume.getWorkPlace())
-                .workDay(resume.getWorkDay())
-                .workTimeSlot(resume.getWorkTimeSlot())
-                .isNegotiableTime(resume.getNegotiableTime())
-                .wage(resume.getWage())
-                .elderRank(resume.getElderRank())
-                .meal(resume.getMeal())
-                .toileting(resume.getToileting())
-                .mobility(resume.getMobility())
-                .daily(resume.getDaily())
-                .preferredGender(resume.getPreferredGender())
-                .isFamilyPreferred(resume.getFamilyPreferred())
-                .experience(experienceDTOList)
-                .introduction(resume.getIntroduction())
-                .profileImage(resume.getProfileImage())
-                .build();
+        ResumeResponseDTO responseDTO = caregiverService.getMyResume(token);
 
         return ResponseEntity.ok(responseDTO);
     }
 
+
+
+
+    /* 요양보호사 이력서 저장 */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_CAREGIVER')")
     public ResponseEntity<Object> saveResume(@RequestHeader("Authorization") String authHeader, @RequestBody ResumeSaveDTO resumeSaveDTO) {
