@@ -23,4 +23,6 @@ public class ExperienceDTO {
     private String centerId;
     @NotBlank
     private String work;
+    @NotBlank
+    private String center;
 }
