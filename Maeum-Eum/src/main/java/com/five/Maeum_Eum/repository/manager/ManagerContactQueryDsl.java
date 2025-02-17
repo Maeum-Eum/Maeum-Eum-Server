@@ -3,6 +3,8 @@ package com.five.Maeum_Eum.repository.manager;
 import com.five.Maeum_Eum.entity.center.QCenter;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.QCaregiver;
+import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
@@ -24,9 +26,14 @@ import java.util.List;
 public class ManagerContactQueryDsl {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public void findContactsByTimeSlot(Caregiver caregiver) {
+    public List<Caregiver> findTop20CaregiversByMatchingDays(Manager manager) {
 
+        QCaregiver caregiver = QCaregiver.caregiver;
 
+        JPAQueryFactory<ManagerContact> query = jpaQueryFactory.selectFrom(caregiver);
+        List<ManagerContact> contacts = query.fetch();
+
+        return null;
     }
 
     public Page<ManagerContact> findContactsByFieldAndCenterWithinDistance(String pointWKT,
