@@ -44,8 +44,6 @@ public class Center {
     @Column(nullable = false, length = 5)
     private String zipCode;
 
-    @Column(length = 3)
-    private String field8;
 
     @Column(nullable = false, length = 11)
     private String centerCode;
