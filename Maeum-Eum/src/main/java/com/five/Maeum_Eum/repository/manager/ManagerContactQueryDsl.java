@@ -1,7 +1,5 @@
 package com.five.Maeum_Eum.repository.manager;
 
-import com.five.Maeum_Eum.common.PageResponse;
-import com.five.Maeum_Eum.dto.user.manager.response.ToCaregiverDTO;
 import com.five.Maeum_Eum.entity.center.QCenter;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.QCaregiver;
@@ -23,8 +21,13 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MangerContactQueryDsl{
+public class ManagerContactQueryDsl {
     private final JPAQueryFactory jpaQueryFactory;
+
+    public void findContactsByTimeSlot(Caregiver caregiver) {
+
+
+    }
 
     public Page<ManagerContact> findContactsByFieldAndCenterWithinDistance(String pointWKT,
                                                                    double distanceValue,

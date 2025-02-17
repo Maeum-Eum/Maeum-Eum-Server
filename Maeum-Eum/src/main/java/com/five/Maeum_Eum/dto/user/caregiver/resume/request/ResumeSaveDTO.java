@@ -55,6 +55,4 @@ public class ResumeSaveDTO {
     private List<ExperienceDTO> experience;
     @NotBlank
     private String introduction;
-    @NotBlank
-    private String profileImage;
 }

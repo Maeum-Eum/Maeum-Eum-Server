@@ -30,6 +30,16 @@ public class WorkExperienceService {
                 Center center = centerRepository.findById(Long.parseLong(dto.getCenterId())).orElse(null);
                 if(center == null) continue;
 
+                // 경력 중복 검사
+                if (workExperienceRepository.existsByCenterAndAndCaregiverAndStartDate(
+                        center,
+                        caregiver,
+                        dto.getStartDate()
+                )) {
+                    continue;
+                }
+
+
                 WorkExperience exp = WorkExperience.builder()
                         .caregiver(caregiver)
                         .center(center)

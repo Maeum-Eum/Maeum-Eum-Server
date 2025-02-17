@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.service.user;
 
+import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.dto.user.register.request.CaregiverRegiDTO;
 import com.five.Maeum_Eum.dto.user.register.request.ManagerRegiDTO;
@@ -86,17 +87,22 @@ public class RegisterService {
                 .hasCaregiverCertificate(false)
                 .build();
 
-        Center center = centerRepository.findByAddress(regiDTO.getCenter()).orElse(null);
-
-        WorkExperience workExperience = WorkExperience.builder()
-                .caregiver(caregiver)
-                .startDate(regiDTO.getStartDate())
-                .endDate(regiDTO.getEndDate())
-                .center(center)
-                .build();
-
         caregiverRepository.save(caregiver);
-        workExperienceRepository.save(workExperience);
+
+        // 경력 사항 추출 및 저장
+        for (ExperienceDTO expDTO : regiDTO.getExperience()) {
+            Center center = centerRepository.findByAddress(expDTO.getCenter()).orElse(null);
+
+            WorkExperience workExperience = WorkExperience.builder()
+                    .caregiver(caregiver)
+                    .startDate(expDTO.getStartDate())
+                    .endDate(expDTO.getEndDate())
+                    .center(center)
+                    .build();
+
+            workExperienceRepository.save(workExperience);
+        }
+
 
         return true;
     }

@@ -73,7 +73,7 @@ public class SecurityConfig {
                 ,"/api/reissue"
                 ,"/api/validateID"
                 ,"/api/logout"
-                ,"/api/center/*"
+                ,"/api/excel/center"
         };
 
         security.csrf(auth -> auth.disable());

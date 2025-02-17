@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
+import com.five.Maeum_Eum.common.WorkCalculator;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
@@ -21,7 +22,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +35,22 @@ public class ResumeController {
     private final CaregiverService caregiverService;
     private final JWTUtil jwtUtil;
     private final WorkExperienceService workExperienceService;
+
+    @GetMapping("/salary")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER')")
+    public ResponseEntity<Object> salary(@RequestHeader("Authorization") String authHeader){
+
+        String token = authHeader.substring(7).trim();
+        Caregiver findCaregiver = caregiverService.findCaregiverByLoginId(jwtUtil.getId(token));
+        if(findCaregiver == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
+        }
+        Resume resume = findCaregiver.getResume();
+
+        Map<String,Integer> response = new HashMap<>();
+        response.put("salary", WorkCalculator.calculateSalary(WorkCalculator.getWorkDayTime(resume.getWorkTimeSlot()) * resume.getWorkDay().size(), resume.getWage()));
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_CAREGIVER')")
@@ -49,10 +68,6 @@ public class ResumeController {
         }
 
         Resume resume = findCaregiver.getResume();
-
-        // 월급 계산 로직 적용
-        int salary = 50000;
-
         List<ExperienceDTO> experienceDTOList = new ArrayList<>();
         for(WorkExperience experience : findCaregiver.getExperience()){
 
@@ -76,7 +91,6 @@ public class ResumeController {
                 .workTimeSlot(resume.getWorkTimeSlot())
                 .isNegotiableTime(resume.getNegotiableTime())
                 .wage(resume.getWage())
-                .expectedSalary(salary)
                 .elderRank(resume.getElderRank())
                 .meal(resume.getMeal())
                 .toileting(resume.getToileting())
@@ -137,7 +151,6 @@ public class ResumeController {
                 .meal(resumeSaveDTO.getMeal())
                 .mobility(resumeSaveDTO.getMobility())
                 .preferredGender(resumeSaveDTO.getPreferredGender())
-                .profileImage(resumeSaveDTO.getProfileImage())
                 .toileting(resumeSaveDTO.getToileting())
                 .wage(resumeSaveDTO.getWage())
                 .workPlace(resumeSaveDTO.getWorkPlace())
