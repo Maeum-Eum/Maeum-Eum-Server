@@ -122,6 +122,5 @@ public class Resume extends BaseTimeEntity {
         this.preferredGender = resumeSaveDTO.getPreferredGender();
         this.familyPreferred = resumeSaveDTO.getIsFamilyPreferred();
         this.introduction = resumeSaveDTO.getIntroduction();
-        this.profileImage = resumeSaveDTO.getProfileImage();
     }
 }

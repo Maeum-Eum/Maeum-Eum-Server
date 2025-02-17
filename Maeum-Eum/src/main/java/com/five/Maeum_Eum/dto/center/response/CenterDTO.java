@@ -17,4 +17,6 @@ public class CenterDTO {
     private String detailAddress;
     private String zipCode;
     private String centerCode;
+    private String finalGrade;
+    private String oneLineIntro;
 }

@@ -9,7 +9,7 @@ import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.elder.ServiceSlotRepository;
-import com.five.Maeum_Eum.repository.manager.MangerContactQueryDsl;
+import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.io.WKTWriter;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class CaregiverMainService {
-    private final MangerContactQueryDsl mangerContactQueryDsl;
+    private final ManagerContactQueryDsl managerContactQueryDsl;
     private final CaregiverRepository caregiverRepository;
     private final ServiceSlotRepository serviceSlotRepository;
 
@@ -43,7 +43,7 @@ public class CaregiverMainService {
 
         // 엔티티 페이지 조회
         Page<ManagerContact> page =
-        mangerContactQueryDsl.findContactsByFieldAndCenterWithinDistance(wkt, range, pageable, caregiver);
+        managerContactQueryDsl.findContactsByFieldAndCenterWithinDistance(wkt, range, pageable, caregiver);
 
         // 엔티티를 DTO로 변환
         List<ManagerContact> managerContacts = page.getContent();

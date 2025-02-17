@@ -34,8 +34,6 @@ public class QCenter extends EntityPathBase<Center> {
 
     public final StringPath detailAddress = createString("detailAddress");
 
-    public final StringPath field8 = createString("field8");
-
     public final BooleanPath hasCar = createBoolean("hasCar");
 
     public final DatePath<java.time.LocalDate> installationTime = createDate("installationTime", java.time.LocalDate.class);

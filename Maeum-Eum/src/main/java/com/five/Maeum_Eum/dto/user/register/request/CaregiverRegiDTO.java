@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.dto.user.register.request;
 
+import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Data
@@ -36,13 +38,9 @@ public class CaregiverRegiDTO {
 
     private String address;
 
-    private LocalDate startDate;
-
-    private LocalDate endDate;
-
-    private String center;
-
     private String introduction;
+
+    private List<ExperienceDTO> experience;
 
     // 자신 있는 사항 추가 필요
 }
