@@ -28,6 +28,8 @@ public class QManagerContact extends EntityPathBase<ManagerContact> {
 
     public final com.five.Maeum_Eum.entity.user.caregiver.QCaregiver caregiver;
 
+    public final StringPath caregiverPhoneNumber = createString("caregiverPhoneNumber");
+
     public final NumberPath<Long> contactId = createNumber("contactId", Long.class);
 
     //inherited
@@ -37,11 +39,13 @@ public class QManagerContact extends EntityPathBase<ManagerContact> {
 
     public final QManager manager;
 
-    public final StringPath message = createString("message");
+    public final StringPath managerPhoneNumber = createString("managerPhoneNumber");
+
+    public final StringPath messageFromCaregiver = createString("messageFromCaregiver");
+
+    public final StringPath messageFromManager = createString("messageFromManager");
 
     public final BooleanPath negotiable = createBoolean("negotiable");
-
-    public final StringPath phoneNumber = createString("phoneNumber");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
