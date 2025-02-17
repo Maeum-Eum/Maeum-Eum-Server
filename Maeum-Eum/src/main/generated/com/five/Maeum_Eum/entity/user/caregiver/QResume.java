@@ -68,7 +68,7 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final ListPath<String, StringPath> workDay = this.<String, StringPath>createList("workDay", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> workPlace = this.<String, StringPath>createList("workPlace", String.class, StringPath.class, PathInits.DIRECT2);
+    public final ListPath<WorkPlace, EnumPath<WorkPlace>> workPlace = this.<WorkPlace, EnumPath<WorkPlace>>createList("workPlace", WorkPlace.class, EnumPath.class, PathInits.DIRECT2);
 
     public final ListPath<String, StringPath> workTimeSlot = this.<String, StringPath>createList("workTimeSlot", String.class, StringPath.class, PathInits.DIRECT2);
 

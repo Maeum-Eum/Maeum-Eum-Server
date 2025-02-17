@@ -50,7 +50,7 @@ public class QManagerContact extends EntityPathBase<ManagerContact> {
 
     public final EnumPath<ManagerContact.WageType> wageType = createEnum("wageType", ManagerContact.WageType.class);
 
-    public final ListPath<String, StringPath> workRequirement = this.<String, StringPath>createList("workRequirement", String.class, StringPath.class, PathInits.DIRECT2);
+    public final StringPath workRequirement = createString("workRequirement");
 
     public QManagerContact(String variable) {
         this(ManagerContact.class, forVariable(variable), INITS);
