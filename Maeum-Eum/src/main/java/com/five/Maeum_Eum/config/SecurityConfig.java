@@ -74,6 +74,7 @@ public class SecurityConfig {
                 ,"/api/validateID"
                 ,"/api/logout"
                 ,"/api/excel/center"
+                ,"/api/center"
         };
 
         security.csrf(auth -> auth.disable());
