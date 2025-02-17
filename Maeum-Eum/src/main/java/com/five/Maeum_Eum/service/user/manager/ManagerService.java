@@ -1,10 +1,14 @@
 package com.five.Maeum_Eum.service.user.manager;
 
+import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
+import com.five.Maeum_Eum.dto.center.response.CenterDTO;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
+import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
+import com.five.Maeum_Eum.repository.center.CenterRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerBookmarkRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
@@ -23,6 +27,7 @@ public class ManagerService {
     private final ManagerRepository managerRepository;
     private final ManagerContactRepository managerContactRepository;
     private final ManagerBookmarkRepository managerBookmarkRepository;
+    private final CenterRepository centerRepository;
 
     // token으로  사용자 role 알아내기
     private String findRole(String token){
@@ -50,5 +55,46 @@ public class ManagerService {
         int bookmarks = managerBookmarkRepository.countManagerBookmarkByManagerId(manager.getManagerId());
 
         return ManagerBasicDto.from(manager , manager.getCenter() , sentContacts , bookmarks);
+    }
+
+    /* 센터 정보 수정 */
+    public CenterDTO modifyCenterInfo(String token, Long centerId , ModifyCenterReq modifyCenterReq) {
+        if(!findRole(token).equals("ROLE_MANAGER")){ // 사용자가 관리자 역할이 아닐 때
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        String loginId = findLoginId(token);
+
+        Manager manager = managerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if(!manager.getCenter().getCenterId().equals(centerId)){ // 사용자가 소속된 center id와 일치하지 않을 때
+            throw  new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+        Center center = centerRepository.findByCenterId(manager.getCenter().getCenterId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CENTER_NOT_FOUND));
+
+
+        center.updateOneLineIntro(modifyCenterReq);
+        centerRepository.save(center);
+
+        Center modifyCenter = centerRepository.findByCenterId(center.getCenterId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CENTER_NOT_FOUND));
+
+        CenterDTO centerDTO = CenterDTO.builder()
+                .centerId(modifyCenter.getCenterId())
+                .centerName(modifyCenter.getCenterName())
+                .centerCode(modifyCenter.getCenterCode())
+                .zipCode(modifyCenter.getZipCode())
+                .designatedTime(modifyCenter.getDesignatedTime())
+                .installationTime(modifyCenter.getInstallationTime())
+                .detailAddress(modifyCenter.getDetailAddress())
+                .address(modifyCenter.getAddress())
+                .finalGrade(modifyCenter.getFinalGrade())
+                .oneLineIntro(modifyCenter.getOneLineIntro())
+                .build();
+
+        return  centerDTO;
     }
 }
