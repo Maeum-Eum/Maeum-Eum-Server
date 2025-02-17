@@ -3,13 +3,16 @@ package com.five.Maeum_Eum.service.user.manager;
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
+import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
+import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ContactResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
@@ -163,5 +166,39 @@ public class ManagerService {
 
         return contactResDto;
 
+    }
+
+    /* 북마크 하기 */
+    public BookmarkResDto bookmarkCaregiver(String token, BookmarkReqDto dto) {
+        Manager manager = findManager(token);
+
+        Caregiver caregiver = caregiverRepository.findById(dto.getCaregiverId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Elder elder = elderRepository.findById(dto.getElderId())
+                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        ManagerBookmark managerBookmark = BookmarkReqDto.toEntity(manager , elder , caregiver);
+
+        managerBookmarkRepository.save(managerBookmark);
+
+        BookmarkResDto resDto = BookmarkResDto.from(managerBookmark);
+
+        return resDto;
+    }
+
+    /* 북마크 삭제*/
+    public String deleteBookmark(String token, Long bookmarkId) {
+        Manager manager = findManager(token);
+        ManagerBookmark managerBookmark = managerBookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
+
+        if(!manager.getManagerId().equals(managerBookmark.getManager().getManagerId())){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        managerBookmarkRepository.delete(managerBookmark);
+
+        return "관리자의 북마크가 삭제되었습니다.";
     }
 }

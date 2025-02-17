@@ -12,7 +12,7 @@ public record ContactResDto(
         String phoneNumber,
         String messageFromManager
 ){
-    /* 연락할 때 따로 폰 번호를 등록한 상태*/
+
     public static ContactResDto from(ManagerContact managerContact){
         return new ContactResDto(
                 managerContact.getContactId(),
