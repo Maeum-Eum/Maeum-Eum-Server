@@ -48,6 +48,8 @@ public class QElder extends EntityPathBase<Elder> {
 
     public final ListPath<String, StringPath> mobility = this.<String, StringPath>createList("mobility", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final BooleanPath negotiable = createBoolean("negotiable");
+
     public final ListPath<String, StringPath> toileting = this.<String, StringPath>createList("toileting", String.class, StringPath.class, PathInits.DIRECT2);
 
     public QElder(String variable) {
