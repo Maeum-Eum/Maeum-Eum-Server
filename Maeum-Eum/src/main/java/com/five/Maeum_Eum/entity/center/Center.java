@@ -66,7 +66,7 @@ public class Center {
         this.hasCar = hasCar;
     }
 
-    public void updateOneLineIntro(ModifyCenterReq modifyReq){
-        this.oneLineIntro = modifyReq.getOneLineIntro();
+    public void updateOneLineIntro(String modifyIntro){
+        this.oneLineIntro = modifyIntro;
     }
 }

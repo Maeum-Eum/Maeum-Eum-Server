@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.service.user.manager;
 
+import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
@@ -76,7 +77,7 @@ public class ManagerService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CENTER_NOT_FOUND));
 
 
-        center.updateOneLineIntro(modifyCenterReq);
+        center.updateOneLineIntro(modifyCenterReq.getOneLineIntro());
         centerRepository.save(center);
 
         Center modifyCenter = centerRepository.findByCenterId(center.getCenterId())
@@ -96,5 +97,43 @@ public class ManagerService {
                 .build();
 
         return  centerDTO;
+    }
+
+    /* 관라지가 소속된 센터 변경 */
+    public ManagerBasicDto changeCenter(String token, ChangeCenterReq centerReq) {
+        if(!findRole(token).equals("ROLE_MANAGER")){ // 사용자가 관리자 역할이 아닐 때
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        String loginId = findLoginId(token);
+
+        Manager manager = managerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Center center = centerRepository.findByCenterId(centerReq.getCenterId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CENTER_NOT_FOUND));
+
+        manager.changeCenter(center);
+        managerRepository.save(manager);
+
+        if(centerReq.getHasCar()!= null && centerReq.getHasCar().isPresent()){
+            center.registerManager(centerReq.getHasCar().get());
+            centerRepository.save(center);
+        }
+
+        if(centerReq.getOneLineIntro() != null && centerReq.getOneLineIntro().isPresent()){
+            center.updateOneLineIntro(centerReq.getOneLineIntro().get());
+            centerRepository.save(center);
+        }
+
+        // 요양보호사에게 보낸 연락 개수
+        int sentContacts = managerContactRepository.countManagerContactByManagerId(manager.getManagerId());
+
+        // 요양보호사 북마크 개수
+        int bookmarks = managerBookmarkRepository.countManagerBookmarkByManagerId(manager.getManagerId());
+
+        ManagerBasicDto managerBasicDto = ManagerBasicDto.from(manager , center , sentContacts , bookmarks);
+
+        return managerBasicDto;
     }
 }

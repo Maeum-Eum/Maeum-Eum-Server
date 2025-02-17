@@ -9,6 +9,10 @@ public record ManagerBasicDto(
         String name,
         String phoneNumber,
         Long centerId,
+        String centerName,
+
+        boolean hasCar,
+        String oneLineIntro,
         int sentContacts, // 관리자가 연락한 요양보호사 수
         int bookmarks // 관리자가 한 요양보호사 북마크 개수
 ) {
@@ -18,6 +22,9 @@ public record ManagerBasicDto(
                 manager.getName(),
                 manager.getPhoneNumber(),
                 center.getCenterId(),
+                center.getCenterName(),
+                center.isHasCar(),
+                center.getOneLineIntro(),
                 sentContacts,
                 bookmarks
         );
@@ -29,6 +36,9 @@ public record ManagerBasicDto(
                 manager.getName(),
                 manager.getPhoneNumber(),
                 center.getCenterId(),
+                center.getCenterName(),
+                center.isHasCar(),
+                center.getOneLineIntro(),
                 0,
                 0
         );

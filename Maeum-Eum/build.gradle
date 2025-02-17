@@ -44,6 +44,8 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation 'org.apache.poi:poi-ooxml:5.2.2'
+	/* json nullable */
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.1'
 }
 
 tasks.named('test') {
