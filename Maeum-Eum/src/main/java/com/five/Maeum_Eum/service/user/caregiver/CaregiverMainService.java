@@ -102,7 +102,7 @@ public class CaregiverMainService {
                 .contactId(contact.getContactId())
                 .center(centerDTO)
                 .message(contact.getMessage())
-                .title(getTitle(contact.getElder()))
+                .title(getTitle(contact.getElder(), contact.getWorkRequirement()))
                 .createdAt(contact.getCreatedAt())
                 .wage(contact.getWage())
                 .negotiable(contact.isNegotiable())
@@ -111,7 +111,7 @@ public class CaregiverMainService {
 
     }
 
-    private String getTitle(Elder elder) {
+    private String getTitle(Elder elder, String requirement) {
         String title = null;
 
         // 제목 만들기
@@ -119,11 +119,13 @@ public class CaregiverMainService {
             title = "[평일";
 
             if (serviceSlotRepository.existsByElderAndServiceSlotDayIn(elder, List.of(5,6))) {
-                title = title + "/주말] - ";
+                title = title + "/주말] ";
             }
-            else title = title + "] - ";
+            else title = title + "] ";
         }
-        else title = "[주말] - ";
+        else title = "[주말] ";
+
+        title = title + requirement + " - ";
 
         title = title + elder.getElderRank() + "등급 ";
         title = title + ( elder.getGender().equals("male") ? "남자" : "여자" ) + " 어르신";
@@ -138,7 +140,7 @@ public class CaregiverMainService {
                 .createdAt(contact.getCreatedAt())
                 .wage(contact.getWage())
                 .negotiable(contact.isNegotiable())
-                .title(getTitle(elder))
+                .title(getTitle(elder, contact.getWorkRequirement()))
                 .build();
     }
 }

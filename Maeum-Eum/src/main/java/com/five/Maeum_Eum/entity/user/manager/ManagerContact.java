@@ -33,8 +33,7 @@ public class ManagerContact extends BaseTimeEntity {
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    @Convert(converter = GenericListConverter.class)
-    private List<String> workRequirement;
+    private String workRequirement;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -58,7 +57,7 @@ public class ManagerContact extends BaseTimeEntity {
     private boolean negotiable;
 
     @Builder
-    public ManagerContact(ApprovalStatus approvalStatus , int wage , String message , List<String> workRequirement , WageType wageType , String phoneNumber){
+    public ManagerContact(ApprovalStatus approvalStatus , int wage , String message , String workRequirement , WageType wageType , String phoneNumber){
         this.approvalStatus = approvalStatus;
         this.wage = wage;
         this.message = message;
