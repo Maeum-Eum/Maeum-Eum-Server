@@ -37,6 +37,8 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final ListPath<Integer, NumberPath<Integer>> elderRank = this.<Integer, NumberPath<Integer>>createList("elderRank", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
+    public final NumberPath<Integer> elderRankLevel = createNumber("elderRankLevel", Integer.class);
+
     public final BooleanPath familyPreferred = createBoolean("familyPreferred");
 
     public final EnumPath<Resume.DemantiaTraining> hasDementiaTraining = createEnum("hasDementiaTraining", Resume.DemantiaTraining.class);

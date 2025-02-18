@@ -76,6 +76,10 @@ public class Caregiver {
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
+    public void setLocation(Point location) {
+        this.location = location;
+    }
+
     // 매칭 상태
     public enum JobState {
         IDLE, MATCHING, MATCHED
