@@ -50,17 +50,10 @@ public class CaregiverMatchingTest {
         for (int i = 1; i <= 1000; i++) {
 
             // 시간대 - 요일
-            List<String> workDay = new ArrayList<>();
-            for (int j = 0 ; j <= 6; j++){
-
-                boolean randbool = random.nextBoolean();
-                if(randbool){
-                    workDay.add(DayOfWeek.values()[j].name());
-                }
-            }
+            List<Integer> workDay = Arrays.asList(0,1,2);
 
             // 시간대 - 시간대
-            List<String> workTimeSlot = Arrays.asList("MORNING","AFTERNOON","EVENING");
+            List<Integer> workTimeSlot = Arrays.asList(0,1,2);
 
             Caregiver caregiver = Caregiver.builder()
                     .name("[요양사]" + i)
@@ -202,11 +195,12 @@ public class CaregiverMatchingTest {
                     + "[위치] " + c.getLocation());
 
             System.out.print("[가능 요일] ");
-            for (String s : c.getResume().getWorkDay()) System.out.print(s + " ");
+            for (int s : c.getResume().getWorkDay()) System.out.print(s + " ");
             System.out.println();
             System.out.println("[가능 시간대] ");
-            for (String s : c.getResume().getWorkTimeSlot()) System.out.print(s + " ");
+            for (int s : c.getResume().getWorkTimeSlot()) System.out.print(s + " ");
             System.out.println();
         }
+
     }
 }

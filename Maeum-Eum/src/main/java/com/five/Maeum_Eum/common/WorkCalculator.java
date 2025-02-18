@@ -1,4 +1,5 @@
 package com.five.Maeum_Eum.common;
+
 import java.util.List;
 
 public class WorkCalculator {
@@ -17,14 +18,14 @@ public class WorkCalculator {
         return (int)(4.35 * weeklySalary);
     }
 
-    public static int getWorkDayTime(List<String> workTimeSlot){
+    public static int getWorkDayTime(List<Integer> workTimeSlot){
 
         int hours = 0;
 
-        for (String workTime : workTimeSlot) {
+        for (int workTime : workTimeSlot) {
             switch (workTime) {
-                case "MORNING", "EVENING" -> hours += 3;
-                case "AFTERNOON" -> hours += 6;
+                case 0,2 -> hours += 3;
+                case 1 -> hours += 6;
             }
         }
 
