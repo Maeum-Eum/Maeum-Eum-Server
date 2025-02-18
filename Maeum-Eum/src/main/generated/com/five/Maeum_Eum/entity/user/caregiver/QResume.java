@@ -76,11 +76,11 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final NumberPath<Integer> wage = createNumber("wage", Integer.class);
 
-    public final ListPath<String, StringPath> workDay = this.<String, StringPath>createList("workDay", String.class, StringPath.class, PathInits.DIRECT2);
+    public final ListPath<Integer, NumberPath<Integer>> workDay = this.<Integer, NumberPath<Integer>>createList("workDay", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final ListPath<WorkPlace, EnumPath<WorkPlace>> workPlace = this.<WorkPlace, EnumPath<WorkPlace>>createList("workPlace", WorkPlace.class, EnumPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> workTimeSlot = this.<String, StringPath>createList("workTimeSlot", String.class, StringPath.class, PathInits.DIRECT2);
+    public final ListPath<Integer, NumberPath<Integer>> workTimeSlot = this.<Integer, NumberPath<Integer>>createList("workTimeSlot", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public QResume(String variable) {
         this(Resume.class, forVariable(variable), INITS);

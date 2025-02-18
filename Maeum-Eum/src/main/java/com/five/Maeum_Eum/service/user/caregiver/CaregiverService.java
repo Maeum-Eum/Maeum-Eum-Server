@@ -9,6 +9,7 @@ import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
+import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
@@ -30,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -193,7 +193,13 @@ public class CaregiverService {
 
     /* 이력서 제목 만들기 */
     public String makeTitle(Resume resume){
-        List<String> workDay = resume.getWorkDay();
+        List<String> workDay = new ArrayList<>();
+
+        List<Integer> workDayDto = resume.getWorkDay();
+        for (int idx : workDayDto) {
+            workDay.add(DayOfWeek.values()[idx].toString());
+        }
+
         String middleWorkDay = workDay.stream()
                 .collect(Collectors.joining("/"));
 
