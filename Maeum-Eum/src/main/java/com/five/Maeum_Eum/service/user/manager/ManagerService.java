@@ -3,6 +3,7 @@ package com.five.Maeum_Eum.service.user.manager;
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
@@ -11,7 +12,9 @@ import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ContactResDto;
 import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.entity.center.Center;
+import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
+import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
@@ -20,6 +23,7 @@ import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
+import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
 import com.five.Maeum_Eum.repository.elder.ElderRepository;
@@ -51,6 +55,7 @@ public class ManagerService {
     private final CaregiverRepository caregiverRepository;
     private final ElderRepository elderRepository;
     private final CaregiverService caregiverService;
+    private final ApplyRepository applyRepository;
 
     // token으로  사용자 role 알아내기
     private String findRole(String token){
@@ -224,9 +229,26 @@ public class ManagerService {
 
             List<ContactCaregiverDto> contactCaregiverDtos = managerContacts.stream()
                     .map(managerContact -> {
+                        // 제목 생성
                         String title = caregiverService.makeTitle(managerContact.getCaregiver().getResume());
+                        // 요양보호사 가능업무 랜덤 3개
+                        List<String> combinedList = new ArrayList<>();
+                        Resume resume = managerContact.getCaregiver().getResume();
 
-                        return ContactCaregiverDto.from(managerContact, title);
+                        if (resume != null) {
+                            combinedList.addAll(resume.getToileting() != null ? resume.getToileting() : Collections.emptyList());
+                            combinedList.addAll(resume.getMeal() != null ? resume.getMeal() : Collections.emptyList());
+                            combinedList.addAll(resume.getDaily() != null ? resume.getDaily() : Collections.emptyList());
+                            combinedList.addAll(resume.getMobility() != null ? resume.getMobility() : Collections.emptyList());
+                        }
+
+                        Collections.shuffle(combinedList);
+
+
+                        List<String> randomThree = combinedList.size() > 3 ? combinedList.subList(0, 3) : new ArrayList<>(combinedList);
+
+
+                        return ContactCaregiverDto.from(managerContact, title , randomThree);
                     })
                     .collect(Collectors.toList());
 
@@ -260,7 +282,7 @@ public class ManagerService {
         List<ManagerBookmark> managerBookmarks = managerBookmarkRepository.findByManagerIdAndElderId(manager.getManagerId() , elder.getElderId());
 
         List<BookmarkCaregiverDto> bookmarkCaregiverDtoList = managerBookmarks.stream()
-                .map(managerBookmark -> { // 올바른 람다식 사용
+                .map(managerBookmark -> {
                     List<String> combinedList = new ArrayList<>();
                     combinedList.addAll(managerBookmark.getCaregiver().getResume().getToileting() != null
                             ? managerBookmark.getCaregiver().getResume().getToileting()
@@ -289,5 +311,77 @@ public class ManagerService {
 
         return bookmarkCaregiverDtoList;
 
+    }
+
+    /* 지원한 요양보호사 목록 조회 */
+    public List<ApplyCaregiverDto> getApplyList(String token, String name, ApprovalStatus approvalStatus) {
+
+        Manager manager = findManager(token);
+
+        Elder elder = elderRepository.findByElderName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
+
+        List<Apply> applyList = applyRepository.findAllByElderAndApprovalStatus(elder.getElderId(), approvalStatus);
+
+        // 지원 목록 중에 해당 노인 요구사항보다 같거나 높은 거 다 노출 , 제목 생성
+
+        List<ApplyCaregiverDto> applyCaregiverDtoList = applyList.stream()
+                .map(apply -> {
+                    // 제목 생성
+                    Caregiver caregiver = applyRepository.findCaregiverByApplyId(apply.getApplyId())
+                    String title = makeTitle(caregiver);
+                    // 요양보호사 가능업무 랜덤 3개
+                    List<String> combinedList = new ArrayList<>();
+                    Resume resume = managerContact.getCaregiver().getResume();
+
+                    if (resume != null) {
+                        combinedList.addAll(resume.getToileting() != null ? resume.getToileting() : Collections.emptyList());
+                        combinedList.addAll(resume.getMeal() != null ? resume.getMeal() : Collections.emptyList());
+                        combinedList.addAll(resume.getDaily() != null ? resume.getDaily() : Collections.emptyList());
+                        combinedList.addAll(resume.getMobility() != null ? resume.getMobility() : Collections.emptyList());
+                    }
+
+                    Collections.shuffle(combinedList);
+
+
+                    List<String> satisfyTasks = combinedList.size() > 3 ? combinedList.subList(0, 3) : new ArrayList<>(combinedList);
+
+
+                    return ApplyCaregiverDto.from(apply , manager , caregiver, title , satisfyTasks);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    /* 지원 목록용 제목*/
+    // 제목 예시 : [월/수/금] 오전 - 식사 배변 이동 일상
+    private String makeTitle(Caregiver caregiver){
+        String title;
+        List<String> workDays = caregiver.getResume().getWorkDay();
+        String workDay = workDays.stream()
+                .collect(Collectors.joining("/"));
+
+        List<String> workTimeSlots = caregiver.getWorkTimeSlot();
+        List<String> translatedTimeSlots = new ArrayList<>();
+
+        for (String slot : workTimeSlots) {
+            switch (slot) {
+                case "MORNING":
+                    translatedTimeSlots.add("오전");
+                    break;
+                case "AFTERNOON":
+                    translatedTimeSlots.add("오후");
+                    break;
+                case "EVENING":
+                    translatedTimeSlots.add("저녁");
+                    break;
+                default:
+                    translatedTimeSlots.add("미정"); // 예외 처리
+            }
+        }
+
+
+        String timeSlotString = String.join(", ", translatedTimeSlots);
+        return title;
     }
 }

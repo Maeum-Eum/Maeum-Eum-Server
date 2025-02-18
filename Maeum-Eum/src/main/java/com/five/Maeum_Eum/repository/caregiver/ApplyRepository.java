@@ -8,9 +8,19 @@ import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface ApplyRepository extends JpaRepository<Apply,Long> {
     Page<Apply> findAllByCaregiverAndApprovalStatus(Pageable pageable, Caregiver caregiver
             , ApprovalStatus approvalStatus);
     boolean existsByCaregiverAndElder(Caregiver caregiver, Elder elder);
+
+    @Query("select a from Apply a where a.elder.elderId =:elderId  and a.approvalStatus =:status")
+    List<Apply> findAllByElderAndApprovalStatus( @Param("elderId")Long elderId , @Param("status")ApprovalStatus approvalStatus);
+
+    @Query("select a.caregiver from Apply a where a.applyId =:applyId")
+    Caregiver findCaregiverByApplyId(@Param("applyId") Long applyId);
 }
