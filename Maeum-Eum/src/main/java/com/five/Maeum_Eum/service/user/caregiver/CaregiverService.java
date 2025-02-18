@@ -1,18 +1,28 @@
 package com.five.Maeum_Eum.service.user.caregiver;
 
+import com.five.Maeum_Eum.common.PageResponse;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
+import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
+import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
+import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.ResumeRepository;
+import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.service.aws.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -31,6 +42,9 @@ public class CaregiverService {
     private final ResumeRepository resumeRepository;
     private final S3Uploader s3Uploader;
     private final JWTUtil jwtUtil;
+    private final ManagerContactRepository managerContactRepository;
+    private final CaregiverMainService caregiverMainService;
+    private final ApplyRepository applyRepository;
 
 
     public Caregiver findCaregiverByLoginId(String loginId) {
@@ -130,6 +144,52 @@ public class CaregiverService {
 
     }
 
+    public PageResponse<SimpleContactDTO> getContacts(Pageable pageable, ApprovalStatus approvalStatus) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Page<ManagerContact> page = managerContactRepository.findAllByCaregiverAndApprovalStatus(pageable,caregiver,approvalStatus);
+
+        List<ManagerContact> managerContacts = page.getContent();
+        List<SimpleContactDTO> contents = managerContacts.stream()
+                .map(caregiverMainService::toDTO)
+                .toList();
+
+        return PageResponse.<SimpleContactDTO>builder()
+                .first(page.isFirst())
+                .last(page.isLast())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(contents)
+                .build();
+
+    }
+
+    public PageResponse<SimpleContactDTO> getApplies(Pageable pageable, ApprovalStatus approvalStatus) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Page<Apply> page = applyRepository.findAllByCaregiverAndApprovalStatus(pageable,caregiver,approvalStatus);
+        List<Apply> applies = page.getContent();
+
+        List<SimpleContactDTO> contents = applies.stream()
+                .map(caregiverMainService::toDTO)
+                .toList();
+
+        return PageResponse.<SimpleContactDTO>builder()
+                .first(page.isFirst())
+                .last(page.isLast())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(contents)
+                .build();
+    }
 
     /* 이력서 제목 만들기 */
     public String makeTitle(Resume resume){

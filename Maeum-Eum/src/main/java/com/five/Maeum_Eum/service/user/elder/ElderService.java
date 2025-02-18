@@ -6,6 +6,7 @@ import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.ElderFamily;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
+import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.elder.ElderRepository;
@@ -37,7 +38,8 @@ public class ElderService {
         }
 
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!managerRepository.existsByLoginId(managerId)) { throw new CustomException(ErrorCode.USER_NOT_FOUND);}
+        Manager manager = managerRepository.findByLoginId(managerId).orElse(null);
+        if (manager == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);}
 
 
         // 입력 검증
@@ -66,6 +68,7 @@ public class ElderService {
                 .elderAddress(dto.getAddress())
                 .elderRank(dto.getRank())
                 .negotiable(dto.getNegotiable())
+                .manager(manager)
                 .meal(dto.getMeal())
                 .mobility(dto.getMobility())
                 .toileting(dto.getToileting())

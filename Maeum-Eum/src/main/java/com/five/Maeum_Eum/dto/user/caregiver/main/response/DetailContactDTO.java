@@ -21,6 +21,7 @@ public class DetailContactDTO {
     private LocalDateTime createdAt;
     private Integer wage;
     private Boolean negotiable;
+    private Boolean bookmarked;
     private ElderInfoDTO elder;
 }
 

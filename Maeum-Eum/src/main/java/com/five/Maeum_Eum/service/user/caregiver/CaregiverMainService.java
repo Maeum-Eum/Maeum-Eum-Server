@@ -7,6 +7,7 @@ import com.five.Maeum_Eum.dto.user.caregiver.main.response.DetailContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
 import com.five.Maeum_Eum.entity.center.Center;
+import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
@@ -116,6 +117,7 @@ public class CaregiverMainService {
                 .createdAt(contact.getCreatedAt())
                 .wage(contact.getWage())
                 .negotiable(contact.isNegotiable())
+                .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
                 .elder(elderInfoDTO)
                 .build();
 
@@ -217,7 +219,7 @@ public class CaregiverMainService {
         return title;
     }
 
-    private SimpleContactDTO toDTO(ManagerContact contact) { // list에 넣을 dto로 변환
+    public SimpleContactDTO toDTO(ManagerContact contact) { // list에 넣을 dto로 변환
         Elder elder = contact.getElder();
         Caregiver caregiver = contact.getCaregiver();
 
@@ -228,6 +230,18 @@ public class CaregiverMainService {
                 .negotiable(contact.isNegotiable())
                 .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
                 .title(getTitle(elder, contact.getWorkRequirement()))
+                .build();
+    }
+
+    public SimpleContactDTO toDTO(Apply apply) { // list에 넣을 dto로 변환
+        Elder elder = apply.getElder();
+
+        return SimpleContactDTO.builder().applyId(apply.getApplyId())
+                .center(elder.getManager().getCenter().getCenterName())
+                .createdAt(apply.getCreatedAt())
+                .wage(elder.getWage())
+                .negotiable(elder.isNegotiable())
+                .title(getTitle(elder, apply.getWorkRequirement()))
                 .build();
     }
 }

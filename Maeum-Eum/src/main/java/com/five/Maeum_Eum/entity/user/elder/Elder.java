@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
@@ -48,6 +49,9 @@ public class Elder {
     @Enumerated(EnumType.STRING)
     private ElderFamily elder_family;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "manager_id")
+    private Manager manager;
 
     @Column
     private boolean negotiable;
@@ -71,6 +75,9 @@ public class Elder {
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = GenericListConverter.class)
     private List<String> daily;
+
+    @Column(nullable = false)
+    private int wage; // 시급만
 
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContacts = new ArrayList<>();
