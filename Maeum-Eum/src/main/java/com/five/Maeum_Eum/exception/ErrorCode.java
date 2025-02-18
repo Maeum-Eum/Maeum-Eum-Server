@@ -13,8 +13,6 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"이미 존재하는 회원입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다."),
 
-
-
     //Manager
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "관리자가 아닌 사용자입니다."),
     CONTACT_NOT_FOUND(HttpStatus.NOT_FOUND, "매칭 요청이 존재하지 않습니다"),

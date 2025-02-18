@@ -93,5 +93,14 @@ public class ManagerController {
     }
 
 
+    /* 요양보호사에게 보낸 연락 취소하기 */
+    @DeleteMapping("contact/{contactId}")
+    public ResponseEntity<String> deleteContact(@RequestHeader("Authorization") String authHeader , @PathVariable("contactId")Long contactId){
+        String token = extractToken(authHeader);
+        String response = managerService.deleteContact(token , contactId);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

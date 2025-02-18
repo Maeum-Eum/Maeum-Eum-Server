@@ -227,4 +227,20 @@ public class ManagerService {
             return caregiverDtos;
 
     }
+
+    /* 요양보호사에게 보낸 연락 취소 */
+    public String deleteContact(String token, Long contactId) {
+        Manager manager = findManager(token);
+
+        ManagerContact managerContact = managerContactRepository.findById(contactId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
+
+        if(!manager.getManagerId().equals(managerContact.getManager().getManagerId())){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        managerContactRepository.delete(managerContact);
+
+        return "연락이 취소되었습니다.";
+    }
 }
