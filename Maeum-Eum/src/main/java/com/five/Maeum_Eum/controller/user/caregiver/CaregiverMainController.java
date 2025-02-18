@@ -40,7 +40,13 @@ public class CaregiverMainController {
 
     @PostMapping("/reject")
     public ResponseEntity<Object> reject(@RequestParam Long contactId) {
-        caregiverMainService.pending(contactId);
+        caregiverMainService.reject(contactId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/bookmark")
+    public ResponseEntity<Object> bookmarkContact(@RequestParam Long contactId) {
+        caregiverMainService.contactBookmark(contactId);
         return ResponseEntity.ok().build();
     }
 }

@@ -33,7 +33,11 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final ListPath<String, StringPath> daily = this.<String, StringPath>createList("daily", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final NumberPath<Integer> dailyLevel = createNumber("dailyLevel", Integer.class);
+
     public final ListPath<Integer, NumberPath<Integer>> elderRank = this.<Integer, NumberPath<Integer>>createList("elderRank", Integer.class, NumberPath.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> elderRankLevel = createNumber("elderRankLevel", Integer.class);
 
     public final BooleanPath familyPreferred = createBoolean("familyPreferred");
 
@@ -47,7 +51,11 @@ public class QResume extends EntityPathBase<Resume> {
 
     public final ListPath<String, StringPath> meal = this.<String, StringPath>createList("meal", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final NumberPath<Integer> mealLevel = createNumber("mealLevel", Integer.class);
+
     public final ListPath<String, StringPath> mobility = this.<String, StringPath>createList("mobility", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> mobilityLevel = createNumber("mobilityLevel", Integer.class);
 
     public final BooleanPath negotiableTime = createBoolean("negotiableTime");
 
@@ -60,6 +68,8 @@ public class QResume extends EntityPathBase<Resume> {
     public final NumberPath<Long> resumeId = createNumber("resumeId", Long.class);
 
     public final ListPath<String, StringPath> toileting = this.<String, StringPath>createList("toileting", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> toiletingLevel = createNumber("toiletingLevel", Integer.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.entity.user.elder;
 
 import com.five.Maeum_Eum.converter.GenericListConverter;
+import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import jakarta.persistence.*;
@@ -48,9 +49,18 @@ public class Elder {
     @Enumerated(EnumType.STRING)
     private ElderFamily elder_family;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "manager_id")
+    private Manager manager;
 
     @Column
     private boolean negotiable;
+
+    // 서비스 요구 수준
+    private int mealLevel;
+    private int toiletingLevel;
+    private int mobilityLevel;
+    private int dailyLevel;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -72,11 +82,20 @@ public class Elder {
     @Convert(converter = GenericListConverter.class)
     private List<String> daily;
 
+    @Column(nullable = false)
+    private int wage; // 시급만
+
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerContact> managerContacts = new ArrayList<>();
 
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceSlot> serviceSlots = new ArrayList<>();
+
+    public void setServiceSlots(List<ServiceSlot> serviceSlots) {
+        this.serviceSlots = serviceSlots;
+    }
 
 }
