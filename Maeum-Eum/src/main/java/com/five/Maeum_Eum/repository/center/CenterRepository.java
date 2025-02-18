@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CenterRepository extends JpaRepository<Center, Long> {
-    Optional<Center> findByAddress(String Address);
+    Optional<Center> findByDetailAddress(String detailAddress);
     Optional<Center> findByCenterName(String centerName);
 
     @Query("select c from Center c where c.centerId =:centerId")
