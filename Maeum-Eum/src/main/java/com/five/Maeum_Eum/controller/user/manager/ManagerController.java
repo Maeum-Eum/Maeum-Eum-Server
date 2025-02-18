@@ -1,7 +1,8 @@
 package com.five.Maeum_Eum.controller.user.manager;
 
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.CaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
@@ -85,11 +86,11 @@ public class ManagerController {
 
 
     /* 연락 보낸 대기 목록 */
-    @GetMapping("contact")
+    @GetMapping("/contact")
     public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name) {
         String token = extractToken(authHeader);
-        List<CaregiverDto> caregiverDtoList = managerService.getContactList(token , name , ApprovalStatus.PENDING);
-        return ResponseEntity.ok(caregiverDtoList);
+        List<ContactCaregiverDto> contactCaregiverDtoList = managerService.getContactList(token , name , ApprovalStatus.PENDING);
+        return ResponseEntity.ok(contactCaregiverDtoList);
     }
 
 
@@ -101,6 +102,14 @@ public class ManagerController {
         return ResponseEntity.ok(response);
     }
 
+
+    /* 북마크한 요양보호사 목록 */
+    @GetMapping("/bookmark")
+    public ResponseEntity<?> getBookmark(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name){
+        String token = extractToken(authHeader);
+        List<BookmarkCaregiverDto> bookmarkCaregiverDtoList = managerService.getBookmarkList(token , name);
+        return ResponseEntity.ok(bookmarkCaregiverDtoList);
+    }
 
 
 }

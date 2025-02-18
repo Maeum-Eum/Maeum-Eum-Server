@@ -3,7 +3,8 @@ package com.five.Maeum_Eum.service.user.manager;
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.CaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -210,21 +213,24 @@ public class ManagerService {
     }
 
     /* 요양보호사에게 연락한 목록 중 아직 대기 상태인 거 */
-    public List<CaregiverDto> getContactList(String token, String name, ApprovalStatus approvalStatus) {
+    public List<ContactCaregiverDto> getContactList(String token, String name, ApprovalStatus approvalStatus) {
 
         Manager manager = findManager(token);
 
-            List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatus(ApprovalStatus.PENDING);
+        Elder elder = elderRepository.findByElderName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
 
-            List<CaregiverDto> caregiverDtos = managerContacts.stream()
+        List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatusAndManagerIdAndElderId(manager.getManagerId(),elder.getElderId() ,ApprovalStatus.PENDING);
+
+            List<ContactCaregiverDto> contactCaregiverDtos = managerContacts.stream()
                     .map(managerContact -> {
                         String title = caregiverService.makeTitle(managerContact.getCaregiver().getResume());
 
-                        return CaregiverDto.from(managerContact, title);
+                        return ContactCaregiverDto.from(managerContact, title);
                     })
                     .collect(Collectors.toList());
 
-            return caregiverDtos;
+            return contactCaregiverDtos;
 
     }
 
@@ -242,5 +248,46 @@ public class ManagerService {
         managerContactRepository.delete(managerContact);
 
         return "연락이 취소되었습니다.";
+    }
+
+    /* 북마크 리스트 가져오기 */
+    public List<BookmarkCaregiverDto> getBookmarkList(String token, String name) {
+        Manager manager = findManager(token);
+
+        Elder elder = elderRepository.findByElderName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
+
+        List<ManagerBookmark> managerBookmarks = managerBookmarkRepository.findByManagerIdAndElderId(manager.getManagerId() , elder.getElderId());
+
+        List<BookmarkCaregiverDto> bookmarkCaregiverDtoList = managerBookmarks.stream()
+                .map(managerBookmark -> { // 올바른 람다식 사용
+                    List<String> combinedList = new ArrayList<>();
+                    combinedList.addAll(managerBookmark.getCaregiver().getResume().getToileting() != null
+                            ? managerBookmark.getCaregiver().getResume().getToileting()
+                            : Collections.emptyList());
+
+                    combinedList.addAll(managerBookmark.getCaregiver().getResume().getMeal() != null
+                            ? managerBookmark.getCaregiver().getResume().getMeal()
+                            : Collections.emptyList());
+
+                    combinedList.addAll(managerBookmark.getCaregiver().getResume().getDaily() != null
+                            ? managerBookmark.getCaregiver().getResume().getDaily()
+                            : Collections.emptyList());
+
+                    combinedList.addAll(managerBookmark.getCaregiver().getResume().getMobility() != null
+                            ? managerBookmark.getCaregiver().getResume().getMobility()
+                            : Collections.emptyList());
+
+                    Collections.shuffle(combinedList); // 랜덤하게 섞기
+
+                    // 3개 뽑기
+                    List<String> randomThree = combinedList.size() > 3 ? combinedList.subList(0, 3) : new ArrayList<>(combinedList);
+
+                    return BookmarkCaregiverDto.from(managerBookmark, randomThree);
+                })
+                .collect(Collectors.toList());
+
+        return bookmarkCaregiverDtoList;
+
     }
 }

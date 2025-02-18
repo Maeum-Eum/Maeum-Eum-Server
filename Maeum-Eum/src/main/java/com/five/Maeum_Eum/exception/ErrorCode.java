@@ -20,6 +20,9 @@ public enum ErrorCode {
     // Manager Bookmark
     BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND , "해당하는 북마크를 찾을 수 없습니다."),
 
+    //elder
+    ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 어르신을 찾을 수 없습니다."),
+
 
     CENTER_NOT_FOUND(HttpStatus.NOT_FOUND, "센터가 존재하지 않습니다."),
     INVALID_ROLE(HttpStatus.UNAUTHORIZED, "해당 경로에 대한 권한이 없습니다."),
