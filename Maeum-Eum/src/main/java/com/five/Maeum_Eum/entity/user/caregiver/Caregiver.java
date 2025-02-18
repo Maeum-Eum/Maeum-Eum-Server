@@ -3,7 +3,6 @@ package com.five.Maeum_Eum.entity.user.caregiver;
 import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
-import com.five.Maeum_Eum.entity.CaregiverTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,14 +79,14 @@ public class Caregiver {
         this.location = location;
     }
 
+    public void setResume(Resume resume) {
+        this.resume = resume;
+    }
+
     // 매칭 상태
     public enum JobState {
         IDLE, MATCHING, MATCHED
     }
-
-    // 근무 시간 정보 테이블
-    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CaregiverTime> workTimeSlot;
 
     @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkExperience> experience;
@@ -97,9 +96,4 @@ public class Caregiver {
     }
 
     public void setResumeRegistered(boolean resumeRegistered) { this.isResumeRegistered = resumeRegistered; }
-
-    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CaregiverTime> caregiverTime;
-
-    public void setResume(Resume resume) { this.resume = resume; }
 }

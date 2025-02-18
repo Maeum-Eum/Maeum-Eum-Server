@@ -8,6 +8,7 @@ import com.five.Maeum_Eum.entity.user.elder.ElderFamily;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+
 @SpringBootTest
 @Transactional
+@Slf4j
 public class CaregiverMatchingTest {
     @Autowired
     private EntityManager em;
@@ -45,6 +48,19 @@ public class CaregiverMatchingTest {
         double maxLongitude = 127.2693;
 
         for (int i = 1; i <= 1000; i++) {
+
+            // 시간대 - 요일
+            List<String> workDay = new ArrayList<>();
+            for (int j = 0 ; j <= 6; j++){
+
+                boolean randbool = random.nextBoolean();
+                if(randbool){
+                    workDay.add(DayOfWeek.values()[j].name());
+                }
+            }
+
+            // 시간대 - 시간대
+            List<String> workTimeSlot = Arrays.asList("MORNING","AFTERNOON","EVENING");
 
             Caregiver caregiver = Caregiver.builder()
                     .name("[요양사]" + i)
@@ -85,6 +101,9 @@ public class CaregiverMatchingTest {
 
             System.out.println("위치" + caregiver.getLocation());
 
+            int randtime = random.nextInt(22);
+            em.persist(caregiver);
+
             // 이력서
             Resume resume = Resume.builder()
                     .preferredGender(gender)
@@ -96,10 +115,11 @@ public class CaregiverMatchingTest {
                     .dailyLevel(random.nextInt(6)+1)
                     .elderRankLevel(Collections.max(ranks))
                     .wage((random.nextInt(7000)+13000))
+                    .workDay(workDay)
+                    .workTimeSlot(workTimeSlot)
                     .build();
 
             caregiver.setResume(resume);
-            em.persist(caregiver);
             em.persist(resume);
             em.flush();
         }
@@ -133,7 +153,6 @@ public class CaregiverMatchingTest {
                 .elderRank(3)
                 .build();
 
-
         em.persist(elder);
         em.flush();
 
@@ -141,7 +160,7 @@ public class CaregiverMatchingTest {
         List<ServiceSlot> serviceSlots = new ArrayList<>();
         ServiceSlot serviceSlot = ServiceSlot.builder()
                 .elder(elder)
-                .serviceSlotDay(DayOfWeek.FRI)
+                .serviceSlotDay(DayOfWeek.MON)
                 .serviceSlotStart(LocalTime.of(14,0))
                 .serviceSlotEnd(LocalTime.of(15,40))
                 .build();
@@ -151,7 +170,7 @@ public class CaregiverMatchingTest {
         em.flush();
 
         // 쿼리 조회 - 어르신에 맞는 10명 가져옴, 반경 5KM 이내
-        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 10, 5);
+        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 100, 5);
 
         Assertions.assertNotNull(caregivers);
         Assertions.assertFalse(caregivers.isEmpty());
@@ -166,6 +185,10 @@ public class CaregiverMatchingTest {
                 + "[일상]" + elder.getDailyLevel()
                 + "[위치] " + elder.getLocation());
 
+        System.out.println("[요구시간대] "
+                + elder.getServiceSlots().get(0).getServiceSlotStart() + " ~ "
+                + elder.getServiceSlots().get(0).getServiceSlotEnd());
+
         for (Caregiver c : caregivers) {
             System.out.println("[LOG] " + c.getName());
             // gender
@@ -177,6 +200,13 @@ public class CaregiverMatchingTest {
                     + "[배변]"+ c.getResume().getToiletingLevel()
                     + "[일상]"+ c.getResume().getDailyLevel()
                     + "[위치] " + c.getLocation());
+
+            System.out.print("[가능 요일] ");
+            for (String s : c.getResume().getWorkDay()) System.out.print(s + " ");
+            System.out.println();
+            System.out.println("[가능 시간대] ");
+            for (String s : c.getResume().getWorkTimeSlot()) System.out.print(s + " ");
+            System.out.println();
         }
     }
 }

@@ -26,8 +26,6 @@ public class QCaregiver extends EntityPathBase<Caregiver> {
 
     public final NumberPath<Long> caregiverId = createNumber("caregiverId", Long.class);
 
-    public final ListPath<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime> caregiverTime = this.<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime>createList("caregiverTime", com.five.Maeum_Eum.entity.CaregiverTime.class, com.five.Maeum_Eum.entity.QCaregiverTime.class, PathInits.DIRECT2);
-
     public final ListPath<WorkExperience, QWorkExperience> experience = this.<WorkExperience, QWorkExperience>createList("experience", WorkExperience.class, QWorkExperience.class, PathInits.DIRECT2);
 
     public final BooleanPath hasCaregiverCertificate = createBoolean("hasCaregiverCertificate");
@@ -57,8 +55,6 @@ public class QCaregiver extends EntityPathBase<Caregiver> {
     public final QResume resume;
 
     public final ListPath<com.five.Maeum_Eum.entity.user.elder.SavedElders, com.five.Maeum_Eum.entity.user.elder.QSavedElders> savedElders = this.<com.five.Maeum_Eum.entity.user.elder.SavedElders, com.five.Maeum_Eum.entity.user.elder.QSavedElders>createList("savedElders", com.five.Maeum_Eum.entity.user.elder.SavedElders.class, com.five.Maeum_Eum.entity.user.elder.QSavedElders.class, PathInits.DIRECT2);
-
-    public final ListPath<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime> workTimeSlot = this.<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime>createList("workTimeSlot", com.five.Maeum_Eum.entity.CaregiverTime.class, com.five.Maeum_Eum.entity.QCaregiverTime.class, PathInits.DIRECT2);
 
     public QCaregiver(String variable) {
         this(Caregiver.class, forVariable(variable), INITS);
