@@ -93,4 +93,9 @@ public class Caregiver {
     }
 
     public void setResumeRegistered(boolean resumeRegistered) { this.isResumeRegistered = resumeRegistered; }
+
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CaregiverTime> caregiverTime;
+
+    public void setResume(Resume resume) { this.resume = resume; }
 }

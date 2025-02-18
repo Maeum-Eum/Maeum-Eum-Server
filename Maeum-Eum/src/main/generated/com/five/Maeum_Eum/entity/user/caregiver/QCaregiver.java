@@ -26,6 +26,8 @@ public class QCaregiver extends EntityPathBase<Caregiver> {
 
     public final NumberPath<Long> caregiverId = createNumber("caregiverId", Long.class);
 
+    public final ListPath<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime> caregiverTime = this.<com.five.Maeum_Eum.entity.CaregiverTime, com.five.Maeum_Eum.entity.QCaregiverTime>createList("caregiverTime", com.five.Maeum_Eum.entity.CaregiverTime.class, com.five.Maeum_Eum.entity.QCaregiverTime.class, PathInits.DIRECT2);
+
     public final ListPath<WorkExperience, QWorkExperience> experience = this.<WorkExperience, QWorkExperience>createList("experience", WorkExperience.class, QWorkExperience.class, PathInits.DIRECT2);
 
     public final BooleanPath hasCaregiverCertificate = createBoolean("hasCaregiverCertificate");

@@ -49,7 +49,6 @@ public class ManagerContact extends BaseTimeEntity {
     @JoinColumn(name = "elder_id")
     private Elder elder;
 
-
     private boolean negotiable;
 
     @Builder

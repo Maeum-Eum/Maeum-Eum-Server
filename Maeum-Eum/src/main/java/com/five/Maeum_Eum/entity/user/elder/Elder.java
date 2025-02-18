@@ -56,6 +56,12 @@ public class Elder {
     @Column
     private boolean negotiable;
 
+    // 서비스 요구 수준
+    private int mealLevel;
+    private int toiletingLevel;
+    private int mobilityLevel;
+    private int dailyLevel;
+
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = GenericListConverter.class)
@@ -85,5 +91,7 @@ public class Elder {
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagerBookmark> managerBookmarks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceSlot> serviceSlots = new ArrayList<>();
 
 }
