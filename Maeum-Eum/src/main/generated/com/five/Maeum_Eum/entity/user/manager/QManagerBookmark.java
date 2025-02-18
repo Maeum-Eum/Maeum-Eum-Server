@@ -57,7 +57,7 @@ public class QManagerBookmark extends EntityPathBase<ManagerBookmark> {
     public QManagerBookmark(Class<? extends ManagerBookmark> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.caregiver = inits.isInitialized("caregiver") ? new com.five.Maeum_Eum.entity.user.caregiver.QCaregiver(forProperty("caregiver"), inits.get("caregiver")) : null;
-        this.elder = inits.isInitialized("elder") ? new com.five.Maeum_Eum.entity.user.elder.QElder(forProperty("elder")) : null;
+        this.elder = inits.isInitialized("elder") ? new com.five.Maeum_Eum.entity.user.elder.QElder(forProperty("elder"), inits.get("elder")) : null;
         this.manager = inits.isInitialized("manager") ? new QManager(forProperty("manager"), inits.get("manager")) : null;
     }
 

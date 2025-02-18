@@ -94,4 +94,8 @@ public class Elder {
     @OneToMany(mappedBy = "elder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceSlot> serviceSlots = new ArrayList<>();
 
+    public void setServiceSlots(List<ServiceSlot> serviceSlots) {
+        this.serviceSlots = serviceSlots;
+    }
+
 }

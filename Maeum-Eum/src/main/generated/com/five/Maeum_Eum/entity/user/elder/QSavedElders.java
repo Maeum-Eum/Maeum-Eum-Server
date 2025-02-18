@@ -47,7 +47,7 @@ public class QSavedElders extends EntityPathBase<SavedElders> {
     public QSavedElders(Class<? extends SavedElders> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.caregiver = inits.isInitialized("caregiver") ? new com.five.Maeum_Eum.entity.user.caregiver.QCaregiver(forProperty("caregiver"), inits.get("caregiver")) : null;
-        this.elder = inits.isInitialized("elder") ? new QElder(forProperty("elder")) : null;
+        this.elder = inits.isInitialized("elder") ? new QElder(forProperty("elder"), inits.get("elder")) : null;
     }
 
 }

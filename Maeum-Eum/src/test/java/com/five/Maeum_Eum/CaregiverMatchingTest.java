@@ -1,29 +1,32 @@
 package com.five.Maeum_Eum;
 
-import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
-import com.five.Maeum_Eum.entity.CaregiverTime;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
+import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.elder.ElderFamily;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
 
 @SpringBootTest
 @Transactional
+@Slf4j
 public class CaregiverMatchingTest {
-
     @Autowired
     private EntityManager em;
 
@@ -31,129 +34,173 @@ public class CaregiverMatchingTest {
     private ManagerContactQueryDsl managerContactQueryDsl;
 
     @Test
-    @DisplayName(value = "인지 지원 등급 매칭 테스트 : 요양사의 가능 등급에는 2가 포함 되어야 함")
-    public void testElderRankMatchingTest(){
+    @DisplayName(value = "최종매칭시스템점검")
+    public void testFinal(){
 
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
 
-        for (int i = 1; i <= 20; i++) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        // 서울의 위도 및 경도 범위
+        double minLatitude = 37.4133;
+        double maxLatitude = 37.7013;
+        double minLongitude = 126.7341;
+        double maxLongitude = 127.2693;
+
+        for (int i = 1; i <= 1000; i++) {
+
+            // 시간대 - 요일
+            List<Integer> workDay = Arrays.asList(0,1,2);
+
+            // 시간대 - 시간대
+            List<Integer> workTimeSlot = Arrays.asList(0,1,2);
 
             Caregiver caregiver = Caregiver.builder()
-                    .name("Caregiver " + i)
-                    .address("Address " + i)
-                    .hasCaregiverCertificate(false)
+                    .name("[요양사]" + i)
+                    .address("서울시" + i)
+                    .hasCaregiverCertificate(true)
                     .isResumeRegistered(true)
                     .isJobOpen(false)
                     .jobState(Caregiver.JobState.MATCHED)
                     .phoneNumber("010-1234-5678")
                     .build();
 
-            List<Integer> details = new ArrayList<>();
+            // 선호 성별
+            int randomInt = random.nextInt(3);
+            Resume.PreferredGender gender = switch (randomInt){
+                case 0 -> Resume.PreferredGender.MALE;
+                case 1 -> Resume.PreferredGender.FEMALE;
+                case 2 -> Resume.PreferredGender.EVERY;
+                default -> throw new IllegalStateException("Unexpected value: " + randomInt);
+            };
+
+            // 인지 지원 등급
+            List<Integer> ranks = new ArrayList<>();
 
             int numRanks = random.nextInt(5) + 1; // 1~5개 등급
             for (int j = 0; j < numRanks; j++) { // 최대 5개 등급 넣기
                 int rank = random.nextInt(7); // 0~6 범위의 랜덤 등급
-                if (!details.contains(rank)) {
-                    details.add(rank);
+                if (!ranks.contains(rank)) {
+                    ranks.add(rank);
                 }
             }
 
+            // 무작위 위도 및 경도 생성
+            double latitude = minLatitude + (maxLatitude - minLatitude) * random.nextDouble();
+            double longitude = minLongitude + (maxLongitude - minLongitude) * random.nextDouble();
+
+            // location
+            caregiver.setLocation(geometryFactory.createPoint(new org.locationtech.jts.geom.Coordinate(longitude, latitude)));
+
+            System.out.println("위치" + caregiver.getLocation());
+
+            int randtime = random.nextInt(22);
+            em.persist(caregiver);
+
+            // 이력서
             Resume resume = Resume.builder()
+                    .preferredGender(gender)
                     .caregiver(caregiver)
-                    .elderRank(details)
+                    .elderRank(ranks)
+                    .mealLevel(random.nextInt(4)+1)
+                    .toiletingLevel(random.nextInt(4)+1)
+                    .mobilityLevel(random.nextInt(4)+1)
+                    .dailyLevel(random.nextInt(6)+1)
+                    .elderRankLevel(Collections.max(ranks))
+                    .wage((random.nextInt(7000)+13000))
+                    .workDay(workDay)
+                    .workTimeSlot(workTimeSlot)
                     .build();
 
             caregiver.setResume(resume);
-            em.persist(caregiver);
             em.persist(resume);
             em.flush();
         }
 
-        int elderRank = 2;
+        // 어르신 샘플 데이터 생성
 
-        List<Caregiver> caregivers = managerContactQueryDsl.findQualifiedCaregivers(elderRank);
+        // 무작위 위도 및 경도 생성
+        double latitude = minLatitude + (maxLatitude - minLatitude) * random.nextDouble();
+        double longitude = minLongitude + (maxLongitude - minLongitude) * random.nextDouble();
+
+        // location
+        Elder elder = Elder.builder()
+                .elderName("홍길동")
+                .gender("MALE")
+                .elder_family(ElderFamily.IN_HOME)
+                .elder_pet(true)
+                .elderAddress("서울시 강남구 역삼동")
+                .elderBirth(LocalDate.of(1955,7,7))
+                .meal(Arrays.asList("스스로식사가능"))
+                .mealLevel(1)
+                .location(geometryFactory.createPoint(new org.locationtech.jts.geom.Coordinate(longitude, latitude)))
+                .toileting(Arrays.asList("기저귀케어필요"))
+                .toiletingLevel(3)
+
+                .mobility(Arrays.asList("거동불가"))
+                .mobilityLevel(4)
+
+                .daily(Arrays.asList("목욕보조"))
+                .dailyLevel(2)
+                .wage(16000)
+                .elderRank(3)
+                .build();
+
+        em.persist(elder);
+        em.flush();
+
+        // 서비스 슬롯
+        List<ServiceSlot> serviceSlots = new ArrayList<>();
+        ServiceSlot serviceSlot = ServiceSlot.builder()
+                .elder(elder)
+                .serviceSlotDay(DayOfWeek.MON)
+                .serviceSlotStart(LocalTime.of(14,0))
+                .serviceSlotEnd(LocalTime.of(15,40))
+                .build();
+        serviceSlots.add(serviceSlot);
+        elder.setServiceSlots(serviceSlots);
+        em.persist(serviceSlot);
+        em.flush();
+
+        // 쿼리 조회 - 어르신에 맞는 10명 가져옴, 반경 5KM 이내
+        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 100, 5);
 
         Assertions.assertNotNull(caregivers);
         Assertions.assertFalse(caregivers.isEmpty());
 
+        // 어르신 정보
+        System.out.println("[어르신] " + elder.getGender()
+                + "[장기요양등급]" + elder.getElderRank()
+                + "[시급]" + elder.getWage()
+                + "[식사]" + elder.getMealLevel()
+                + "[이동]"+ elder.getMobilityLevel()
+                + "[배변]"+ elder.getToiletingLevel()
+                + "[일상]" + elder.getDailyLevel()
+                + "[위치] " + elder.getLocation());
+
+        System.out.println("[요구시간대] "
+                + elder.getServiceSlots().get(0).getServiceSlotStart() + " ~ "
+                + elder.getServiceSlots().get(0).getServiceSlotEnd());
+
         for (Caregiver c : caregivers) {
             System.out.println("[LOG] " + c.getName());
+            // gender
+            System.out.print(" 선호 성별 : " + c.getResume().getPreferredGender()
+                + "[서비스가능등급]" + c.getResume().getElderRankLevel()
+                    + "[시급]" + c.getResume().getWage()
+                    + "[식사]" + c.getResume().getMealLevel()
+                    + "[이동]"+ c.getResume().getMobilityLevel()
+                    + "[배변]"+ c.getResume().getToiletingLevel()
+                    + "[일상]"+ c.getResume().getDailyLevel()
+                    + "[위치] " + c.getLocation());
 
-            for (Integer rank : c.getResume().getElderRank()) {
-                System.out.println("[LOG] " + rank);
-            }
-        }
-    }
-
-    @Test
-    @DisplayName(value = "시간대 매칭 테스트")
-    public void testFindingCaregiverByMatchingTimeSlot(){
-
-        for (int i = 1; i <= 20; i++) {
-            Caregiver caregiver = Caregiver.builder()
-                    .name("Caregiver " + i)
-                    .address("Address " + i)
-                    .hasCaregiverCertificate(false)
-                    .isResumeRegistered(false)
-                    .isJobOpen(false)
-                    .jobState(Caregiver.JobState.MATCHED)
-                    .phoneNumber("010-1234-5678")
-                    .build();
-
-            em.persist(caregiver);
-
-            DayOfWeek workDay = DayOfWeek.TUE;
-            LocalTime startTime = LocalTime.of(8 + (i % 5), 0); // 08:00 ~ 12:00 사이
-            LocalTime endTime = startTime.plusHours(3);
-
-            System.out.println("[LOG] " + caregiver.getName() + " " + startTime + " " + endTime);
-
-            CaregiverTime ct = CaregiverTime.builder()
-                    .caregiver(caregiver)
-                    .workDay(workDay)
-                    .startTime(startTime)
-                    .endTime(endTime)
-                    .build();
-
-            System.out.println("[LOG] " + caregiver.getName() + " " + ct.getStartTime() + " " + ct.getEndTime());
-            em.persist(ct);
-        }
-        em.flush();
-        em.clear();
-
-        // 어르신의 요구 시간대를 담은 ServiceSlot 리스트 생성
-        ServiceSlot slot1 = ServiceSlot.builder()
-                .serviceSlotDay(DayOfWeek.TUE)
-                .serviceSlotStart(LocalTime.of(8,30))
-                .serviceSlotEnd(LocalTime.of(11, 0))
-                .build();
-
-        List<ServiceSlot> serviceSlots = new ArrayList<>();
-        serviceSlots.add(slot1);
-
-        // 쿼리 메서드 호출
-        List<CaregiverWithOverlapDto> result = managerContactQueryDsl.findCaregiverByMatchingTimeSlot(serviceSlots);
-
-        // 결과 확인 (예시로 결과가 비어있지 않은지, 예상 순서대로 정렬되었는지 확인)
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(10, result.size());
-
-        for (CaregiverWithOverlapDto dto : result) {
-            Caregiver caregiver = dto.getCaregiver();
-            Integer totalOverlap = dto.getTotalOverlap();
-
-            System.out.println("Matched Caregiver: " + caregiver.getCaregiverTime().get(0).getStartTime() + " 겹치는 시간 : " + totalOverlap
-            );
+            System.out.print("[가능 요일] ");
+            for (int s : c.getResume().getWorkDay()) System.out.print(s + " ");
+            System.out.println();
+            System.out.println("[가능 시간대] ");
+            for (int s : c.getResume().getWorkTimeSlot()) System.out.print(s + " ");
+            System.out.println();
         }
 
-        List<CaregiverWithOverlapDto> lastresult = managerContactQueryDsl.findCaregiversByWeeklyMatchingTimeUpdate(serviceSlots);
-
-        Assertions.assertNotNull(lastresult);
-
-        for (CaregiverWithOverlapDto dto : lastresult) {
-            System.out.println("Caregiver : " + dto.getCaregiver().getCaregiverTime().get(0).getStartTime() + "~" + dto.getCaregiver().getCaregiverTime().get(0).getEndTime() + " tot : " + dto.getTotalOverlap());
-        }
     }
 }

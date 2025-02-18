@@ -33,7 +33,7 @@ public class Resume extends BaseTimeEntity {
     private int wage;
 
     @Convert(converter = GenericListConverter.class)
-    private List<String> workTimeSlot;
+    private List<Integer> workTimeSlot;
 
     private Boolean negotiableTime;
 
@@ -50,7 +50,7 @@ public class Resume extends BaseTimeEntity {
     private Certificate certificate;
 
     @Convert(converter = GenericListConverter.class)
-    private List<String> workDay;
+    private List<Integer> workDay;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -90,6 +90,8 @@ public class Resume extends BaseTimeEntity {
 
     @Convert(converter = GenericListConverter.class)
     private List<Integer> elderRank;
+
+    private int elderRankLevel;
 
     @Enumerated(EnumType.STRING)
     private PreferredGender preferredGender;

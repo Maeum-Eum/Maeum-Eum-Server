@@ -27,9 +27,9 @@ public class ResumeSaveDTO {
     @NotNull
     private List<WorkPlace> workPlace;
     @NotNull
-    private List<String> workDay;
+    private List<Integer> workDay;
     @NotNull
-    private List<String> workTimeSlot;
+    private List<Integer> workTimeSlot;
     @NotNull
     private Boolean isNegotiableTime;
     @Min(value = 13000)
