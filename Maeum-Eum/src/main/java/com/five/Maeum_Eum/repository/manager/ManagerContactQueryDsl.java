@@ -33,7 +33,7 @@ public class ManagerContactQueryDsl {
     private final JPAQueryFactory jpaQueryFactory;
 
     // 최종
-    public List<Caregiver> findCaregiverByFullMatchingSystem(ManagerContact mc, Elder elder, int count){
+    public List<Caregiver> findCaregiverByFullMatchingSystem(Elder elder, int count, double distance){
 
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverTime caregiverTime = QCaregiverTime.caregiverTime;
@@ -45,12 +45,11 @@ public class ManagerContactQueryDsl {
         // 2. [필] 요양보호사 자격증 번호 등록 여부
         BooleanExpression isCertificateRegistred = caregiver.isResumeRegistered.eq(true);
 
-        // 3. [필] 장기 요양 등급별 필터링
-        BooleanExpression rankFilter = Expressions.numberTemplate(Integer.class,
-                "FIND_IN_SET({0}, {1})", elder.getElderRank() + "", resume.elderRank).gt(0);
+        // 3. [필] 장기 요양 등급별 필터링 : 어르신의 등급보다 요양사의 서비스 가능 등급이 이상이어야 함.
+        BooleanExpression rankFilter = resume.elderRankLevel.goe(elder.getElderRank());
 
         // 4. [필] 성별 조건 필터링 : 선호 성별이 모두 가능[EVERY]인 경우에는 노출
-        BooleanExpression genderFilter = resume.preferredGender.eq(Resume.PreferredGender.valueOf(elder.getGender()))
+        BooleanExpression genderFilter = resume.preferredGender.stringValue().eq(elder.getGender())
                 .or(resume.preferredGender.eq(Resume.PreferredGender.EVERY));
 
         // 5. [필] 어르신 필요 서비스 필터링
@@ -59,8 +58,13 @@ public class ManagerContactQueryDsl {
                 .and(resume.dailyLevel.goe(elder.getDailyLevel()))
                 .and(resume.mobilityLevel.goe(elder.getMobilityLevel()));
 
-        // 6. 거리 조건 - 어르신의 주소지 위치와 요양사의 주소지 위치를 계산하고 이력서상 요양사의 가능 근무범위 (N Km 이내) 에 해당되는지 체크 후 필터링
-        BooleanExpression distanceFilter = null;
+        // 6. 거리 조건 - 어르신의 주소지 위치와 요양사의 주소지 위치를 계산하고 이력서상 요양사의 가능 근무범위 (예시 : 5 Km 이내) 에 해당되는지 체크 후 필터링
+        BooleanExpression distanceFilter = Expressions.numberTemplate(
+                        Double.class,
+                "ST_Distance_Sphere({0}, {1})",
+                        elder.getLocation(),
+                        caregiver.location
+                ).loe(distance * 1000.0);
 
         // 7. 시간 조건 : 근로자의 근무 가능 요일자가 어르신 요구 요일자 중 최소 하루는 포함하고 있어야 필터링.
         // 이후 어르신 요구 요일 Day에 대해서, 어르신의 요구 시간대와 겹치는 시간을 minute 값으로 환산 후 모든 정렬
@@ -118,10 +122,10 @@ public class ManagerContactQueryDsl {
                         serviceFilter,
 
                         // 6. [중] 거리 조건 필터링
-                        distanceFilter,
+                        distanceFilter
 
                         // 7. [중] 시간 조건 점수
-                        timeFilter.gt(0)
+                        //timeFilter.gt(0)
                 )
                 .limit(count)
                 .fetch();
