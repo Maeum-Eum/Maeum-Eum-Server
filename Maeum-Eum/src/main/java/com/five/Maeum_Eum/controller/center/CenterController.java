@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/center")
@@ -32,11 +34,11 @@ public class CenterController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> searchCenter(@RequestParam("name") String name) {
+    public ResponseEntity<Object> searchCenter(@RequestParam("keyword") String keyword) {
 
-        Center center = centerRepository.findByCenterName(name).orElse(null);
+        List<Center> centerList= centerRepository.searchCentersByKeyword(keyword);
 
-        if(center == null) {
+        if(centerList.isEmpty()) {
             return ResponseEntity
                     .status(400)
                     .body(ErrorResponse.builder()
@@ -46,22 +48,24 @@ public class CenterController {
                             .build());
         }
 
-        CenterDTO dto = CenterDTO.builder()
-                .centerId(center.getCenterId())
-                .centerName(center.getCenterName())
-                .address(center.getAddress())
-                .designatedTime(center.getDesignatedTime())
-                .installationTime(center.getInstallationTime())
-                .detailAddress(center.getDetailAddress())
-                .zipCode(center.getZipCode())
-                .centerCode(center.getCenterCode())
-                .finalGrade(center.getFinalGrade())
-                .oneLineIntro(center.getOneLineIntro())
-                .build();
+        // Center 리스트를 CenterDTO 리스트로 변환
+        List<CenterDTO> dtoList = centerList.stream()
+                .map(center -> CenterDTO.builder()
+                        .centerId(center.getCenterId())
+                        .centerName(center.getCenterName())
+                        .address(center.getAddress())
+                        .designatedTime(center.getDesignatedTime())
+                        .installationTime(center.getInstallationTime())
+                        .detailAddress(center.getDetailAddress())
+                        .zipCode(center.getZipCode())
+                        .centerCode(center.getCenterCode())
+                        .finalGrade(center.getFinalGrade())
+                        .oneLineIntro(center.getOneLineIntro())
+                        .build())
+                .toList();
 
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(dtoList);
     }
-
 
     /*관리자가 소속된 센터 조회*/
     @GetMapping("/{centerId}")

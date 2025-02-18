@@ -150,7 +150,7 @@ public class ManagerContactQueryDsl {
                         // 6. [중] 거리 조건 필터링
                         distanceFilter.loe(distance * 1000.0),
 
-                        // 7. [중] 시간 조건 점수
+                        // 7. [중] 시간 조건
                         timeSlotFilter,
                         workDayFilter
                 )
