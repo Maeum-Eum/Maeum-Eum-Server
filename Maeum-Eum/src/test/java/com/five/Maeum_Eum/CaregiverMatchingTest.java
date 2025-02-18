@@ -2,13 +2,11 @@ package com.five.Maeum_Eum;
 
 import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
 import com.five.Maeum_Eum.entity.CaregiverTime;
-import com.five.Maeum_Eum.entity.QCaregiverTime;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
-import com.five.Maeum_Eum.entity.user.caregiver.QCaregiver;
+import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 @Transactional
@@ -32,7 +31,63 @@ public class CaregiverMatchingTest {
     private ManagerContactQueryDsl managerContactQueryDsl;
 
     @Test
-    @DisplayName(value = "test")
+    @DisplayName(value = "인지 지원 등급 매칭 테스트 : 요양사의 가능 등급에는 2가 포함 되어야 함")
+    public void testElderRankMatchingTest(){
+
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+
+        for (int i = 1; i <= 20; i++) {
+
+            Caregiver caregiver = Caregiver.builder()
+                    .name("Caregiver " + i)
+                    .address("Address " + i)
+                    .hasCaregiverCertificate(false)
+                    .isResumeRegistered(true)
+                    .isJobOpen(false)
+                    .jobState(Caregiver.JobState.MATCHED)
+                    .phoneNumber("010-1234-5678")
+                    .build();
+
+            List<Integer> details = new ArrayList<>();
+
+            int numRanks = random.nextInt(5) + 1; // 1~5개 등급
+            for (int j = 0; j < numRanks; j++) { // 최대 5개 등급 넣기
+                int rank = random.nextInt(7); // 0~6 범위의 랜덤 등급
+                if (!details.contains(rank)) {
+                    details.add(rank);
+                }
+            }
+
+            Resume resume = Resume.builder()
+                    .caregiver(caregiver)
+                    .elderRank(details)
+                    .build();
+
+            caregiver.setResume(resume);
+            em.persist(caregiver);
+            em.persist(resume);
+            em.flush();
+        }
+
+        int elderRank = 2;
+
+        List<Caregiver> caregivers = managerContactQueryDsl.findQualifiedCaregivers(elderRank);
+
+        Assertions.assertNotNull(caregivers);
+        Assertions.assertFalse(caregivers.isEmpty());
+
+        for (Caregiver c : caregivers) {
+            System.out.println("[LOG] " + c.getName());
+
+            for (Integer rank : c.getResume().getElderRank()) {
+                System.out.println("[LOG] " + rank);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName(value = "시간대 매칭 테스트")
     public void testFindingCaregiverByMatchingTimeSlot(){
 
         for (int i = 1; i <= 20; i++) {
@@ -88,32 +143,17 @@ public class CaregiverMatchingTest {
         for (CaregiverWithOverlapDto dto : result) {
             Caregiver caregiver = dto.getCaregiver();
             Integer totalOverlap = dto.getTotalOverlap();
-            System.out.println("Matched Caregiver: " + caregiver.getName() + " 겹치는 시간 : " + totalOverlap
+
+            System.out.println("Matched Caregiver: " + caregiver.getCaregiverTime().get(0).getStartTime() + " 겹치는 시간 : " + totalOverlap
             );
         }
 
-        // workDay 가 화요일인 요양보호사를 모두 조회해오는 쿼리
+        List<CaregiverWithOverlapDto> lastresult = managerContactQueryDsl.findCaregiversByWeeklyMatchingTimeUpdate(serviceSlots);
 
-        QCaregiverTime caregiverTime = QCaregiverTime.caregiverTime;
-        QCaregiver caregiver = QCaregiver.caregiver;
+        Assertions.assertNotNull(lastresult);
 
-        JPAQueryFactory query = new JPAQueryFactory(em);
-
-        // 요양보호사와 해당 근무시간 정보를 조인하여, workDay가 화요일인 요양보호사 조회
-
-        List<Caregiver> res = query
-                .select(caregiver)
-                .from(caregiverTime)
-                .join(caregiverTime.caregiver, caregiver)
-                .where(caregiverTime.workDay.eq(DayOfWeek.TUE))
-                .fetch();
-
-        // System.out.println("요양보호사 모두 가져오기 : " +query.select(caregiver.name).from(caregiverTime).fetch());
-
-        for(Caregiver c : res)
-        {
-            // System.out.println("근무날이 화요일인 요양 보호사 목록 : "+ c.getName());
+        for (CaregiverWithOverlapDto dto : lastresult) {
+            System.out.println("Caregiver : " + dto.getCaregiver().getCaregiverTime().get(0).getStartTime() + "~" + dto.getCaregiver().getCaregiverTime().get(0).getEndTime() + " tot : " + dto.getTotalOverlap());
         }
-        Assertions.assertNotNull(res);
     }
 }

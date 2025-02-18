@@ -22,6 +22,8 @@ public class QElder extends EntityPathBase<Elder> {
 
     public final ListPath<String, StringPath> daily = this.<String, StringPath>createList("daily", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final NumberPath<Integer> dailyLevel = createNumber("dailyLevel", Integer.class);
+
     public final EnumPath<ElderFamily> elder_family = createEnum("elder_family", ElderFamily.class);
 
     public final BooleanPath elder_pet = createBoolean("elder_pet");
@@ -46,11 +48,17 @@ public class QElder extends EntityPathBase<Elder> {
 
     public final ListPath<String, StringPath> meal = this.<String, StringPath>createList("meal", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final NumberPath<Integer> mealLevel = createNumber("mealLevel", Integer.class);
+
     public final ListPath<String, StringPath> mobility = this.<String, StringPath>createList("mobility", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> mobilityLevel = createNumber("mobilityLevel", Integer.class);
 
     public final BooleanPath negotiable = createBoolean("negotiable");
 
     public final ListPath<String, StringPath> toileting = this.<String, StringPath>createList("toileting", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> toiletingLevel = createNumber("toiletingLevel", Integer.class);
 
     public QElder(String variable) {
         super(Elder.class, forVariable(variable));
