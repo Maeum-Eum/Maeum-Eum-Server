@@ -6,6 +6,8 @@ import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactAcceptDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.DetailContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderListDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.NearElderDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
@@ -19,6 +21,7 @@ import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.ResumeRepository;
+import com.five.Maeum_Eum.repository.elder.ElderQueryDsl;
 import com.five.Maeum_Eum.repository.elder.ElderRepository;
 import com.five.Maeum_Eum.repository.elder.SavedEldersRepository;
 import com.five.Maeum_Eum.repository.elder.ServiceSlotRepository;
@@ -46,6 +49,7 @@ public class CaregiverMainService {
     private final ElderRepository elderRepository;
     private final ApplyRepository applyRepository;
     private final ResumeRepository resumeRepository;
+    private final ElderQueryDsl elderQueryDsl;
 
     // n km내 매칭 요청 리스트
     public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable, int order) {
@@ -154,9 +158,11 @@ public class CaregiverMainService {
         contact.approve(acceptDTO.getMessage(), acceptDTO.getPhone());
         managerContactRepository.save(contact);
 
+        Elder elder = contact.getElder();
 
         return ContactAcceptDTO.builder()
                 .phone(contact.getManagerPhoneNumber())
+                .title(getTitle(elder, contact.getWorkRequirement()))
                 .build();
     }
 
@@ -183,7 +189,7 @@ public class CaregiverMainService {
     }
 
     // 직접 지원하기
-    public void apply(Long elderId, ContactAcceptDTO dto) {
+    public ContactAcceptDTO apply(Long elderId, ContactAcceptDTO dto) {
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
         Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
         if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -202,11 +208,15 @@ public class CaregiverMainService {
                 .approvalStatus(ApprovalStatus.PENDING)
                 .caregiverPhoneNumber(dto.getPhone())
                 .messageFromCaregiver(dto.getMessage())
-                .workRequirement("test")
+                .workRequirement("")
                 .managerPhoneNumber(elder.getManager().getPhoneNumber())
                 .build();
 
         applyRepository.save(apply);
+
+        return ContactAcceptDTO.builder()
+                .title(getTitle(elder, ""))
+                .build();
     }
 
     public DetailContactDTO applyDetail(long id) {
@@ -303,6 +313,69 @@ public class CaregiverMainService {
         }
     }
 
+    public ElderListDTO nearElder(Double range) {
+        // 요양보호사 엔티티 확인 및 검증
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 좌표를 문자열 형식으로 변환
+        WKTWriter writer = new WKTWriter();
+        String wkt = writer.write(caregiver.getLocation());
+
+        NearElderDTO meal = elderQueryDsl.findElder(wkt, range, caregiver, 0);
+        if (meal != null) {
+            Elder elder = meal.getElder();
+            meal.setElderId(elder.getElderId());
+            meal.setTitle(getTitle(elder, ""));
+            meal.setElder(null);
+        }
+
+
+        NearElderDTO toileting = elderQueryDsl.findElder(wkt, range, caregiver, 1);
+        if (toileting != null) {
+            Elder elder = toileting.getElder();
+            toileting.setElderId(elder.getElderId());
+            toileting.setTitle(getTitle(elder, ""));
+            toileting.setElder(null);
+        }
+
+
+        NearElderDTO mobility = elderQueryDsl.findElder(wkt, range, caregiver, 2);
+        if (mobility != null) {
+            Elder elder = mobility.getElder();
+            mobility.setElderId(elder.getElderId());
+            mobility.setTitle(getTitle(elder, ""));
+            mobility.setElder(null);
+        }
+
+
+        NearElderDTO daily = elderQueryDsl.findElder(wkt, range, caregiver, 3);
+        if (daily != null) {
+            Elder elder = daily.getElder();
+            daily.setElderId(elder.getElderId());
+            daily.setTitle(getTitle(elder, ""));
+            daily.setElder(null);
+        }
+        NearElderDTO wage = elderQueryDsl.findWageElder(wkt,range,caregiver);
+        if (wage != null) {
+            Elder elder = wage.getElder();
+            wage.setElderId(elder.getElderId());
+            wage.setTitle(getTitle(elder,""));
+            wage.setElder(null);
+        }
+
+        return ElderListDTO.builder()
+                .meal(meal)
+                .toileting(toileting)
+                .mobility(mobility)
+                .daily(daily)
+                .wage(wage).build();
+
+
+    }
 
     private String getTitle(Elder elder, String requirement) {
         String title = null;

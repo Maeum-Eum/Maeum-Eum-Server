@@ -180,7 +180,7 @@ public class CaregiverService {
 
         // 엔티티를 DTO로 변환
         List<SimpleContactDTO> contents = page.getContent()
-                .stream().map(caregiverMainService::toDTO)
+                .stream().map(caregiverMainService::toDTOApply)
                 .toList();
 
         return PageResponse.<SimpleContactDTO>builder()
