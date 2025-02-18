@@ -15,7 +15,9 @@ import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
+import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
+import com.five.Maeum_Eum.repository.elder.ElderRepository;
 import com.five.Maeum_Eum.repository.elder.SavedEldersRepository;
 import com.five.Maeum_Eum.repository.elder.ServiceSlotRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
@@ -39,6 +41,8 @@ public class CaregiverMainService {
     private final ServiceSlotRepository serviceSlotRepository;
     private final ManagerContactRepository managerContactRepository;
     private final SavedEldersRepository savedEldersRepository;
+    private final ElderRepository elderRepository;
+    private final ApplyRepository applyRepository;
 
     // n km내 매칭 요청 리스트
     public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable) {
@@ -169,8 +173,76 @@ public class CaregiverMainService {
         return true;
     }
 
+    // 직접 지원하기
+    public void apply(Long elderId, ContactAcceptDTO dto) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Elder elder = elderRepository.findById(elderId).orElse(null);
+        if (elder == null) { throw new CustomException(ErrorCode.INVALID_INPUT); }
+
+        if (applyRepository.existsByCaregiverAndElder(caregiver, elder)) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+        Apply apply = Apply.builder()
+                .caregiver(caregiver)
+                .elder(elder)
+                .approvalStatus(ApprovalStatus.PENDING)
+                .caregiverPhoneNumber(dto.getPhone())
+                .messageFromCaregiver(dto.getMessage())
+                .workRequirement("test")
+                .managerPhoneNumber(elder.getManager().getPhoneNumber())
+                .build();
+
+        applyRepository.save(apply);
+    }
+
+    public DetailContactDTO applyDetail(long id) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Elder elder = elderRepository.findById(id).orElse(null);
+        if (elder == null) { throw new CustomException(ErrorCode.INVALID_INPUT); }
+
+        Center center = elder.getManager().getCenter();
+        CenterDTO centerDTO = CenterDTO.builder()
+                .centerName(center.getCenterName())
+                .hasCar(center.isHasCar())
+                .finalGrade(center.getFinalGrade())
+                .installationTime(center.getInstallationTime())
+                .build();
+
+        ElderInfoDTO elderInfoDTO = ElderInfoDTO.builder()
+                .rank(elder.getElderRank())
+                .gender(elder.getGender())
+                .address(elder.getElderAddress())
+                .meal(elder.getMeal())
+                .toileting(elder.getToileting())
+                .mobility(elder.getMobility())
+                .daily(elder.getDaily())
+                .family(elder.getElder_family().getValue())
+                .pet(elder.getElder_pet() ? "있어요" : "없어요")
+                .build();
+
+        return DetailContactDTO.builder()
+                .elderId(id)
+                .center(centerDTO)
+                .title(getTitle(elder, "test"))
+                .wage(elder.getWage())
+                .negotiable(elder.isNegotiable())
+                .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
+                .elder(elderInfoDTO)
+                .build();
+
+    }
+
     // 요청 북마크
-    public void bookmark(Long id) {
+    public void contactBookmark(Long id) {
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
         Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
         if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -184,6 +256,24 @@ public class CaregiverMainService {
         }
 
         Elder elder = contact.getElder();
+        bookmark(elder, caregiver);
+
+    }
+
+    // 지원 페이지 어르신 북마크
+    public void applyBookmark(Long id) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Elder elder = elderRepository.findById(id).orElse(null);
+        if (elder == null) { throw new CustomException(ErrorCode.INVALID_INPUT); }
+
+        bookmark(elder, caregiver);
+    }
+
+    private void bookmark(Elder elder, Caregiver caregiver) {
         SavedElders savedElders = savedEldersRepository.findByElderAndCaregiver(elder, caregiver).orElse(null);
 
         if (savedElders != null) {
@@ -195,8 +285,8 @@ public class CaregiverMainService {
                     .elder(elder).build();
             savedEldersRepository.save(savedElders);
         }
-
     }
+
 
     private String getTitle(Elder elder, String requirement) {
         String title = null;

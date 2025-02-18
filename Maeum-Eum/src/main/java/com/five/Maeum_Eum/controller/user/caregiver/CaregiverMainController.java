@@ -45,8 +45,8 @@ public class CaregiverMainController {
     }
 
     @PostMapping("/bookmark")
-    public ResponseEntity<Object> bookmark(@RequestParam Long contactId) {
-        caregiverMainService.bookmark(contactId);
+    public ResponseEntity<Object> bookmarkContact(@RequestParam Long contactId) {
+        caregiverMainService.contactBookmark(contactId);
         return ResponseEntity.ok().build();
     }
 }
