@@ -132,7 +132,7 @@ public class CaregiverService {
 
 
     /* 이력서 제목 만들기 */
-    private String makeTitle(Resume resume){
+    public String makeTitle(Resume resume){
         List<String> workDay = resume.getWorkDay();
         String middleWorkDay = workDay.stream()
                 .collect(Collectors.joining("/"));

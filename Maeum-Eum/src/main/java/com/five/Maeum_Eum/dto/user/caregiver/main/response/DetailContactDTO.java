@@ -23,3 +23,5 @@ public class DetailContactDTO {
     private Boolean negotiable;
     private ElderInfoDTO elder;
 }
+
+
