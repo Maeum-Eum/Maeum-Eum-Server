@@ -10,6 +10,9 @@ import com.five.Maeum_Eum.service.center.CenterService;
 import com.five.Maeum_Eum.service.center.KakaoAddressService;
 import com.five.Maeum_Eum.service.user.manager.ManagerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +38,7 @@ public class CenterController {
 
     @GetMapping
     public ResponseEntity<Object> searchCenter(@RequestParam("keyword") String keyword) {
-
-        List<Center> centerList= centerRepository.searchCentersByKeyword(keyword);
+        List<Center> centerList= centerRepository.findByCenterNameContaining(keyword);
 
         if(centerList.isEmpty()) {
             return ResponseEntity
@@ -49,7 +51,7 @@ public class CenterController {
         }
 
         // Center 리스트를 CenterDTO 리스트로 변환
-        List<CenterDTO> dtoList = centerList.stream()
+        List<CenterDTO> dto = centerList.stream()
                 .map(center -> CenterDTO.builder()
                         .centerId(center.getCenterId())
                         .centerName(center.getCenterName())
@@ -61,10 +63,9 @@ public class CenterController {
                         .centerCode(center.getCenterCode())
                         .finalGrade(center.getFinalGrade())
                         .oneLineIntro(center.getOneLineIntro())
-                        .build())
-                .toList();
+                        .build()).toList();
 
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(dto);
     }
 
     /*관리자가 소속된 센터 조회*/
