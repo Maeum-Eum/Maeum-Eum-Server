@@ -1,12 +1,22 @@
 package com.five.Maeum_Eum.repository.manager;
 
+import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.QSimpleContactDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
+import com.five.Maeum_Eum.entity.QCaregiverTime;
 import com.five.Maeum_Eum.entity.center.QCenter;
 import com.five.Maeum_Eum.entity.user.caregiver.*;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.elder.QElder;
+import com.five.Maeum_Eum.entity.user.elder.QSavedElders;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.core.types.dsl.Expressions;
@@ -160,15 +170,17 @@ public class ManagerContactQueryDsl {
     }
 
     // 거리기반 매칭
-    public Page<ManagerContact> findContactsByFieldAndCenterWithinDistance(String pointWKT,
-                                                                   double distanceValue,
-                                                                   Pageable pageable,
-                                                                   Caregiver caregiver) {
+    public Page<SimpleContactDTO> findContacts(String pointWKT,
+                                               double distanceValue,
+                                               Pageable pageable,
+                                               Caregiver caregiver,
+                                               int order) {
 
         QManagerContact contact = QManagerContact.managerContact;
         QManager manager = QManager.manager;
         QCenter center = QCenter.center;
         QCaregiver qCaregiver = QCaregiver.caregiver;
+        QResume resume = QResume.resume;
 
         // 거리 계산 (미터 단위)
         NumberExpression<Double> distanceExpr = Expressions.numberTemplate(
@@ -181,21 +193,78 @@ public class ManagerContactQueryDsl {
         // n km 이내 조건
         BooleanExpression withinDistance = distanceExpr.loe(distanceValue);
 
-        JPAQuery<ManagerContact> query = jpaQueryFactory
-                .selectFrom(contact)
+        // 업무 가능 여부 확인
+        BooleanExpression meal = resume.caregiver.eq(caregiver)
+                        .and(resume.mealLevel.goe(QElder.elder.mealLevel));
+        BooleanExpression toileting = resume.caregiver.eq(caregiver)
+                        .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+        BooleanExpression mobility = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+        BooleanExpression daily = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+
+        // 가능한 업무 개수
+        NumberExpression<Integer> mealCount = Expressions.numberTemplate(
+                Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", meal);
+        NumberExpression<Integer> toiletingCount = Expressions.numberTemplate(
+                Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", toileting);
+        NumberExpression<Integer> mobilityCount = Expressions.numberTemplate(
+                Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", mobility);
+        NumberExpression<Integer> dailyCount = Expressions.numberTemplate(
+                Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", daily);
+
+        // 개수 총합
+        NumberExpression<Integer> workExpr = mealCount
+                .add(toiletingCount)
+                .add(mobilityCount)
+                .add(dailyCount);
+
+        // 북마크 여부
+        BooleanExpression bookmarked = caregiver != null ? JPAExpressions
+                .selectOne()
+                .from(QSavedElders.savedElders)
+                .join(QSavedElders.savedElders.caregiver, qCaregiver)
+                .join(QSavedElders.savedElders.elder, QElder.elder)
+                .where(QSavedElders.savedElders.elder.eq(contact.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
+                .exists() : Expressions.FALSE;
+
+
+        OrderSpecifier orderSpecifier = new OrderSpecifier<>(Order.DESC, workExpr);
+        if (order == 2) orderSpecifier = new OrderSpecifier<>(Order.ASC, contact.wage);
+        else if (order == 3) orderSpecifier = new OrderSpecifier<>(Order.DESC, contact.wage);
+
+        JPAQuery<SimpleContactDTO> query = jpaQueryFactory
+                .select(new QSimpleContactDTO(
+                        contact.contactId,
+                        center.centerName,
+                        contact.elder,
+                        contact.createdAt,
+                        contact.wage,
+                        contact.negotiable,
+                        bookmarked,
+                        meal,
+                        toileting,
+                        mobility,
+                        daily,
+                        contact.workRequirement
+                ))
+                .from(contact)
                 .join(contact.manager, manager)
                 .join(manager.center, center)
                 .join(contact.caregiver, qCaregiver)
-                .where(contact.caregiver.eq(caregiver))
-                // 정렬: 거리에 따라 오름차순 정렬 (가까운 순)
-                .orderBy(distanceExpr.asc())
+                .where(contact.caregiver.eq(caregiver), withinDistance)
+                .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
+
+
         // 결과 리스트 조회
-        List<ManagerContact> contacts = query.fetch();
+        List<SimpleContactDTO> contacts = query.fetch();
         // 전체 건수 조회 (페이징 처리를 위한 count)
         long total = query.fetchCount();
+
+
 
         return new PageImpl<>(contacts, pageable, total);
     }

@@ -45,7 +45,7 @@ public class CaregiverMainService {
     private final ApplyRepository applyRepository;
 
     // n km내 매칭 요청 리스트
-    public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable) {
+    public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable, int order) {
 
         // 요양보호사 엔티티 확인 및 검증
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -58,13 +58,12 @@ public class CaregiverMainService {
         String wkt = writer.write(caregiver.getLocation());
 
         // 엔티티 페이지 조회
-        Page<ManagerContact> page =
-        managerContactQueryDsl.findContactsByFieldAndCenterWithinDistance(wkt, range, pageable, caregiver);
+
+        Page<SimpleContactDTO> page = managerContactQueryDsl.findContacts(wkt, range, pageable, caregiver, order);
 
         // 엔티티를 DTO로 변환
-        List<ManagerContact> managerContacts = page.getContent();
-        List<SimpleContactDTO> contents = managerContacts.stream()
-                .map(this::toDTO)
+        List<SimpleContactDTO> contents = page.getContent()
+                .stream().map(this::toDTO)
                 .toList();
 
         return PageResponse.<SimpleContactDTO>builder()
@@ -319,6 +318,19 @@ public class CaregiverMainService {
                 .wage(contact.getWage())
                 .negotiable(contact.isNegotiable())
                 .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
+                .title(getTitle(elder, contact.getWorkRequirement()))
+                .build();
+    }
+
+    public SimpleContactDTO toDTO(SimpleContactDTO contact) { // list에 넣을 dto로 변환
+        Elder elder = contact.getElder();
+
+        return SimpleContactDTO.builder().contactId(contact.getContactId())
+                .center(contact.getCenter())
+                .createdAt(contact.getCreatedAt())
+                .wage(contact.getWage())
+                .negotiable(contact.getNegotiable())
+                .bookmarked(contact.getBookmarked())
                 .title(getTitle(elder, contact.getWorkRequirement()))
                 .build();
     }
