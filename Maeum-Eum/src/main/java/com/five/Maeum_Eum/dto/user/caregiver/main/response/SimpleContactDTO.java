@@ -46,4 +46,19 @@ public class SimpleContactDTO {
         this.daily = daily;
         this.workRequirement = workRequirement;
     }
+
+    @QueryProjection
+    public SimpleContactDTO(Long applyId, String center, Elder elder, LocalDateTime createdAt, Integer wage, Boolean negotiable, Boolean bookmarked, Boolean meal, Boolean toileting, Boolean mobility, Boolean daily) {
+        this.applyId = applyId;
+        this.center = center;
+        this.elder = elder;
+        this.createdAt = createdAt;
+        this.wage = wage;
+        this.negotiable = negotiable;
+        this.bookmarked = bookmarked;
+        this.meal = meal;
+        this.toileting = toileting;
+        this.mobility = mobility;
+        this.daily = daily;
+    }
 }

@@ -26,6 +26,10 @@ public class DetailContactDTO {
     private Boolean negotiable;
     private Boolean bookmarked;
     private ElderInfoDTO elder;
+    private Boolean meal;
+    private Boolean toileting;
+    private Boolean mobility;
+    private Boolean daily;
 }
 
 

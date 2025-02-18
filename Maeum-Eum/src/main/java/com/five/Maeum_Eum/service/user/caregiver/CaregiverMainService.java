@@ -9,6 +9,7 @@ import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
+import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.SavedElders;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
@@ -17,6 +18,7 @@ import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
+import com.five.Maeum_Eum.repository.caregiver.ResumeRepository;
 import com.five.Maeum_Eum.repository.elder.ElderRepository;
 import com.five.Maeum_Eum.repository.elder.SavedEldersRepository;
 import com.five.Maeum_Eum.repository.elder.ServiceSlotRepository;
@@ -43,6 +45,7 @@ public class CaregiverMainService {
     private final SavedEldersRepository savedEldersRepository;
     private final ElderRepository elderRepository;
     private final ApplyRepository applyRepository;
+    private final ResumeRepository resumeRepository;
 
     // n km내 매칭 요청 리스트
     public PageResponse<SimpleContactDTO> getPages(Double range, Pageable pageable, int order) {
@@ -91,6 +94,9 @@ public class CaregiverMainService {
             throw new CustomException(ErrorCode.INVALID_ROLE);
         }
 
+        Resume resume = resumeRepository.findByCaregiverId(caregiver.getCaregiverId()).orElse(null);
+        if (resume == null) { throw new CustomException(ErrorCode.RESUME_NOT_REGISTERED); }
+
         Center center = contact.getManager().getCenter();
         CenterDTO centerDTO = CenterDTO.builder()
                 .centerName(center.getCenterName())
@@ -122,6 +128,10 @@ public class CaregiverMainService {
                 .negotiable(contact.isNegotiable())
                 .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
                 .elder(elderInfoDTO)
+                .meal(resume.getMealLevel() >= elder.getMealLevel())
+                .toileting(resume.getToiletingLevel() >= elder.getToiletingLevel())
+                .mobility(resume.getMobilityLevel() >= elder.getMobilityLevel())
+                .daily(resume.getDailyLevel() >= elder.getDailyLevel())
                 .build();
 
     }
@@ -208,6 +218,9 @@ public class CaregiverMainService {
         Elder elder = elderRepository.findById(id).orElse(null);
         if (elder == null) { throw new CustomException(ErrorCode.INVALID_INPUT); }
 
+        Resume resume = resumeRepository.findByCaregiverId(caregiver.getCaregiverId()).orElse(null);
+        if (resume == null) { throw new CustomException(ErrorCode.RESUME_NOT_REGISTERED); }
+
         Center center = elder.getManager().getCenter();
         CenterDTO centerDTO = CenterDTO.builder()
                 .centerName(center.getCenterName())
@@ -236,6 +249,10 @@ public class CaregiverMainService {
                 .negotiable(elder.isNegotiable())
                 .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
                 .elder(elderInfoDTO)
+                .meal(resume.getMealLevel() >= elder.getMealLevel())
+                .toileting(resume.getToiletingLevel() >= elder.getToiletingLevel())
+                .mobility(resume.getMobilityLevel() >= elder.getMobilityLevel())
+                .daily(resume.getDailyLevel() >= elder.getDailyLevel())
                 .build();
 
     }
@@ -308,19 +325,6 @@ public class CaregiverMainService {
         return title;
     }
 
-    public SimpleContactDTO toDTO(ManagerContact contact) { // list에 넣을 dto로 변환
-        Elder elder = contact.getElder();
-        Caregiver caregiver = contact.getCaregiver();
-
-        return SimpleContactDTO.builder().contactId(contact.getContactId())
-                .center(contact.getManager().getCenter().getCenterName())
-                .createdAt(contact.getCreatedAt())
-                .wage(contact.getWage())
-                .negotiable(contact.isNegotiable())
-                .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
-                .title(getTitle(elder, contact.getWorkRequirement()))
-                .build();
-    }
 
     public SimpleContactDTO toDTO(SimpleContactDTO contact) { // list에 넣을 dto로 변환
         Elder elder = contact.getElder();
@@ -332,18 +336,26 @@ public class CaregiverMainService {
                 .negotiable(contact.getNegotiable())
                 .bookmarked(contact.getBookmarked())
                 .title(getTitle(elder, contact.getWorkRequirement()))
+                .meal(contact.getMeal())
+                .toileting(contact.getToileting())
+                .mobility(contact.getMobility())
+                .daily(contact.getDaily())
                 .build();
     }
 
-    public SimpleContactDTO toDTO(Apply apply) { // list에 넣을 dto로 변환
-        Elder elder = apply.getElder();
+    public SimpleContactDTO toDTOApply(SimpleContactDTO contact) { // list에 넣을 dto로 변환
+        Elder elder = contact.getElder();
 
-        return SimpleContactDTO.builder().applyId(apply.getApplyId())
-                .center(elder.getManager().getCenter().getCenterName())
-                .createdAt(apply.getCreatedAt())
-                .wage(elder.getWage())
-                .negotiable(elder.isNegotiable())
-                .title(getTitle(elder, apply.getWorkRequirement()))
+        return SimpleContactDTO.builder().contactId(contact.getContactId())
+                .center(contact.getCenter())
+                .createdAt(contact.getCreatedAt())
+                .wage(contact.getWage())
+                .negotiable(contact.getNegotiable())
+                .title(getTitle(elder, ""))
+                .meal(contact.getMeal())
+                .toileting(contact.getToileting())
+                .mobility(contact.getMobility())
+                .daily(contact.getDaily())
                 .build();
     }
 }

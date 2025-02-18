@@ -10,6 +10,7 @@ import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.QElder;
 import com.five.Maeum_Eum.entity.user.elder.QSavedElders;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
@@ -252,7 +253,7 @@ public class ManagerContactQueryDsl {
                 .join(contact.manager, manager)
                 .join(manager.center, center)
                 .join(contact.caregiver, qCaregiver)
-                .where(contact.caregiver.eq(caregiver), withinDistance)
+                .where(contact.caregiver.eq(caregiver), withinDistance, contact.approvalStatus.eq(ApprovalStatus.PENDING))
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -265,6 +266,61 @@ public class ManagerContactQueryDsl {
         long total = query.fetchCount();
 
 
+
+        return new PageImpl<>(contacts, pageable, total);
+    }
+
+    public Page<SimpleContactDTO> findMyContacts(Caregiver caregiver, Pageable pageable, ApprovalStatus approvalStatus) {
+        QManagerContact contact = QManagerContact.managerContact;
+        QManager manager = QManager.manager;
+        QCenter center = QCenter.center;
+        QCaregiver qCaregiver = QCaregiver.caregiver;
+        QResume resume = QResume.resume;
+
+        BooleanExpression meal = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.mealLevel));
+        BooleanExpression toileting = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+        BooleanExpression mobility = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+        BooleanExpression daily = resume.caregiver.eq(caregiver)
+                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+
+        BooleanExpression bookmarked = caregiver != null ? JPAExpressions
+                .selectOne()
+                .from(QSavedElders.savedElders)
+                .join(QSavedElders.savedElders.caregiver, qCaregiver)
+                .join(QSavedElders.savedElders.elder, QElder.elder)
+                .where(QSavedElders.savedElders.elder.eq(contact.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
+                .exists() : Expressions.FALSE;
+
+        JPAQuery<SimpleContactDTO> query = jpaQueryFactory
+                .select(new QSimpleContactDTO(
+                        contact.contactId,
+                        center.centerName,
+                        contact.elder,
+                        contact.createdAt,
+                        contact.wage,
+                        contact.negotiable,
+                        bookmarked,
+                        meal,
+                        toileting,
+                        mobility,
+                        daily,
+                        contact.workRequirement
+                ))
+                .from(contact)
+                .join(contact.manager, manager)
+                .join(manager.center, center)
+                .join(contact.caregiver, qCaregiver)
+                .where(contact.caregiver.eq(caregiver), contact.approvalStatus.eq(approvalStatus))
+                .orderBy(contact.contactId.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        List<SimpleContactDTO> contacts = query.fetch();
+        // 전체 건수 조회 (페이징 처리를 위한 count)
+        long total = query.fetchCount();
 
         return new PageImpl<>(contacts, pageable, total);
     }
