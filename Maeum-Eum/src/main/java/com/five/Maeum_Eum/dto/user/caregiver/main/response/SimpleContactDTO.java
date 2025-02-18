@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
     @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SimpleContactDTO {
     private Long contactId;
+    private Long elderId;
     private Long applyId;
     private String center;
     private String title;

@@ -419,9 +419,26 @@ public class CaregiverMainService {
     public SimpleContactDTO toDTOApply(SimpleContactDTO contact) { // list에 넣을 dto로 변환
         Elder elder = contact.getElder();
 
-        return SimpleContactDTO.builder().contactId(contact.getContactId())
+        return SimpleContactDTO.builder().contactId(null)
+                .applyId(contact.getApplyId())
                 .center(contact.getCenter())
                 .createdAt(contact.getCreatedAt())
+                .wage(contact.getWage())
+                .negotiable(contact.getNegotiable())
+                .title(getTitle(elder, ""))
+                .meal(contact.getMeal())
+                .toileting(contact.getToileting())
+                .mobility(contact.getMobility())
+                .daily(contact.getDaily())
+                .build();
+    }
+
+    public SimpleContactDTO toDTOBookmark(SimpleContactDTO contact) { // list에 넣을 dto로 변환
+        Elder elder = contact.getElder();
+
+        return SimpleContactDTO.builder().contactId(null)
+                .elderId(elder.getElderId())
+                .center(contact.getCenter())
                 .wage(contact.getWage())
                 .negotiable(contact.getNegotiable())
                 .title(getTitle(elder, ""))

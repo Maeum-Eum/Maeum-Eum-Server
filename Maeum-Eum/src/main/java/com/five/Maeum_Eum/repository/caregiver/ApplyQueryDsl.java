@@ -70,7 +70,7 @@ public class ApplyQueryDsl {
                 ))
                 .from(apply)
                 .join(apply.elder.manager, manager)
-                .join(manager.center, center)
+                .join(apply.elder.manager.center, center)
                 .join(apply.caregiver, qCaregiver)
                 .where(apply.caregiver.eq(caregiver), apply.approvalStatus.eq(approvalStatus))
                 .orderBy(apply.applyId.asc())

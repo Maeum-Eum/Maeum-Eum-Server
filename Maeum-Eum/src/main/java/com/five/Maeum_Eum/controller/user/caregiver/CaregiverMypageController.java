@@ -149,4 +149,10 @@ public class CaregiverMypageController {
         PageResponse<SimpleContactDTO> body = caregiverService.getApplies(pageable, approvalStatus);
         return ResponseEntity.ok().body(body);
     }
+
+    @GetMapping("/bookmarks")
+    public ResponseEntity<Object> getBookmarks(@PageableDefault(size = 5) Pageable pageable) {
+        PageResponse<SimpleContactDTO> body = caregiverService.getBookmark(pageable);
+        return ResponseEntity.ok().body(body);
+    }
 }
