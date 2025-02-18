@@ -3,6 +3,7 @@ package com.five.Maeum_Eum.service.user.manager;
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.CaregiverDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
@@ -11,6 +12,7 @@ import com.five.Maeum_Eum.dto.user.manager.response.ManagerBasicDto;
 import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
 import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
@@ -23,10 +25,14 @@ import com.five.Maeum_Eum.repository.elder.ElderRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerBookmarkRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
+import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,6 +47,7 @@ public class ManagerService {
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
     private final ElderRepository elderRepository;
+    private final CaregiverService caregiverService;
 
     // token으로  사용자 role 알아내기
     private String findRole(String token){
@@ -200,5 +207,24 @@ public class ManagerService {
         managerBookmarkRepository.delete(managerBookmark);
 
         return "관리자의 북마크가 삭제되었습니다.";
+    }
+
+    /* 요양보호사에게 연락한 목록 중 아직 대기 상태인 거 */
+    public List<CaregiverDto> getContactList(String token, String name, ApprovalStatus approvalStatus) {
+
+        Manager manager = findManager(token);
+
+            List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatus(ApprovalStatus.PENDING);
+
+            List<CaregiverDto> caregiverDtos = managerContacts.stream()
+                    .map(managerContact -> {
+                        String title = caregiverService.makeTitle(managerContact.getCaregiver().getResume());
+
+                        return CaregiverDto.from(managerContact, title);
+                    })
+                    .collect(Collectors.toList());
+
+            return caregiverDtos;
+
     }
 }
