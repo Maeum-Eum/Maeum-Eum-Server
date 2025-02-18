@@ -39,5 +39,6 @@ public class ElderCreateDTO {
     @NotBlank
     private String pet;
     private Boolean negotiable;
+    private Integer wage;
 
 }
