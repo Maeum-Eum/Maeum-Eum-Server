@@ -1,14 +1,19 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
+import com.five.Maeum_Eum.common.PageResponse;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.mypage.CaregiverMypageDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -111,5 +116,37 @@ public class CaregiverMypageController {
 
         String result = caregiverService.deleteProfileImage(findCaregiver);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/contacts")
+    public ResponseEntity<Object> getContacts(@PageableDefault(size = 5) Pageable pageable,
+                                          @RequestParam String tab) {
+        ApprovalStatus approvalStatus;
+        if (tab.equals("pending")) {
+            approvalStatus = ApprovalStatus.PENDING;
+        }
+
+        else if (tab.equals("approved")) {
+            approvalStatus = ApprovalStatus.APPROVED;
+        }
+        else throw new CustomException(ErrorCode.INVALID_INPUT);
+        PageResponse<SimpleContactDTO> body = caregiverService.getContacts(pageable, approvalStatus);
+        return ResponseEntity.ok().body(body);
+    }
+
+    @GetMapping("/applies")
+    public ResponseEntity<Object> getApplies(@PageableDefault(size = 5) Pageable pageable,
+                                              @RequestParam String tab) {
+        ApprovalStatus approvalStatus;
+        if (tab.equals("pending")) {
+            approvalStatus = ApprovalStatus.PENDING;
+        }
+
+        else if (tab.equals("approved")) {
+            approvalStatus = ApprovalStatus.APPROVED;
+        }
+        else throw new CustomException(ErrorCode.INVALID_INPUT);
+        PageResponse<SimpleContactDTO> body = caregiverService.getApplies(pageable, approvalStatus);
+        return ResponseEntity.ok().body(body);
     }
 }

@@ -1,7 +1,10 @@
 package com.five.Maeum_Eum.repository.manager;
 
+import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +20,8 @@ public interface ManagerContactRepository extends JpaRepository<ManagerContact, 
 
     @Query("SELECT mc FROM ManagerContact mc WHERE mc.approvalStatus = :state")
     List<ManagerContact> findByApprovalStatus(@Param("state") ApprovalStatus state);
+
+    Page<ManagerContact> findAllByCaregiverAndApprovalStatus(Pageable pageable, Caregiver caregiver
+            , ApprovalStatus approvalStatus);
 }
 
