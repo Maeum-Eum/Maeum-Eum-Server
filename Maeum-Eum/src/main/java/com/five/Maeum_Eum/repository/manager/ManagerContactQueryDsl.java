@@ -32,8 +32,6 @@ public class ManagerContactQueryDsl {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    // 이 주변에서 시급이 가장 높은 어르신 조회
-
     // 최종
     public List<Caregiver> findCaregiverByFullMatchingSystem(ManagerContact mc, Elder elder, int count){
 
@@ -135,27 +133,6 @@ public class ManagerContactQueryDsl {
         return null;
     }
 
-    public List<Caregiver> findQualifiedCaregivers(int requiredElderRank){
-
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QResume resume = QResume.resume;
-
-        // FIND_IN_SET : (요양보호사의 등급 목록에 elderRank가 포함되는지 확인하기)
-        BooleanExpression rankCondition = Expressions.numberTemplate(Integer.class,
-                "FIND_IN_SET({0}, {1})", requiredElderRank + "", resume.elderRank).gt(0);
-
-        return jpaQueryFactory
-                .select(caregiver)
-                .from(resume)
-                .join(resume.caregiver, caregiver)
-                .where(
-                        rankCondition,
-                        caregiver.isResumeRegistered.eq(true)
-                )
-                .limit(20)
-                .fetch();
-    }
-
     // ServiceSlot : 어떤 요일에 대한 요구 서비스 시간대에 적합한 요양사를 추출 (테스트 완료)
     public List<CaregiverWithOverlapDto> findCaregiverByMatchingTimeOne(ServiceSlot serviceSlot) {
 
@@ -207,48 +184,6 @@ public class ManagerContactQueryDsl {
                 .fetch();
 
         return caregivers;
-    }
-
-    // ServiceSlot : 어떤 어르신의 [월~일]까지 요구 서비스 시간대에 적합한 요양사를 추출한다. (안됨)
-    public List<CaregiverWithOverlapDto> findCaregiverByMatchingTimeSlot(List<ServiceSlot> serviceSlotList) {
-
-        QCaregiverTime caregiverTime = QCaregiverTime.caregiverTime;
-        QCaregiver caregiver = QCaregiver.caregiver;
-
-        NumberExpression<Integer> totalOverlapExpr = Expressions.numberTemplate(Integer.class, "0");
-
-        for (ServiceSlot slot : serviceSlotList) {
-            NumberExpression<Integer> dailyOverlap = Expressions.numberTemplate(
-                    Integer.class,
-                    "CASE " +
-                            "WHEN GREATEST({0}, {2}) >= LEAST({1}, {3}) THEN 0 " + // 시간대 겹치지 않음
-                            "WHEN {0} <= {1} AND {2} <= {3} THEN TIMESTAMPDIFF(MINUTE, {1}, {2}) " + // 완전 포함
-                            "WHEN {0} <= {1} AND {2} >= {3} THEN TIMESTAMPDIFF(MINUTE, {1}, {3}) " + // 시작점 포함
-                            "WHEN {1} <= {0} AND {2} >= {3} THEN TIMESTAMPDIFF(MINUTE, {0}, {3}) " + // 끝점 포함
-                            "WHEN {1} <= {0} AND {2} <= {3} THEN TIMESTAMPDIFF(MINUTE, {0}, {2}) " + // 완전히 내부
-                            "ELSE 0 END",
-                    caregiverTime.startTime,          // {0}
-                    slot.getServiceSlotStart(),       // {1}
-                    caregiverTime.endTime,            // {2}
-                    slot.getServiceSlotEnd(),         // {3}
-                    caregiverTime.workDay,           // {4}
-                    slot.getServiceSlotDay()          // {5}
-            );
-            totalOverlapExpr.add(dailyOverlap);
-        }
-
-        return jpaQueryFactory
-                .select(Projections.constructor(
-                        CaregiverWithOverlapDto.class,
-                        caregiver,
-                        totalOverlapExpr.sum()
-                ))
-                .from(caregiverTime)
-                .join(caregiver).on(caregiverTime.caregiver.eq(caregiver))
-                .groupBy(caregiver.caregiverId)
-                .orderBy(totalOverlapExpr.sum().desc())
-                .limit(10)
-                .fetch();
     }
 
     // 거리기반 매칭
