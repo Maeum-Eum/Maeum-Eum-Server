@@ -12,11 +12,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplyRepository extends JpaRepository<Apply,Long> {
     Page<Apply> findAllByCaregiverAndApprovalStatus(Pageable pageable, Caregiver caregiver
             , ApprovalStatus approvalStatus);
     boolean existsByCaregiverAndElder(Caregiver caregiver, Elder elder);
+    Optional<Apply> findByCaregiverAndElder(Caregiver caregiver, Elder elder);
 
     @Query("select a from Apply a where a.elder.elderId =:elderId  and a.approvalStatus =:status")
     List<Apply> findAllByElderAndApprovalStatus( @Param("elderId")Long elderId , @Param("status")ApprovalStatus approvalStatus);
