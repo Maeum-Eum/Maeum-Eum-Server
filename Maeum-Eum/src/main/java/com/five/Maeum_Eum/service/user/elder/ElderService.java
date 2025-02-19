@@ -68,6 +68,11 @@ public class ElderService {
         if ( cnt > 0)
             dto.setName(dto.getName() + " (" + cnt + ")");
 
+        // 잘못된 필드 검사
+        for(String test : dto.getDaily()){
+            DailyElderType dailyType = DailyElderType.fromLabel(test);
+        }
+
         Elder elder = Elder.builder()
                 .elderName(dto.getName())
                 .gender(dto.getGender())
@@ -94,22 +99,22 @@ public class ElderService {
                                 .orElse(0)
                 )
                 .dailyFilter1(
-                        dto.getDaily().contains(DailyType.ONE.getLabel())
+                        dto.getDaily().contains(DailyElderType.ONE.getLabel())
                 )
                 .dailyFilter2(
-                        dto.getDaily().contains(DailyType.TWO.getLabel())
+                        dto.getDaily().contains(DailyElderType.TWO.getLabel())
                 )
                 .dailyFilter3(
-                        dto.getDaily().contains(DailyType.THREE.getLabel())
+                        dto.getDaily().contains(DailyElderType.THREE.getLabel())
                 )
                 .dailyFilter4(
-                        dto.getDaily().contains(DailyType.FOUR.getLabel())
+                        dto.getDaily().contains(DailyElderType.FOUR.getLabel())
                 )
                 .dailyFilter5(
-                        dto.getDaily().contains(DailyType.FIVE.getLabel())
+                        dto.getDaily().contains(DailyElderType.FIVE.getLabel())
                 )
                 .dailyFilter6(
-                        dto.getDaily().contains(DailyType.SIX.getLabel())
+                        dto.getDaily().contains(DailyElderType.SIX.getLabel())
                 )
                 .mobilityLevel(
                         dto.getMobility().stream()
