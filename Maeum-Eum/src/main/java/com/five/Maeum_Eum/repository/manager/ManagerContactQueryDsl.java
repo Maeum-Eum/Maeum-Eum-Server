@@ -205,8 +205,13 @@ public class ManagerContactQueryDsl {
                         .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
-       //         .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = Expressions.numberTemplate(
+                Integer.class,
+                "function('bitand', {0}, {1})",
+                QElder.elder.dailyLevel,
+                resume.dailyLevel
+
+        ).eq(QElder.elder.dailyLevel);
 
         // 가능한 업무 개수
         NumberExpression<Integer> mealCount = Expressions.numberTemplate(
@@ -224,11 +229,38 @@ public class ManagerContactQueryDsl {
                 .add(mobilityCount)
                 .add(dailyCount);
 
+
+
         // 일치도 총합
+        NumberExpression<Integer> bitCountResume = Expressions.numberTemplate(
+                Integer.class, "function('bit_count', {0})", resume.dailyLevel
+        );
+        NumberExpression<Integer> bitCountElder = Expressions.numberTemplate(
+                Integer.class, "function('bit_count', {0})", QElder.elder.dailyLevel
+        );
+        NumberExpression<Integer> dailyDifference = Expressions.numberTemplate(
+                Integer.class,
+                "cast({0} as signed) - cast({1} as signed)",
+                bitCountResume,
+                bitCountElder
+        );
+
         NumberExpression<Integer> totalDifference = resume.mealLevel.subtract(QElder.elder.mealLevel)
                 .add(resume.toiletingLevel.subtract(QElder.elder.toiletingLevel))
-                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel));
-        // 삭제
+                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel))
+                .add(
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "cast(function('bit_count', {0}) as integer)",
+                                resume.dailyLevel
+                        ).subtract(
+                                Expressions.numberTemplate(
+                                        Integer.class,
+                                        "cast(function('bit_count', {0}) as integer)",
+                                        QElder.elder.dailyLevel
+                                )
+                        )
+                );
 
         // 북마크 여부
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions

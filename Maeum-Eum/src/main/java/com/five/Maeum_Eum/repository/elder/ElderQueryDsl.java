@@ -49,7 +49,8 @@ public class ElderQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
+        BooleanExpression daily = resume.caregiver.eq(caregiver)
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         BooleanExpression tmp = meal;
         if (num == 1) {
@@ -118,7 +119,13 @@ public class ElderQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
+        BooleanExpression daily = Expressions.numberTemplate(
+                Integer.class,
+                "function('bitand', {0}, {1})",
+                QElder.elder.dailyLevel,
+                resume.dailyLevel
+
+        ).eq(QElder.elder.dailyLevel);
 
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
@@ -172,7 +179,13 @@ public class ElderQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
+        BooleanExpression daily = Expressions.numberTemplate(
+                Integer.class,
+                "function('bitand', {0}, {1})",
+                QElder.elder.dailyLevel,
+                resume.dailyLevel
+
+        ).eq(QElder.elder.dailyLevel);
 
 
         JPAQuery<SimpleContactDTO> query = jpaQueryFactory
