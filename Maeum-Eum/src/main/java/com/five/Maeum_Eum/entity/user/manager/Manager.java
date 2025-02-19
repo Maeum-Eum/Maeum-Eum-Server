@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.entity.user.manager;
 
 import com.five.Maeum_Eum.entity.center.Center;
+import com.five.Maeum_Eum.entity.user.elder.Elder;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,6 +29,9 @@ public class Manager {
     private String loginId;
 
     private String password;
+
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Elder> elders = new ArrayList<>();
 
 
     @ManyToOne
