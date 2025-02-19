@@ -19,5 +19,8 @@ public interface ManagerBookmarkRepository extends JpaRepository<ManagerBookmark
 
 
     @Query("SELECT CASE WHEN COUNT(mb) > 0 THEN TRUE ELSE FALSE END FROM ManagerBookmark mb WHERE mb.manager.managerId = :managerId AND mb.caregiver.caregiverId = :caregiverId")
-    boolean findByManagerIdAndCaregiverId(@Param("managerId") Long managerId, @Param("caregiverId") Long caregiverId);
+    boolean isMarkedByManagerIdAndCaregiverId(@Param("managerId") Long managerId, @Param("caregiverId") Long caregiverId);
+
+    @Query("SELECT mb FROM ManagerBookmark mb WHERE mb.manager.managerId = :managerId AND mb.caregiver.caregiverId = :caregiverId")
+    ManagerBookmark findByManagerIdAndCaregiverId(@Param("managerId") Long managerId, @Param("caregiverId") Long caregiverId);
 }
