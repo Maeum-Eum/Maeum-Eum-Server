@@ -3,10 +3,10 @@ package com.five.Maeum_Eum.service.user.manager;
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.center.request.ModifyCenterReq;
 import com.five.Maeum_Eum.dto.center.response.CenterDTO;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.*;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderListDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderSimpleDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
@@ -507,5 +507,46 @@ public class ManagerService {
     /* 거리 변환 */
     private double getDistanceFromWorkPlace(String workPlace) {
         return WorkDistance.fromLabel(workPlace).getDistance();
+    }
+
+    /* 지원한 요양보호사 수락하기 */
+    public ApplySimpleDto approveApplication(String token, Long applyId) {
+        Manager manager = findManager(token);
+
+        Apply apply = applyRepository.findById(applyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.APPLY_NOT_FOUND));
+
+        apply.updateStatus(ApprovalStatus.APPROVED);
+        applyRepository.save(apply);
+
+        Apply savedApply = applyRepository.findById(applyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.APPLY_NOT_FOUND));
+
+        ApplySimpleDto applySimpleDto = ApplySimpleDto.from(apply);
+
+        return applySimpleDto;
+    }
+
+    /* 지원한 요양보호사 거절하기 */
+    public String deleteApplication(String token, Long applyId) {
+        Manager manager = findManager(token);
+
+        Apply apply = applyRepository.findById(applyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.APPLY_NOT_FOUND));
+        apply.updateStatus(ApprovalStatus.REJECTED);
+
+        return "지원한 요양보호사가 거절되었습니다.";
+    }
+
+    /* 관리자가 소속한 센터에 속한 어르신 목록 조회 */
+    public List<ElderSimpleDto> getElderList(String token) {
+        Manager manager = findManager(token);
+         List<Elder> elders = elderRepository.findByManagerId(manager.getManagerId());
+
+         List<ElderSimpleDto> elderSimpleDtos  = elders.stream()
+                .map(elder -> ElderSimpleDto.from(elder))
+                .collect(Collectors.toList());
+
+        return elderSimpleDtos;
     }
 }

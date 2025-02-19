@@ -60,7 +60,7 @@ public class Center {
     private String oneLineIntro; // 한 줄 소개
 
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Manager> contents = new ArrayList<>();
+    private List<Manager> managers = new ArrayList<>();
 
     public void registerManager(boolean hasCar) {
         this.hasCar = hasCar;
