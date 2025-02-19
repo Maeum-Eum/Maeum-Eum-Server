@@ -163,7 +163,6 @@ public class ElderQueryDsl {
     }
 
     public Page<SimpleContactDTO> findMyBookmark(Caregiver caregiver, Pageable pageable) {
-        QApply apply = QApply.apply;
         QManager manager = QManager.manager;
         QCenter center = QCenter.center;
         QCaregiver qCaregiver = QCaregiver.caregiver;
@@ -172,29 +171,22 @@ public class ElderQueryDsl {
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                 .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
-        BooleanExpression bookmarked = caregiver != null ? JPAExpressions
-                .selectOne()
-                .from(QSavedElders.savedElders)
-                .join(QSavedElders.savedElders.caregiver, qCaregiver)
-                .join(QSavedElders.savedElders.elder, QElder.elder)
-                .where(QSavedElders.savedElders.elder.eq(apply.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
-                .exists() : Expressions.FALSE;
 
         JPAQuery<SimpleContactDTO> query = jpaQueryFactory
                 .select(new QSimpleContactDTO(
-                        QSavedElders.savedElders.elder.elderId,
+                        QElder.elder.elderId,
                         center.centerName,
-                        QSavedElders.savedElders.elder,
-                        null,
-                        QSavedElders.savedElders.elder.wage,
-                        QSavedElders.savedElders.elder.negotiable,
-                        bookmarked,
+                        QElder.elder,
+                        resume.createdAt,
+                        QElder.elder.wage,
+                        QElder.elder.negotiable,
+                        Expressions.TRUE,
                         meal,
                         toileting,
                         mobility,
@@ -202,9 +194,10 @@ public class ElderQueryDsl {
                 ))
                 .from(QSavedElders.savedElders)
                 .join(QSavedElders.savedElders.elder, QElder.elder)
-                .join(QSavedElders.savedElders.elder.manager, manager)
-                .join(QSavedElders.savedElders.elder.manager.center, center)
+                .join(QElder.elder.manager, manager)
+                .join(manager.center, center)
                 .join(QSavedElders.savedElders.caregiver, qCaregiver)
+                .join(qCaregiver.resume, resume)
                 .where(QSavedElders.savedElders.caregiver.eq(caregiver))
                 .orderBy(QSavedElders.savedElders.savedEldersId.asc())
                 .offset(pageable.getOffset())

@@ -1,5 +1,10 @@
 package com.five.Maeum_Eum.service.user.elder;
 
+import com.five.Maeum_Eum.controller.user.service.DailyElderType;
+import com.five.Maeum_Eum.controller.user.service.MealElderType;
+import com.five.Maeum_Eum.controller.user.service.MobilityElderType;
+import com.five.Maeum_Eum.controller.user.service.ToiletingElderType;
+import com.five.Maeum_Eum.controller.work.MobilityType;
 import com.five.Maeum_Eum.dto.user.elder.request.ElderCreateDTO;
 import com.five.Maeum_Eum.dto.user.register.request.ManagerRegiDTO;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
@@ -16,6 +21,7 @@ import com.five.Maeum_Eum.service.center.KakaoAddressService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -41,7 +47,6 @@ public class ElderService {
         Manager manager = managerRepository.findByLoginId(managerId).orElse(null);
         if (manager == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);}
 
-
         // 입력 검증
         for (ConstraintViolation<ElderCreateDTO> violation : Validation.buildDefaultValidatorFactory().getValidator().validate(dto)) {
             System.out.println(violation.getPropertyPath().toString());
@@ -51,7 +56,6 @@ public class ElderService {
         // family 필드 변환
         ElderFamily family = ElderFamily.fromValue(dto.getFamily());
         if (family == null) throw new CustomException(ErrorCode.INVALID_INPUT);
-
 
         // 주소 -> 좌표 변환
         Point location = kakaoAddressService.getCoordinates(dto.getAddress());
@@ -77,7 +81,38 @@ public class ElderService {
                 .elder_family(family)
                 .elder_pet(dto.getPet().equals("있어요"))
                 .location(location)
+
+                // 서비스 요구 단계
+                .mealLevel(
+                       dto.getMeal().stream()
+                                .map(MealElderType::fromLabel)
+                                .mapToInt(MealElderType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
+                .dailyLevel(
+                        dto.getDaily().stream()
+                                .map(DailyElderType::fromLabel)
+                                .mapToInt(DailyElderType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
+                .mobilityLevel(
+                        dto.getMobility().stream()
+                                .map(MobilityElderType::fromLabel)
+                                .mapToInt(MobilityElderType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
+                .toiletingLevel(
+                        dto.getToileting().stream()
+                                .map(ToiletingElderType::fromLabel)
+                                .mapToInt(ToiletingElderType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
                 .build();
+
 
         elderRepository.save(elder);
 
