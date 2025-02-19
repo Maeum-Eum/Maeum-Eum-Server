@@ -3,7 +3,6 @@ package com.five.Maeum_Eum.dto.user.caregiver.resume.request;
 
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import com.five.Maeum_Eum.entity.user.caregiver.WorkPlace;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -25,7 +24,7 @@ public class ResumeSaveDTO {
     @NotNull
     private Boolean hasVehicle;
     @NotNull
-    private List<WorkPlace> workPlace;
+    private List<String> workPlace;
     @NotNull
     private List<Integer> workDay;
     @NotNull

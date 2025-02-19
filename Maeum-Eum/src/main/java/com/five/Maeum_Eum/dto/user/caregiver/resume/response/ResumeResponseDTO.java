@@ -1,7 +1,6 @@
 package com.five.Maeum_Eum.dto.user.caregiver.resume.response;
 
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import com.five.Maeum_Eum.entity.user.caregiver.WorkPlace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +18,7 @@ public class ResumeResponseDTO {
     private String certificateCode;
     private Resume.DemantiaTraining hasDementiaTraining;
     private Boolean hasVehicle;
-    private List<WorkPlace> workPlace;
+    private List<String> workPlace;
     private List<Integer> workDay;
     private List<Integer> workTimeSlot;
     private Boolean isNegotiableTime;

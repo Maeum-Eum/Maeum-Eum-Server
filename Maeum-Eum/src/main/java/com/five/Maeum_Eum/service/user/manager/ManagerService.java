@@ -16,8 +16,7 @@ import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import com.five.Maeum_Eum.entity.user.caregiver.WorkPlace;
-import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
+import com.five.Maeum_Eum.entity.user.caregiver.WorkDistance;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
@@ -42,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -436,6 +434,10 @@ public class ManagerService {
         // 일단 임의로 30개만 조회
         List<Caregiver> caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
 
+        if(caregiverList.isEmpty()){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "매칭으로 조회된 유저가 아예 없습니다.");
+        }
+
         // 정렬 및 변환
         return caregiverList.stream()
                 .sorted((c1, c2) -> {
@@ -494,17 +496,6 @@ public class ManagerService {
 
     /* 거리 변환 */
     private double getDistanceFromWorkPlace(String workPlace) {
-        switch (workPlace) {
-            case "도보15분이내":
-                return 1.25; // 1.25Km
-            case "도보20분이내":
-                return 1.65; // 1.65Km
-            case "3km":
-                return 3.0; // 3Km
-            case "5km":
-                return 5.0; // 5Km
-            default:
-                throw new IllegalArgumentException("잘못된 WorkPlace 값입니다: " + workPlace);
-        }
+        return WorkDistance.fromLabel(workPlace).getDistance();
     }
 }
