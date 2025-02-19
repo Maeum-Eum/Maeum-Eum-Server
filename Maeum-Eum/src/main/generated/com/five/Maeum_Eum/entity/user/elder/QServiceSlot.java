@@ -50,7 +50,7 @@ public class QServiceSlot extends EntityPathBase<ServiceSlot> {
 
     public QServiceSlot(Class<? extends ServiceSlot> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.elder = inits.isInitialized("elder") ? new QElder(forProperty("elder")) : null;
+        this.elder = inits.isInitialized("elder") ? new QElder(forProperty("elder"), inits.get("elder")) : null;
     }
 
 }

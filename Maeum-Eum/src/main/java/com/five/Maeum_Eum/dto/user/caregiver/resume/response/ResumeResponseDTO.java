@@ -20,8 +20,8 @@ public class ResumeResponseDTO {
     private Resume.DemantiaTraining hasDementiaTraining;
     private Boolean hasVehicle;
     private List<WorkPlace> workPlace;
-    private List<String> workDay;
-    private List<String> workTimeSlot;
+    private List<Integer> workDay;
+    private List<Integer> workTimeSlot;
     private Boolean isNegotiableTime;
     private Integer wage;
     private List<Integer> elderRank;

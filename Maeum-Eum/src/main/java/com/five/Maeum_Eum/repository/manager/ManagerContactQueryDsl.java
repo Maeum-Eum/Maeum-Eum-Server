@@ -1,15 +1,13 @@
 package com.five.Maeum_Eum.repository.manager;
 
 import com.five.Maeum_Eum.entity.center.QCenter;
-import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
-import com.five.Maeum_Eum.entity.user.caregiver.QCaregiver;
-import com.five.Maeum_Eum.entity.user.caregiver.QResume;
-import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.caregiver.*;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -68,7 +66,7 @@ public class ManagerContactQueryDsl {
                 );
 
         // 7. [필] 시간 조건 : 근로자의 근무 가능 요일자가 어르신 요구 요일자 및 시간대를 전부 가지고 있어야 할 것
-        Set<String> requiredWorkTimeSlot = new HashSet<>();
+        Set<Integer> requiredWorkTimeSlot = new HashSet<>();
 
         // 각 시간대의 기준 시간 정의
         LocalTime morningStart = LocalTime.of(9, 0);
@@ -85,21 +83,21 @@ public class ManagerContactQueryDsl {
 
             // MORNING: 슬롯이 오전 시간대와 일부라도 겹치는 경우
             if (slotEnd.isAfter(morningStart) && slotStart.isBefore(morningEnd)) {
-                requiredWorkTimeSlot.add("MORNING");
+                requiredWorkTimeSlot.add(TimeSlot.MORNING.ordinal());
             }
             // AFTERNOON: 슬롯이 점심(오후) 시간대와 일부라도 겹치는 경우
             if (slotEnd.isAfter(afternoonStart) && slotStart.isBefore(afternoonEnd)) {
-                requiredWorkTimeSlot.add("AFTERNOON");
+                requiredWorkTimeSlot.add(TimeSlot.AFTERNOON.ordinal());
             }
             // EVENING: 슬롯이 저녁 시간대와 일부라도 겹치는 경우
             if (slotEnd.isAfter(eveningStart) && slotStart.isBefore(eveningEnd)) {
-                requiredWorkTimeSlot.add("EVENING");
+                requiredWorkTimeSlot.add(TimeSlot.EVENING.ordinal());
             }
         }
 
         // 어르신이 원하는 시간대를 모두 추출하여 저장
         BooleanExpression timeSlotFilter = Expressions.TRUE;
-        for (String requiredWorkTime : requiredWorkTimeSlot) {
+        for (int requiredWorkTime : requiredWorkTimeSlot) {
 
             log.info("요구 시간대" + requiredWorkTime);
 
@@ -107,27 +105,25 @@ public class ManagerContactQueryDsl {
             BooleanExpression slotExpr = Expressions.numberTemplate(
                     Integer.class,
                     "FIND_IN_SET({0}, {1})",
-                    requiredWorkTime,
+                    requiredWorkTime + "",
                     resume.workTimeSlot
 
             ).gt(0);
             timeSlotFilter = timeSlotFilter.and(slotExpr);
         }
 
-        BooleanExpression workDayFilter = Expressions.TRUE;
-
+        BooleanBuilder workDayFilter = new BooleanBuilder();
         for (ServiceSlot slot : elder.getServiceSlots()) {
-
-            log.info("요구 요일 : " + slot.getServiceSlotDay());
 
             // 요일을 필터에 추가 한다.
             BooleanExpression dayExpr = Expressions.numberTemplate(
                     Integer.class,
                     "FIND_IN_SET({0}, {1})",
-                    slot.getServiceSlotDay(),
+                    (slot.getServiceSlotDay().ordinal()+1) + "",
                     resume.workDay
+
             ).gt(0);
-            workDayFilter = workDayFilter.and(dayExpr);
+            workDayFilter.and(dayExpr);
         }
 
         return jpaQueryFactory
@@ -135,6 +131,7 @@ public class ManagerContactQueryDsl {
                 .from(resume)
                 .join(resume.caregiver, caregiver)
                 .where(
+
                         // 1. [필] 이력서 등록 여부
                         isResumeRegistred,
 
@@ -151,10 +148,11 @@ public class ManagerContactQueryDsl {
                         serviceFilter,
 
                         // 6. [중] 거리 조건 필터링
-                        distanceFilter.loe(distance * 1000.0)
+                        distanceFilter.loe(distance * 1000.0),
 
-                        // 7. [중] 시간 조건 점수
-                        //timeFilter.gt(0)
+                        // 7. [중] 시간 조건
+                        timeSlotFilter,
+                        workDayFilter
                 )
                 .limit(count)
                 .orderBy(distanceFilter.desc())
