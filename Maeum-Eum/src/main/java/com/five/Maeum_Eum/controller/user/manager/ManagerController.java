@@ -1,11 +1,10 @@
 package com.five.Maeum_Eum.controller.user.manager;
 
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.*;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderInfoDTO;
+import com.five.Maeum_Eum.dto.user.elder.response.ElderSimpleDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
@@ -133,5 +132,28 @@ public class ManagerController {
         return ResponseEntity.ok(recommendedCaregiverDtoList);
     }
 
+    /* 지원한 요양보호사 수락하기 */
+    @PostMapping("/apply/{applyId}")
+    public ResponseEntity<ApplySimpleDto> approveApplication(@RequestHeader("Authorization") String authHeader , @PathVariable("applyId")Long applyId){
+        String token = extractToken(authHeader);
+        ApplySimpleDto applySimpleDto = managerService.approveApplication(token , applyId);
+        return ResponseEntity.ok(applySimpleDto);
+    }
+
+    /* 지원한 요양보호사 거절하기 */
+    @DeleteMapping("/apply/{applyId}")
+    public ResponseEntity<String> rejectApplication(@RequestHeader("Authorization") String authHeader , @PathVariable("applyId")Long applyId){
+        String token = extractToken(authHeader);
+        String response = managerService.deleteApplication(token , applyId);
+        return ResponseEntity.ok(response);
+    }
+
+    /* 관리자가 소속한 센터에 속한 어르신 목록 조회*/
+    @GetMapping("/elder")
+    public ResponseEntity<?> getElderList(@RequestHeader("Authorization") String authHeader){
+        String token = extractToken(authHeader);
+        List<ElderSimpleDto> elderInfoDTOList = managerService.getElderList(token);
+        return ResponseEntity.ok(elderInfoDTOList);
+    }
 
 }

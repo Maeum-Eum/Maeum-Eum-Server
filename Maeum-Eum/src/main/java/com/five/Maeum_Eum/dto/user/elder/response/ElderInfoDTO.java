@@ -22,4 +22,5 @@ public class ElderInfoDTO {
     private List<String> daily;
     private String family;
     private String pet;
+
 }

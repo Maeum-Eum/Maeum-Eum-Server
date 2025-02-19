@@ -48,4 +48,8 @@ public class Apply extends BaseTimeEntity {
 
     @Column(length = 20)
     private String caregiverPhoneNumber; // 요양복지사 핸드폰
+
+    public void updateStatus(ApprovalStatus approvalStatus){
+        this.approvalStatus = approvalStatus;
+    }
 }
