@@ -23,6 +23,7 @@ public record ApplyCaregiverDto(
         boolean negotiable,
         String title ,
         List<String> satisfyTasks, //해당 어르신의 요구사항과 같거나 높은 거 노출
+        int wage ,
         LocalDateTime createdAt,
         LocalDateTime updateAt
 ) {
@@ -38,6 +39,7 @@ public record ApplyCaregiverDto(
                   caregiver.getResume().getNegotiableTime(),
                   title,
                   satisfyTasks,
+                  caregiver.getResume().getWage(),
                   apply.getCreatedAt(),
                   apply.getUpdatedAt()
           );
