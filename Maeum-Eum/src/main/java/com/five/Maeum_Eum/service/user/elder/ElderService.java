@@ -297,12 +297,12 @@ public class ElderService {
                         .mapToInt(MobilityElderType::getLevel)
                         .max()
                         .orElse(0),
-                dto.getDaily().stream()
-                        .map(DailyElderType::fromLabel)
-                        .mapToInt(DailyElderType::getLevel)
-                        .max()
-                        .orElse(0)
-
+                dto.getDaily().contains(DailyType.ONE.getLabel()),
+                dto.getDaily().contains(DailyType.TWO.getLabel()),
+                dto.getDaily().contains(DailyType.THREE.getLabel()),
+                dto.getDaily().contains(DailyType.FOUR.getLabel()),
+                dto.getDaily().contains(DailyType.FIVE.getLabel()),
+                dto.getDaily().contains(DailyType.SIX.getLabel())
         );
         elderRepository.save(elder);
 

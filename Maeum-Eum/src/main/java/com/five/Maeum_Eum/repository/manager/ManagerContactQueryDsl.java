@@ -205,13 +205,12 @@ public class ManagerContactQueryDsl {
                         .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = Expressions.numberTemplate(
-                Integer.class,
-                "function('bitand', {0}, {1})",
-                QElder.elder.dailyLevel,
-                resume.dailyLevel
-
-        ).eq(QElder.elder.dailyLevel);
+        BooleanExpression daily = resume.dailyFilter1.goe(QElder.elder.dailyFilter1)
+                .and(resume.dailyFilter2.goe(QElder.elder.dailyFilter2))
+                .and(resume.dailyFilter3.goe(QElder.elder.dailyFilter3))
+                .and(resume.dailyFilter4.goe(QElder.elder.dailyFilter4))
+                .and(resume.dailyFilter5.goe(QElder.elder.dailyFilter5))
+                .and(resume.dailyFilter6.goe(QElder.elder.dailyFilter6));
 
         // 가능한 업무 개수
         NumberExpression<Integer> mealCount = Expressions.numberTemplate(
@@ -232,35 +231,27 @@ public class ManagerContactQueryDsl {
 
 
         // 일치도 총합
-        NumberExpression<Integer> bitCountResume = Expressions.numberTemplate(
-                Integer.class, "function('bit_count', {0})", resume.dailyLevel
-        );
-        NumberExpression<Integer> bitCountElder = Expressions.numberTemplate(
-                Integer.class, "function('bit_count', {0})", QElder.elder.dailyLevel
-        );
-        NumberExpression<Integer> dailyDifference = Expressions.numberTemplate(
-                Integer.class,
-                "cast({0} as signed) - cast({1} as signed)",
-                bitCountResume,
-                bitCountElder
-        );
+        NumberExpression<Integer> resumeTrueCount =
+                Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter1)
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter2))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter3))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter4))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter5))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter6));
 
+        NumberExpression<Integer> elderTrueCount =
+                Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter1)
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter2))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter3))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter4))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter5))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter6));
+
+        NumberExpression<Integer> trueCountDifference = resumeTrueCount.subtract(elderTrueCount);
         NumberExpression<Integer> totalDifference = resume.mealLevel.subtract(QElder.elder.mealLevel)
                 .add(resume.toiletingLevel.subtract(QElder.elder.toiletingLevel))
                 .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel))
-                .add(
-                        Expressions.numberTemplate(
-                                Integer.class,
-                                "cast(function('bit_count', {0}) as integer)",
-                                resume.dailyLevel
-                        ).subtract(
-                                Expressions.numberTemplate(
-                                        Integer.class,
-                                        "cast(function('bit_count', {0}) as integer)",
-                                        QElder.elder.dailyLevel
-                                )
-                        )
-                );
+                .add(trueCountDifference);
 
         // 북마크 여부
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
@@ -329,8 +320,12 @@ public class ManagerContactQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
-                //.and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.dailyFilter1.goe(QElder.elder.dailyFilter1)
+                .and(resume.dailyFilter2.goe(QElder.elder.dailyFilter2))
+                .and(resume.dailyFilter3.goe(QElder.elder.dailyFilter3))
+                .and(resume.dailyFilter4.goe(QElder.elder.dailyFilter4))
+                .and(resume.dailyFilter5.goe(QElder.elder.dailyFilter5))
+                .and(resume.dailyFilter6.goe(QElder.elder.dailyFilter6));
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
