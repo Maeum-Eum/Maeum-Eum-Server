@@ -36,6 +36,8 @@ public class QElder extends EntityPathBase<Elder> {
 
     public final BooleanPath dailyFilter6 = createBoolean("dailyFilter6");
 
+    public final NumberPath<Integer> dailyLevel = createNumber("dailyLevel", Integer.class);
+
     public final EnumPath<ElderFamily> elder_family = createEnum("elder_family", ElderFamily.class);
 
     public final BooleanPath elder_pet = createBoolean("elder_pet");

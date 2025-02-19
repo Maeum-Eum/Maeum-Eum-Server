@@ -1,18 +1,15 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
 import com.five.Maeum_Eum.common.WorkCalculator;
-import com.five.Maeum_Eum.controller.user.service.DailyElderType;
 import com.five.Maeum_Eum.controller.work.DailyType;
 import com.five.Maeum_Eum.controller.work.MealType;
 import com.five.Maeum_Eum.controller.work.MobilityType;
 import com.five.Maeum_Eum.controller.work.ToiletingType;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
-import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Certificate;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.exception.ErrorResponse;
@@ -26,9 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -131,22 +126,22 @@ public class ResumeController {
                                 .orElse(0)
                 )
                 .dailyFilter1(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.ONE.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.ONE.getLabel())
                 )
                 .dailyFilter2(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.TWO.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.TWO.getLabel())
                 )
                 .dailyFilter3(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.THREE.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.THREE.getLabel())
                 )
                 .dailyFilter4(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.FOUR.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.FOUR.getLabel())
                 )
                 .dailyFilter5(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.FIVE.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.FIVE.getLabel())
                 )
                 .dailyFilter6(
-                        resumeSaveDTO.getDaily().contains(DailyElderType.SIX.getLabel())
+                        resumeSaveDTO.getDaily().contains(DailyType.SIX.getLabel())
                 )
                 .mobilityLevel(
                         resumeSaveDTO.getMobility().stream()
