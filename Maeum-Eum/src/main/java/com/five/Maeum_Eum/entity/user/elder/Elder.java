@@ -58,12 +58,12 @@ public class Elder {
     private boolean negotiable;
 
     // 서비스 요구 수준
-    private Boolean dailyFilter1;
-    private Boolean dailyFilter2;
-    private Boolean dailyFilter3;
-    private Boolean dailyFilter4;
-    private Boolean dailyFilter5;
-    private Boolean dailyFilter6;
+    private boolean dailyFilter1;
+    private boolean dailyFilter2;
+    private boolean dailyFilter3;
+    private boolean dailyFilter4;
+    private boolean dailyFilter5;
+    private boolean dailyFilter6;
     private Integer mealLevel;
     private Integer toiletingLevel;
     private Integer mobilityLevel;
