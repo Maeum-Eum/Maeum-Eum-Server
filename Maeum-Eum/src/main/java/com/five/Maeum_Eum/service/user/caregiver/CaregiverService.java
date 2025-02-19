@@ -220,11 +220,19 @@ public class CaregiverService {
 
         List<Integer> workDayDto = resume.getWorkDay();
         for (int idx : workDayDto) {
-            workDay.add(DayOfWeek.values()[idx].toString());
+            switch (idx) {
+                case 0: workDay.add("월"); break;
+                case 1: workDay.add("화"); break;
+                case 2: workDay.add("수"); break;
+                case 3: workDay.add("목"); break;
+                case 4: workDay.add("금"); break;
+                case 5: workDay.add("토"); break;
+                case 6: workDay.add("일"); break;
+                default: workDay.add("미정");
+            }
         }
 
-        String middleWorkDay = workDay.stream()
-                .collect(Collectors.joining("/"));
+        String middleWorkDay = String.join("/", workDay);
 
         String position = resume.getJobPosition().get(0); // Job position
 
