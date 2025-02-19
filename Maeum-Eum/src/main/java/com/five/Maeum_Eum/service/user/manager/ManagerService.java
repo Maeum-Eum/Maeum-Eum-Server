@@ -460,15 +460,18 @@ public class ManagerService {
                     String title = makeTitle(caregiver);
                     List<String> possibleTasks = extractPossibleTasks(caregiver.getResume());
                     Boolean isMarked = checkIfMarked(manager.getManagerId(), caregiver.getCaregiverId());
-
-                    return RecommendedCaregiverDto.from(caregiver, title, possibleTasks, isMarked);
+                    if(isMarked){ // 북마크 여부가 있다면
+                        ManagerBookmark managerBookmark = managerBookmarkRepository.findByManagerIdAndCaregiverId(manager.getManagerId(), caregiver.getCaregiverId());
+                        return RecommendedCaregiverDto.from(caregiver, title, possibleTasks, true ,managerBookmark);
+                    }
+                    else return RecommendedCaregiverDto.of(caregiver, title, possibleTasks, false);
                 }) // Caregiver -> RecommendedCaregiverDto 변환
                 .collect(Collectors.toList());
     }
 
     /* 해당 요양보호사가 북마크가 된 요양보호사인지*/
     private Boolean checkIfMarked(Long managerId, Long caregiverId) {
-        if(managerBookmarkRepository.findByManagerIdAndCaregiverId(managerId , caregiverId)){
+        if(managerBookmarkRepository.isMarkedByManagerIdAndCaregiverId(managerId , caregiverId)){
             return true;
         }
         else return false;

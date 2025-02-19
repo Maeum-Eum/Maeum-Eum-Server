@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.dto.user.caregiver.main.response;
 
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
+import com.five.Maeum_Eum.entity.user.manager.ManagerBookmark;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,11 +17,13 @@ public record RecommendedCaregiverDto(
 
      boolean isBookmarks,
 
+     Long bookmarkId,
+
      LocalDateTime createdAt
 
 
 ) {
-    public static RecommendedCaregiverDto from(Caregiver caregiver , String title , List<String> possibleTasks ,Boolean isMarked) {
+    public static RecommendedCaregiverDto from(Caregiver caregiver , String title , List<String> possibleTasks , Boolean isMarked , ManagerBookmark managerBookmark) {
         return new RecommendedCaregiverDto(
                 caregiver.getCaregiverId(),
                 caregiver.getName(),
@@ -29,6 +32,21 @@ public record RecommendedCaregiverDto(
                 caregiver.getResume().getNegotiableTime(),
                 possibleTasks,
                 isMarked,
+                managerBookmark.getBookmarkId(),
+                caregiver.getResume().getCreatedAt()
+        );
+    }
+
+    public static RecommendedCaregiverDto of(Caregiver caregiver, String title, List<String> possibleTasks, Boolean isMarked) {
+        return new RecommendedCaregiverDto(
+                caregiver.getCaregiverId(),
+                caregiver.getName(),
+                caregiver.getResume().getResumeId(),
+                title,
+                caregiver.getResume().getNegotiableTime(),
+                possibleTasks,
+                isMarked,
+                null,
                 caregiver.getResume().getCreatedAt()
         );
     }
