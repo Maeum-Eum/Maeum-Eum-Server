@@ -6,6 +6,7 @@ import com.five.Maeum_Eum.dto.center.response.CenterDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
 import com.five.Maeum_Eum.dto.user.manager.response.BookmarkResDto;
@@ -15,6 +16,7 @@ import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.caregiver.WorkPlace;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
@@ -29,6 +31,7 @@ import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.center.CenterRepository;
 import com.five.Maeum_Eum.repository.elder.ElderRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerBookmarkRepository;
+import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerRepository;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
@@ -39,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +61,7 @@ public class ManagerService {
     private final ElderRepository elderRepository;
     private final CaregiverService caregiverService;
     private final ApplyRepository applyRepository;
+    private final ManagerContactQueryDsl managerContactQueryDsl;
 
     // token으로  사용자 role 알아내기
     private String findRole(String token){
@@ -416,5 +421,90 @@ public class ManagerService {
         title = String.format("[%s] %s - %s", middleWorkDay, timeSlotString, workAttributesString);
 
         return title;
+    }
+
+    /* 추천 요양보호사 목록*/
+    public List<RecommendedCaregiverDto> getRecommendedList(String token, String name, String workPlace, String sort) {
+
+        Manager manager = findManager(token);
+
+        Elder elder = elderRepository.findByElderName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
+
+        double distance = getDistanceFromWorkPlace(workPlace);
+
+        // 일단 임의로 30개만 조회
+        List<Caregiver> caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
+
+        // 정렬 및 변환
+        return caregiverList.stream()
+                .sorted((c1, c2) -> {
+                    if (sort.equals("accuracy")) { // 가능 업무가 많은 순 정렬
+                        return Integer.compare(getTotalSkills(c2.getResume()), getTotalSkills(c1.getResume()));
+                    } else if (sort.equals("time_match")) { // 근무 가능 시간이 많은 순 정렬
+                        return Integer.compare(c2.getResume().getWorkTimeSlot().size(), c1.getResume().getWorkTimeSlot().size());
+                    } else { // 높은 급여순 정렬
+                        return Integer.compare(c2.getResume().getWage(), c1.getResume().getWage());
+                    }
+                })
+                .map(caregiver -> {
+                    String title = makeTitle(caregiver);
+                    List<String> possibleTasks = extractPossibleTasks(caregiver.getResume());
+                    Boolean isMarked = checkIfMarked(manager.getManagerId(), caregiver.getCaregiverId());
+
+                    return RecommendedCaregiverDto.from(caregiver, title, possibleTasks, isMarked);
+                }) // Caregiver -> RecommendedCaregiverDto 변환
+                .collect(Collectors.toList());
+    }
+
+    /* 해당 요양보호사가 북마크가 된 요양보호사인지*/
+    private Boolean checkIfMarked(Long managerId, Long caregiverId) {
+        if(managerBookmarkRepository.findByManagerIdAndCaregiverId(managerId , caregiverId)){
+            return true;
+        }
+        else return false;
+    }
+
+    /* 랜덤으로 최대 7개 뽑기*/
+    private List<String> extractPossibleTasks(Resume resume) {
+        List<String> combinedList = new ArrayList<>();
+
+        if (resume.getToileting() != null) combinedList.addAll(resume.getToileting());
+        if (resume.getMeal() != null) combinedList.addAll(resume.getMeal());
+        if (resume.getDaily() != null) combinedList.addAll(resume.getDaily());
+        if (resume.getMobility() != null) combinedList.addAll(resume.getMobility());
+
+        // 만약 리스트가 비어 있다면 빈 리스트 반환
+        if (combinedList.isEmpty()) return Collections.emptyList();
+
+        // 리스트를 랜덤하게 섞기
+        Collections.shuffle(combinedList);
+
+        // 최대 7개까지만 추출 (7개보다 적으면 가능한 만큼만 반환)
+        return combinedList.subList(0, Math.min(7, combinedList.size()));
+    }
+
+    /*가능한 업무 개수*/
+    private int getTotalSkills(Resume resume) {
+        return (resume.getMeal() != null ? resume.getMeal().size() : 0) +
+                (resume.getToileting() != null ? resume.getToileting().size() : 0) +
+                (resume.getMobility() != null ? resume.getMobility().size() : 0) +
+                (resume.getDaily() != null ? resume.getDaily().size() : 0);
+    }
+
+    /* 거리 변환 */
+    private double getDistanceFromWorkPlace(String workPlace) {
+        switch (workPlace) {
+            case "도보15분이내":
+                return 1.25; // 1.25Km
+            case "도보20분이내":
+                return 1.65; // 1.65Km
+            case "3km":
+                return 3.0; // 3Km
+            case "5km":
+                return 5.0; // 5Km
+            default:
+                throw new IllegalArgumentException("잘못된 WorkPlace 값입니다: " + workPlace);
+        }
     }
 }
