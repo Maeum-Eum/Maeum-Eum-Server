@@ -20,8 +20,8 @@ public class CaregiverMainController {
 
     @GetMapping("/list")
     public ResponseEntity<Object> getList(@PageableDefault(size = 5) Pageable pageable,
-                                                 @RequestParam Double range) {
-        PageResponse<SimpleContactDTO> body = caregiverMainService.getPages(range, pageable);
+                                                 @RequestParam Double range,@RequestParam Integer order) {
+        PageResponse<SimpleContactDTO> body = caregiverMainService.getPages(range, pageable, order);
         return ResponseEntity.ok().body(body);
     }
 

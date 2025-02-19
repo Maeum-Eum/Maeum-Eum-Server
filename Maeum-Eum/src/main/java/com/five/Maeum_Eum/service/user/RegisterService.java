@@ -44,7 +44,7 @@ public class RegisterService {
         }
 
         // 센터 조회 후 차량 보유 여부 변경
-        Center center = centerRepository.findByAddress(regiDTO.getAddress()).orElse(null);
+        Center center = centerRepository.findByDetailAddress(regiDTO.getAddress()).orElse(null);
         if (center == null) { throw new CustomException(ErrorCode.CENTER_NOT_FOUND);
         }
         center.registerManager(regiDTO.getHasCar());
@@ -91,7 +91,7 @@ public class RegisterService {
 
         // 경력 사항 추출 및 저장
         for (ExperienceDTO expDTO : regiDTO.getExperience()) {
-            Center center = centerRepository.findByAddress(expDTO.getCenter()).orElse(null);
+            Center center = centerRepository.findByDetailAddress(expDTO.getCenter()).orElse(null);
 
             WorkExperience workExperience = WorkExperience.builder()
                     .caregiver(caregiver)

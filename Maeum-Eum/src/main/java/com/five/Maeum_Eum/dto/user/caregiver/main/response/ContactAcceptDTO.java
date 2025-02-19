@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class ContactAcceptDTO {
     private String phone;
     private String message;
+    private String title;
 }
