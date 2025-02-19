@@ -234,7 +234,7 @@ public class ManagerService {
         return "관리자의 북마크가 삭제되었습니다.";
     }
 
-    /* 요양보호사에게 연락한 목록 중 아직 상태인 거 */
+    /* 요양보호사에게 연락한 목록 중  상태인에 다른 것  거 */
     public List<ContactCaregiverDto> getContactList(String token, String name, String approvalStatus) {
 
         Manager manager = findManager(token);
