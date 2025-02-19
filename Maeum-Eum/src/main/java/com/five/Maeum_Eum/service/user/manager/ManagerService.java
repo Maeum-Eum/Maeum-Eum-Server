@@ -15,6 +15,7 @@ import com.five.Maeum_Eum.entity.center.Center;
 import com.five.Maeum_Eum.entity.user.caregiver.Apply;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.Manager;
@@ -324,32 +325,25 @@ public class ManagerService {
         List<Apply> applyList = applyRepository.findAllByElderAndApprovalStatus(elder.getElderId(), approvalStatus);
 
         // 지원 목록 중에 해당 노인 요구사항보다 같거나 높은 거 다 노출 , 제목 생성
-
         List<ApplyCaregiverDto> applyCaregiverDtoList = applyList.stream()
                 .map(apply -> {
                     // 제목 생성
-                    Caregiver caregiver = applyRepository.findCaregiverByApplyId(apply.getApplyId())
+                    Caregiver caregiver = applyRepository.findCaregiverByApplyId(apply.getApplyId());
                     String title = makeTitle(caregiver);
-                    // 요양보호사 가능업무 랜덤 3개
-                    List<String> combinedList = new ArrayList<>();
-                    Resume resume = managerContact.getCaregiver().getResume();
+                    // 요양보호사 가능업무 다
+                    List<String> satisyTasks= new ArrayList<>();
+                    Resume resume = caregiver.getResume();
 
-                    if (resume != null) {
-                        combinedList.addAll(resume.getToileting() != null ? resume.getToileting() : Collections.emptyList());
-                        combinedList.addAll(resume.getMeal() != null ? resume.getMeal() : Collections.emptyList());
-                        combinedList.addAll(resume.getDaily() != null ? resume.getDaily() : Collections.emptyList());
-                        combinedList.addAll(resume.getMobility() != null ? resume.getMobility() : Collections.emptyList());
-                    }
+                    if (resume.getMeal() != null) satisyTasks.add("식사");
+                    if (resume.getToileting() != null) satisyTasks.add("배변");
+                    if (resume.getMobility() != null) satisyTasks.add("이동");
+                    if (resume.getDaily() != null) satisyTasks.add("일상");
 
-                    Collections.shuffle(combinedList);
-
-
-                    List<String> satisfyTasks = combinedList.size() > 3 ? combinedList.subList(0, 3) : new ArrayList<>(combinedList);
-
-
-                    return ApplyCaregiverDto.from(apply , manager , caregiver, title , satisfyTasks);
+                    return ApplyCaregiverDto.from(apply , manager , caregiver, title , satisyTasks);
                 })
                 .collect(Collectors.toList());
+
+        return applyCaregiverDtoList;
     }
 
 
@@ -357,22 +351,36 @@ public class ManagerService {
     // 제목 예시 : [월/수/금] 오전 - 식사 배변 이동 일상
     private String makeTitle(Caregiver caregiver){
         String title;
-        List<String> workDays = caregiver.getResume().getWorkDay();
-        String workDay = workDays.stream()
-                .collect(Collectors.joining("/"));
+        List<String> workDay = new ArrayList<>();
 
-        List<String> workTimeSlots = caregiver.getWorkTimeSlot();
+        List<Integer> workDayDto = caregiver.getResume().getWorkDay();
+        for (int idx : workDayDto) {
+            switch (idx) {
+                case 0: workDay.add("월"); break;
+                case 1: workDay.add("화"); break;
+                case 2: workDay.add("수"); break;
+                case 3: workDay.add("목"); break;
+                case 4: workDay.add("금"); break;
+                case 5: workDay.add("토"); break;
+                case 6: workDay.add("일"); break;
+                default: workDay.add("미정");
+            }
+        }
+
+        String middleWorkDay = String.join("/", workDay);
+
+        List<Integer> workTimeSlots = caregiver.getResume().getWorkTimeSlot();
         List<String> translatedTimeSlots = new ArrayList<>();
 
-        for (String slot : workTimeSlots) {
+        for (Integer slot : workTimeSlots) {
             switch (slot) {
-                case "MORNING":
+                case 0:
                     translatedTimeSlots.add("오전");
                     break;
-                case "AFTERNOON":
+                case 1:
                     translatedTimeSlots.add("오후");
                     break;
-                case "EVENING":
+                case 2:
                     translatedTimeSlots.add("저녁");
                     break;
                 default:
@@ -380,8 +388,20 @@ public class ManagerService {
             }
         }
 
-
         String timeSlotString = String.join(", ", translatedTimeSlots);
+
+        List<String> workAttributes = new ArrayList<>();
+        Resume resume = caregiver.getResume();
+
+        if (resume.getMeal() != null) workAttributes.add("식사");
+        if (resume.getToileting() != null) workAttributes.add("배변");
+        if (resume.getMobility() != null) workAttributes.add("이동");
+        if (resume.getDaily() != null) workAttributes.add("일상");
+
+        String workAttributesString = String.join(" ", workAttributes);
+
+        title = String.format("[%s] %s - %s", middleWorkDay, timeSlotString, workAttributesString);
+
         return title;
     }
 }
