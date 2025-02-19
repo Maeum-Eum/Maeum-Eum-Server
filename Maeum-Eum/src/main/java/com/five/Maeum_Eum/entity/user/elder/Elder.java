@@ -50,7 +50,7 @@ public class Elder {
     @Enumerated(EnumType.STRING)
     private ElderFamily elder_family;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
