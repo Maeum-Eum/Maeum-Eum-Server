@@ -40,11 +40,11 @@ public class ApplyQueryDsl {
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                 .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
@@ -69,9 +69,11 @@ public class ApplyQueryDsl {
                         daily
                 ))
                 .from(apply)
+                .join(apply.elder, QElder.elder)
                 .join(apply.elder.manager, manager)
-                .join(apply.elder.manager.center, center)
+                .join(manager.center, center)
                 .join(apply.caregiver, qCaregiver)
+                .join(qCaregiver.resume, resume)
                 .where(apply.caregiver.eq(caregiver), apply.approvalStatus.eq(approvalStatus))
                 .orderBy(apply.applyId.asc())
                 .offset(pageable.getOffset())

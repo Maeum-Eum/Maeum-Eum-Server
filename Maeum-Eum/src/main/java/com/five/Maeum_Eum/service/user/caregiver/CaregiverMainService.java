@@ -321,11 +321,7 @@ public class CaregiverMainService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        // 좌표를 문자열 형식으로 변환
-        WKTWriter writer = new WKTWriter();
-        String wkt = writer.write(caregiver.getLocation());
-
-        NearElderDTO meal = elderQueryDsl.findElder(wkt, range, caregiver, 0);
+        NearElderDTO meal = elderQueryDsl.findElder(range, caregiver, 0);
         if (meal != null) {
             Elder elder = meal.getElder();
             meal.setElderId(elder.getElderId());
@@ -334,7 +330,7 @@ public class CaregiverMainService {
         }
 
 
-        NearElderDTO toileting = elderQueryDsl.findElder(wkt, range, caregiver, 1);
+        NearElderDTO toileting = elderQueryDsl.findElder(range, caregiver, 1);
         if (toileting != null) {
             Elder elder = toileting.getElder();
             toileting.setElderId(elder.getElderId());
@@ -343,7 +339,7 @@ public class CaregiverMainService {
         }
 
 
-        NearElderDTO mobility = elderQueryDsl.findElder(wkt, range, caregiver, 2);
+        NearElderDTO mobility = elderQueryDsl.findElder(range, caregiver, 2);
         if (mobility != null) {
             Elder elder = mobility.getElder();
             mobility.setElderId(elder.getElderId());
@@ -352,14 +348,14 @@ public class CaregiverMainService {
         }
 
 
-        NearElderDTO daily = elderQueryDsl.findElder(wkt, range, caregiver, 3);
+        NearElderDTO daily = elderQueryDsl.findElder(range, caregiver, 3);
         if (daily != null) {
             Elder elder = daily.getElder();
             daily.setElderId(elder.getElderId());
             daily.setTitle(getTitle(elder, ""));
             daily.setElder(null);
         }
-        NearElderDTO wage = elderQueryDsl.findWageElder(wkt,range,caregiver);
+        NearElderDTO wage = elderQueryDsl.findWageElder(range,caregiver);
         if (wage != null) {
             Elder elder = wage.getElder();
             wage.setElderId(elder.getElderId());

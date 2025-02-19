@@ -33,11 +33,10 @@ public class ElderQueryDsl {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public NearElderDTO findElder(String pointWKT,
+    public NearElderDTO findElder(
                                      double distanceValue,
                                      Caregiver caregiver,
                                       int num) {
-        QApply apply = QApply.apply;
         QManager manager = QManager.manager;
         QCenter center = QCenter.center;
         QCaregiver qCaregiver = QCaregiver.caregiver;
@@ -47,11 +46,11 @@ public class ElderQueryDsl {
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                 .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         BooleanExpression tmp = meal;
         if (num == 1) {
@@ -71,18 +70,17 @@ public class ElderQueryDsl {
                 .from(QSavedElders.savedElders)
                 .join(QSavedElders.savedElders.caregiver, qCaregiver)
                 .join(QSavedElders.savedElders.elder, QElder.elder)
-                .where(QSavedElders.savedElders.elder.eq(apply.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
+                .where(QSavedElders.savedElders.caregiver.eq(caregiver))
                 .exists() : Expressions.FALSE;
-
         NumberExpression<Double> distanceExpr = Expressions.numberTemplate(
                 Double.class,
-                "ST_Distance_Sphere({0}, ST_GeomFromText({1}, 4326))",
-                center.location,
-                pointWKT
+                "ST_Distance_Sphere({0}, {1})",
+                elder.location,
+                caregiver.getLocation()
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
 
         return jpaQueryFactory
                 .select(new QNearElderDTO(
@@ -99,16 +97,16 @@ public class ElderQueryDsl {
                 .from(elder)
                 .join(elder.manager, manager)
                 .join(elder.manager.center, center)
-                .where(tmp.isTrue(), withinDistance)
+                .join(resume).on(resume.caregiver.eq(caregiver))
+                .where(tmp, withinDistance)
                 .orderBy(elder.elderId.desc())
                 .fetchFirst();
     }
 
 
-    public NearElderDTO findWageElder(String pointWKT,
+    public NearElderDTO findWageElder(
                                       double distanceValue,
                                       Caregiver caregiver) {
-        QApply apply = QApply.apply;
         QManager manager = QManager.manager;
         QCenter center = QCenter.center;
         QCaregiver qCaregiver = QCaregiver.caregiver;
@@ -118,11 +116,11 @@ public class ElderQueryDsl {
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                 .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
@@ -130,18 +128,18 @@ public class ElderQueryDsl {
                 .from(QSavedElders.savedElders)
                 .join(QSavedElders.savedElders.caregiver, qCaregiver)
                 .join(QSavedElders.savedElders.elder, QElder.elder)
-                .where(QSavedElders.savedElders.elder.eq(apply.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
+                .where(QSavedElders.savedElders.elder.eq(QElder.elder), QSavedElders.savedElders.caregiver.eq(caregiver))
                 .exists() : Expressions.FALSE;
 
         NumberExpression<Double> distanceExpr = Expressions.numberTemplate(
                 Double.class,
-                "ST_Distance_Sphere({0}, ST_GeomFromText({1}, 4326))",
-                center.location,
-                pointWKT
+                "ST_Distance_Sphere({0}, {1})",
+                elder.location,
+                caregiver.getLocation()
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
 
         return jpaQueryFactory
                 .select(new QNearElderDTO(
@@ -158,6 +156,7 @@ public class ElderQueryDsl {
                 .from(elder)
                 .join(elder.manager, manager)
                 .join(elder.manager.center, center)
+                .join(resume).on(resume.caregiver.eq(caregiver))
                 .where(withinDistance)
                 .orderBy(elder.wage.desc(), elder.elderId.desc())
                 .fetchFirst();

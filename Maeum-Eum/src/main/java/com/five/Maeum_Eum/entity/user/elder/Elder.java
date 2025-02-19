@@ -36,6 +36,7 @@ public class Elder {
     @Column(nullable = false)
     private String elderAddress;
 
+    @Setter
     @Column(columnDefinition = "POINT SRID 4326")
     private Point location;
 

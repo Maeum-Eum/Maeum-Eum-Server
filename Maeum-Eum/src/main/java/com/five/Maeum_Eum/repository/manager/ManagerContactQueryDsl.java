@@ -3,7 +3,6 @@ package com.five.Maeum_Eum.repository.manager;
 import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.QSimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
-import com.five.Maeum_Eum.entity.QCaregiverTime;
 import com.five.Maeum_Eum.entity.center.QCenter;
 import com.five.Maeum_Eum.entity.user.caregiver.*;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
@@ -186,23 +185,23 @@ public class ManagerContactQueryDsl {
         // 거리 계산 (미터 단위)
         NumberExpression<Double> distanceExpr = Expressions.numberTemplate(
                 Double.class,
-                "ST_Distance_Sphere({0}, ST_GeomFromText({1}, 4326))",
-                center.location,
-                pointWKT
+                "ST_Distance_Sphere({0}, {1})",
+                contact.elder.location,
+                caregiver.getLocation()
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
 
         // 업무 가능 여부 확인
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                         .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                        .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                        .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         // 가능한 업무 개수
         NumberExpression<Integer> mealCount = Expressions.numberTemplate(
@@ -253,6 +252,7 @@ public class ManagerContactQueryDsl {
                 .join(contact.manager, manager)
                 .join(manager.center, center)
                 .join(contact.caregiver, qCaregiver)
+                .join(qCaregiver.resume, resume)
                 .where(contact.caregiver.eq(caregiver), withinDistance, contact.approvalStatus.eq(ApprovalStatus.PENDING))
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
@@ -280,11 +280,11 @@ public class ManagerContactQueryDsl {
         BooleanExpression meal = resume.caregiver.eq(caregiver)
                 .and(resume.mealLevel.goe(QElder.elder.mealLevel));
         BooleanExpression toileting = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.toiletingLevel));
+                .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.mobilityLevel));
+                .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
         BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.mealLevel.goe(QElder.elder.dailyLevel));
+                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
@@ -303,10 +303,10 @@ public class ManagerContactQueryDsl {
                         contact.wage,
                         contact.negotiable,
                         bookmarked,
-                        meal,
-                        toileting,
-                        mobility,
-                        daily,
+                        meal.coalesce(false).as("meal"),
+                        toileting.coalesce(false).as("toileting"),
+                        mobility.coalesce(false).as("mobility"),
+                        daily.coalesce(false).as("daily"),
                         contact.workRequirement
                 ))
                 .from(contact)
@@ -319,6 +319,7 @@ public class ManagerContactQueryDsl {
                 .limit(pageable.getPageSize());
 
         List<SimpleContactDTO> contacts = query.fetch();
+        System.out.println(contacts);
         // 전체 건수 조회 (페이징 처리를 위한 count)
         long total = query.fetchCount();
 
