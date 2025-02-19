@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.controller.user.manager;
 
 import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
@@ -95,7 +96,7 @@ public class ManagerController {
 
 
     /* 요양보호사에게 보낸 연락 취소하기 */
-    @DeleteMapping("contact/{contactId}")
+    @DeleteMapping("/contact/{contactId}")
     public ResponseEntity<String> deleteContact(@RequestHeader("Authorization") String authHeader , @PathVariable("contactId")Long contactId){
         String token = extractToken(authHeader);
         String response = managerService.deleteContact(token , contactId);
@@ -109,6 +110,15 @@ public class ManagerController {
         String token = extractToken(authHeader);
         List<BookmarkCaregiverDto> bookmarkCaregiverDtoList = managerService.getBookmarkList(token , name);
         return ResponseEntity.ok(bookmarkCaregiverDtoList);
+    }
+
+
+    /* 지원 들어온 요양보호사 목록 */
+    @GetMapping("/apply")
+    public ResponseEntity<?> getApply(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name) {
+        String token = extractToken(authHeader);
+        List<ApplyCaregiverDto> applyCaregiverDtoList = managerService.getApplyList(token , name , ApprovalStatus.PENDING);
+        return ResponseEntity.ok(applyCaregiverDtoList);
     }
 
 
