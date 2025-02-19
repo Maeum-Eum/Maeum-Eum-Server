@@ -80,7 +80,7 @@ public class ElderQueryDsl {
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000.0);
 
         return jpaQueryFactory
                 .select(new QNearElderDTO(
@@ -139,7 +139,7 @@ public class ElderQueryDsl {
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000.0);
 
         return jpaQueryFactory
                 .select(new QNearElderDTO(

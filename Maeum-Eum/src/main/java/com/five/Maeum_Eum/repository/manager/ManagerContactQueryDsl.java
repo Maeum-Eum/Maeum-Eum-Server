@@ -191,7 +191,7 @@ public class ManagerContactQueryDsl {
         );
 
         // n km 이내 조건
-        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000);
+        BooleanExpression withinDistance = distanceExpr.loe(distanceValue * 1000.0);
 
         // 업무 가능 여부 확인
         BooleanExpression meal = resume.caregiver.eq(caregiver)
@@ -229,8 +229,8 @@ public class ManagerContactQueryDsl {
                 .exists() : Expressions.FALSE;
 
 
-        OrderSpecifier orderSpecifier = new OrderSpecifier<>(Order.DESC, workExpr);
-        if (order == 2) orderSpecifier = new OrderSpecifier<>(Order.ASC, contact.wage);
+        OrderSpecifier orderSpecifier = new OrderSpecifier<>(Order.DESC, contact.contactId);
+        if (order == 2) orderSpecifier = new OrderSpecifier<>(Order.DESC, workExpr);
         else if (order == 3) orderSpecifier = new OrderSpecifier<>(Order.DESC, contact.wage);
 
         JPAQuery<SimpleContactDTO> query = jpaQueryFactory
