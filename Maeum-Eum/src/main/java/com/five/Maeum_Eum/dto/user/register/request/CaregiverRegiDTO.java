@@ -19,12 +19,12 @@ import java.util.List;
 @AllArgsConstructor
 public class CaregiverRegiDTO {
     @NotBlank
-    @Size(min = 1, max = 32)
+    @Size(min = 8, max = 20)
     @Pattern(regexp = "^[a-zA-Z0-9]+$")
     private String id;
 
     @NotBlank
-    @Size(min = 10, max = 100)
+    @Size(min = 8, max = 20)
     @Pattern(regexp = "^(?=(.*[A-Za-z].*[0-9])|(?=.*[A-Za-z].*[@$!%*?&])|(?=.*[0-9].*[@$!%*?&])).{10,}$")
     private String password;
 

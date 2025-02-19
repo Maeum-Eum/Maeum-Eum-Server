@@ -42,4 +42,10 @@ public class CaregiverNearController {
         ElderListDTO body = caregiverMainService.nearElder(range);
         return ResponseEntity.ok().body(body);
     }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<Object> cancel(@RequestParam Long elderId) {
+        caregiverMainService.applyCancle(elderId);
+        return ResponseEntity.ok().build();
+    }
 }

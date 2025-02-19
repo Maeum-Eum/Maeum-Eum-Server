@@ -13,6 +13,7 @@ import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -219,6 +220,12 @@ public class ManagerContactQueryDsl {
                 .add(mobilityCount)
                 .add(dailyCount);
 
+        // 일치도 총합
+        NumberExpression<Integer> totalDifference = resume.mealLevel.subtract(QElder.elder.mealLevel)
+                .add(resume.toiletingLevel.subtract(QElder.elder.toiletingLevel))
+                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel))
+                .add(resume.dailyLevel.subtract(QElder.elder.dailyLevel));
+
         // 북마크 여부
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
@@ -230,7 +237,10 @@ public class ManagerContactQueryDsl {
 
 
         OrderSpecifier orderSpecifier = new OrderSpecifier<>(Order.DESC, contact.contactId);
-        if (order == 2) orderSpecifier = new OrderSpecifier<>(Order.DESC, workExpr);
+        if (order == 2) orderSpecifier = new OrderSpecifier<>(
+                Order.DESC,
+                ExpressionUtils.template(Integer.class, "{0}, {1}", workExpr, totalDifference)
+        );
         else if (order == 3) orderSpecifier = new OrderSpecifier<>(Order.DESC, contact.wage);
 
         JPAQuery<SimpleContactDTO> query = jpaQueryFactory
