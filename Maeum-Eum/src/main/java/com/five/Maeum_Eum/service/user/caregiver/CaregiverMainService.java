@@ -219,6 +219,23 @@ public class CaregiverMainService {
                 .build();
     }
 
+    public void applyCancle(Long elderId) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Elder elder = elderRepository.findById(elderId).orElse(null);
+        if (elder == null) { throw new CustomException(ErrorCode.INVALID_INPUT); }
+
+        Apply apply = applyRepository.findByCaregiverAndElder(caregiver,elder).orElse(null);
+        if (apply == null) {
+            throw new CustomException(ErrorCode.INVALID_ROLE);
+        }
+
+        applyRepository.delete(apply);
+    }
+
     public DetailContactDTO applyDetail(long id) {
         String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
         Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);

@@ -44,7 +44,7 @@ public class RegisterService {
         }
 
         // 센터 조회 후 차량 보유 여부 변경
-        Center center = centerRepository.findByDetailAddress(regiDTO.getAddress()).orElse(null);
+        Center center = centerRepository.findByCenterId(regiDTO.getCenterId()).orElse(null);
         if (center == null) { throw new CustomException(ErrorCode.CENTER_NOT_FOUND);
         }
         center.registerManager(regiDTO.getHasCar());
