@@ -41,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -425,12 +424,7 @@ public class ManagerService {
     /* 추천 요양보호사 목록*/
     public List<RecommendedCaregiverDto> getRecommendedList(String token, String name, String workPlace, String sort) {
 
-        //Manager manager = findManager(token);
-
-        Manager manager = Manager.builder()
-                .name("manager")
-                .phoneNumber("010-1234-1234")
-                .build();
+        Manager manager = findManager(token);
 
         Elder elder = elderRepository.findByElderName(name)
                 .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
