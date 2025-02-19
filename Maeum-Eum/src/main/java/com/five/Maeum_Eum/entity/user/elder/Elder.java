@@ -58,16 +58,16 @@ public class Elder {
     private boolean negotiable;
 
     // 서비스 요구 수준
-    private int mealLevel;
-    private int toiletingLevel;
-    private int mobilityLevel;
-
-    private boolean dailyFilter1;
-    private boolean dailyFilter2;
-    private boolean dailyFilter3;
-    private boolean dailyFilter4;
-    private boolean dailyFilter5;
-    private boolean dailyFilter6;
+    private Boolean dailyFilter1;
+    private Boolean dailyFilter2;
+    private Boolean dailyFilter3;
+    private Boolean dailyFilter4;
+    private Boolean dailyFilter5;
+    private Boolean dailyFilter6;
+    private Integer mealLevel;
+    private Integer toiletingLevel;
+    private Integer mobilityLevel;
+    private Integer dailyLevel;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -105,7 +105,29 @@ public class Elder {
         this.serviceSlots = serviceSlots;
     }
 
-    public void update(String gender, LocalDate elderBirth, String elderAddress, Integer elderRank, Boolean negotiable, Integer wage, Manager manager, List<String> meal, List<String> toileting, List<String> mobility, List<String> daily, ElderFamily elder_family, Boolean elder_pet, Point location) {
+    public void update(String gender,
+                       LocalDate elderBirth,
+                       String elderAddress,
+                       Integer elderRank,
+                       Boolean negotiable,
+                       Integer wage,
+                       Manager manager,
+                       List<String> meal,
+                       List<String> toileting,
+                       List<String> mobility,
+                       List<String> daily,
+                       ElderFamily elder_family,
+                       Boolean elder_pet,
+                       Point location,
+                       Integer mealLevel,
+                       Integer toiletingLevel,
+                       Integer mobilityLevel,
+                       Boolean dailyFilter1,
+                       Boolean dailyFilter2,
+                       Boolean dailyFilter3,
+                       Boolean dailyFilter4,
+                       Boolean dailyFilter5,
+                       Boolean dailyFilter6) {
         this.gender = gender == null ? this.gender : gender ;
         this.elderBirth = elderBirth == null ? this.elderBirth : elderBirth ;
         this.elderAddress = elderAddress == null ? this.elderAddress : elderAddress ;
@@ -120,5 +142,14 @@ public class Elder {
         this.elder_family = elder_family == null ? this.elder_family : elder_family ;
         this.elder_pet = elder_pet == null ? this.elder_pet : elder_pet ;
         this.location = location == null ? this.location : location ;
+        this.mealLevel = mealLevel == null ? this.mealLevel : mealLevel ;
+        this.toiletingLevel = toiletingLevel == null ? this.toiletingLevel : toiletingLevel ;
+        this.mobilityLevel = mobilityLevel == null ? this.mobilityLevel : mobilityLevel ;
+        this.dailyFilter1 = dailyFilter1 == null ? this.dailyFilter1 : dailyFilter1 ;
+        this.dailyFilter2 = dailyFilter2 == null ? this.dailyFilter2 : dailyFilter2 ;
+        this.dailyFilter3 = dailyFilter3 == null ? this.dailyFilter3 : dailyFilter3 ;
+        this.dailyFilter4 = dailyFilter4 == null ? this.dailyFilter4 : dailyFilter4 ;
+        this.dailyFilter5 = dailyFilter5 == null ? this.dailyFilter5 : dailyFilter5 ;
+        this.dailyFilter6 = dailyFilter6 == null ? this.dailyFilter6 : dailyFilter6 ;
     }
 }

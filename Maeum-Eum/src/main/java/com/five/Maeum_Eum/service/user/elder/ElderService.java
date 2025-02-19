@@ -281,7 +281,28 @@ public class ElderService {
                 dto.getDaily(),
                 family,
                 dto.getPet().equals("있어요"),
-                location
+                location,
+                dto.getMeal().stream()
+                        .map(MealElderType::fromLabel)
+                        .mapToInt(MealElderType::getLevel)
+                        .max()
+                        .orElse(0),
+                dto.getToileting().stream()
+                        .map(ToiletingElderType::fromLabel)
+                        .mapToInt(ToiletingElderType::getLevel)
+                        .max()
+                        .orElse(0),
+                dto.getMobility().stream()
+                        .map(MobilityElderType::fromLabel)
+                        .mapToInt(MobilityElderType::getLevel)
+                        .max()
+                        .orElse(0),
+                dto.getDaily().contains(DailyType.ONE.getLabel()),
+                dto.getDaily().contains(DailyType.TWO.getLabel()),
+                dto.getDaily().contains(DailyType.THREE.getLabel()),
+                dto.getDaily().contains(DailyType.FOUR.getLabel()),
+                dto.getDaily().contains(DailyType.FIVE.getLabel()),
+                dto.getDaily().contains(DailyType.SIX.getLabel())
         );
         elderRepository.save(elder);
 
