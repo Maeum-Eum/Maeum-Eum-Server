@@ -254,7 +254,7 @@ public class ManagerService {
             List<ContactCaregiverDto> contactCaregiverDtos = managerContacts.stream()
                     .map(managerContact -> {
                         // 제목 생성
-                        String title = caregiverService.makeTitle(managerContact.getCaregiver().getResume());
+                        String title = makeTitle(managerContact.getCaregiver());
                         // 요양보호사 가능업무 랜덤 3개
                         List<String> combinedList = new ArrayList<>();
                         Resume resume = managerContact.getCaregiver().getResume();
