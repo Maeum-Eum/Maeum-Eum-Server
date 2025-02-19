@@ -235,14 +235,21 @@ public class ManagerService {
     }
 
     /* 요양보호사에게 연락한 목록 중 아직 상태인 거 */
-    public List<ContactCaregiverDto> getContactList(String token, String name, ApprovalStatus approvalStatus) {
+    public List<ContactCaregiverDto> getContactList(String token, String name, String approvalStatus) {
 
         Manager manager = findManager(token);
 
         Elder elder = elderRepository.findByElderName(name)
                 .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
 
-        List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatusAndManagerIdAndElderId(manager.getManagerId(),elder.getElderId() ,approvalStatus);
+        ApprovalStatus status;
+        try {
+            status = ApprovalStatus.valueOf(approvalStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_APPROVAL_STATUS);
+        }
+
+        List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatusAndManagerIdAndElderId(manager.getManagerId(),elder.getElderId() ,status);
 
             List<ContactCaregiverDto> contactCaregiverDtos = managerContacts.stream()
                     .map(managerContact -> {

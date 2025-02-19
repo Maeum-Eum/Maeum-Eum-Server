@@ -90,7 +90,7 @@ public class ManagerController {
 
     /* 연락 보낸 대기 목록 */
     @GetMapping("/contact")
-    public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name, @RequestParam(name="tab") ApprovalStatus approvalStatus) {
+    public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name, @RequestParam(name="tab") String approvalStatus) {
         String token = extractToken(authHeader);
         List<ContactCaregiverDto> contactCaregiverDtoList = managerService.getContactList(token , name , approvalStatus);
         return ResponseEntity.ok(contactCaregiverDtoList);
