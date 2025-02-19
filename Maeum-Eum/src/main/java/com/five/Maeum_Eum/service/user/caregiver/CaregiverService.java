@@ -260,6 +260,7 @@ public class CaregiverService {
                 .daily(resume.getDaily())
                 .preferredGender(resume.getPreferredGender())
                 .isFamilyPreferred(resume.getFamilyPreferred())
+                .isPetPreferred(resume.getPetPreferred())
                 .experience(experienceDTOList)
                 .introduction(resume.getIntroduction())
                 .profileImage(resume.getProfileImage())

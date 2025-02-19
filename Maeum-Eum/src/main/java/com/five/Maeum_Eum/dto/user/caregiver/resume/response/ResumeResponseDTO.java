@@ -31,6 +31,7 @@ public class ResumeResponseDTO {
     private List<String> daily;
     private Resume.PreferredGender preferredGender;
     private Boolean isFamilyPreferred;
+    private Boolean isPetPreferred;
     private List<ExperienceDTO> experience;
     private String introduction;
     private String profileImage;
