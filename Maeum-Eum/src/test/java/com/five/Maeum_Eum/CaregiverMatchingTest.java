@@ -1,12 +1,16 @@
 package com.five.Maeum_Eum;
 
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
+import com.five.Maeum_Eum.entity.user.caregiver.WorkDistance;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.ElderFamily;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
+import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
+import com.five.Maeum_Eum.service.user.manager.ManagerService;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @SpringBootTest
@@ -31,7 +36,12 @@ public class CaregiverMatchingTest {
     private EntityManager em;
 
     @Autowired
+    private ManagerService managerService;
+
+    @Autowired
     private ManagerContactQueryDsl managerContactQueryDsl;
+    @Autowired
+    private CaregiverRepository caregiverRepository;
 
     @Test
     @DisplayName(value = "최종매칭시스템점검")
@@ -47,13 +57,16 @@ public class CaregiverMatchingTest {
         double minLongitude = 126.7341;
         double maxLongitude = 127.2693;
 
-        for (int i = 1; i <= 1000; i++) {
+        for (int i = 1; i <= 2000; i++) {
 
             // 시간대 - 요일
             List<Integer> workDay = Arrays.asList(0,1,2);
 
-            // 시간대 - 시간대
-            List<Integer> workTimeSlot = Arrays.asList(0,1,2);
+            // 시간대 - 시간대 : 랜덤
+            List<Integer> workTimeSlot = new ArrayList<>();
+            if(random.nextBoolean()) workTimeSlot.add(0);
+            if(random.nextBoolean()) workTimeSlot.add(1);
+            if(random.nextBoolean()) workTimeSlot.add(2);
 
             Caregiver caregiver = Caregiver.builder()
                     .name("[요양사]" + i)
@@ -110,6 +123,7 @@ public class CaregiverMatchingTest {
                     .wage((random.nextInt(7000)+13000))
                     .workDay(workDay)
                     .workTimeSlot(workTimeSlot)
+                    .negotiableTime(true)
                     .build();
 
             caregiver.setResume(resume);
@@ -162,8 +176,21 @@ public class CaregiverMatchingTest {
         em.persist(serviceSlot);
         em.flush();
 
+        // sorting
+        String token = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFzZGZhc2RmIiwiY2F0ZWdvcnkiOiJhY2Nlc3MiLCJyb2xlIjoiUk9MRV9DQVJFR0lWRVIiLCJpYXQiOjE3Mzk5NDUwMDcsImV4cCI6MTczOTk0ODYwN30.sCkfwDq13oYNlvWu28NizXwTP4jq2zDFOc5V96LpKCk";
+        String name = elder.getElderName();
+        String workPlace = WorkDistance.WALK_15.getLabel();
+        String sort = "accuracy";
+
+        List<RecommendedCaregiverDto> dtoList = managerService.getRecommendedList(token, name, workPlace, sort);
+        List<Caregiver> caregivers = new ArrayList<>();
+
+        for (RecommendedCaregiverDto dto : dtoList) {
+            caregivers.add(caregiverRepository.findById(dto.caregiverId()).orElse(null));
+        }
+
         // 쿼리 조회 - 어르신에 맞는 10명 가져옴, 반경 5KM 이내
-        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 100, 5);
+//      List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 100, 5);
 
         Assertions.assertNotNull(caregivers);
         Assertions.assertFalse(caregivers.isEmpty());
