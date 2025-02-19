@@ -76,6 +76,10 @@ public class ResumeController {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
         }
 
+        for(String test : resumeSaveDTO.getDaily()){
+            DailyType dailyType = DailyType.fromLabel(test);
+        }
+
         if(findCaregiver.isResumeRegistered())
         {
             caregiverService.updateResume(findCaregiver.getResume(), resumeSaveDTO);
