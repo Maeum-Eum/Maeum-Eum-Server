@@ -15,6 +15,8 @@ public record RecommendedCaregiverDto(
      boolean negotiable,
      List<String> possibleTasks,
 
+     int wage,
+
      boolean isBookmarks,
 
      Long bookmarkId,
@@ -31,6 +33,7 @@ public record RecommendedCaregiverDto(
                 title,
                 caregiver.getResume().getNegotiableTime(),
                 possibleTasks,
+                caregiver.getResume().getWage(),
                 isMarked,
                 managerBookmark.getBookmarkId(),
                 caregiver.getResume().getCreatedAt()
@@ -45,6 +48,7 @@ public record RecommendedCaregiverDto(
                 title,
                 caregiver.getResume().getNegotiableTime(),
                 possibleTasks,
+                caregiver.getResume().getWage(),
                 isMarked,
                 null,
                 caregiver.getResume().getCreatedAt()
