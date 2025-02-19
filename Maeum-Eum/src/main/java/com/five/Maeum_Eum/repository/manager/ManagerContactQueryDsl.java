@@ -53,9 +53,9 @@ public class ManagerContactQueryDsl {
 
         // 5. [필] 어르신 필요 서비스 필터링
         BooleanExpression serviceFilter = resume.mealLevel.goe(elder.getMealLevel())
-                .and(resume.toiletingLevel.goe(elder.getToiletingLevel()))
-                .and(resume.dailyLevel.goe(elder.getDailyLevel()))
-                .and(resume.mobilityLevel.goe(elder.getMobilityLevel()));
+                .or(resume.toiletingLevel.goe(elder.getToiletingLevel()))
+                .or(resume.dailyLevel.goe(elder.getDailyLevel()))
+                .or(resume.mobilityLevel.goe(elder.getMobilityLevel()));
 
         // 6. 거리 조건 - 어르신의 주소지 위치와 요양사의 주소지 위치를 계산하고 이력서상 요양사의 가능 근무범위 (예시 : 5 Km 이내) 에 해당되는지 체크 후 필터링
         NumberExpression<Double> distanceFilter = Expressions.numberTemplate(
