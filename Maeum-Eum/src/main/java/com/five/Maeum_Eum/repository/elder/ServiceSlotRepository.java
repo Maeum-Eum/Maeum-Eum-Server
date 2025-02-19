@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ServiceSlotRepository extends JpaRepository<ServiceSlot, Long> {
     boolean existsByElderAndServiceSlotDayIn(Elder elder, List<Integer> serviceSlotDay);
+    void deleteByElder(Elder elder);
 }
