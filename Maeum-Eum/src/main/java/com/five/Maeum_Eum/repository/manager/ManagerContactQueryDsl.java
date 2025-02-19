@@ -1,7 +1,4 @@
 package com.five.Maeum_Eum.repository.manager;
-
-import com.five.Maeum_Eum.controller.user.service.DailyElderType;
-import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.QSimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
 import com.five.Maeum_Eum.entity.center.QCenter;
@@ -11,13 +8,11 @@ import com.five.Maeum_Eum.entity.user.elder.QElder;
 import com.five.Maeum_Eum.entity.user.elder.QSavedElders;
 import com.five.Maeum_Eum.entity.user.elder.ServiceSlot;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
-import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.entity.user.manager.QManager;
 import com.five.Maeum_Eum.entity.user.manager.QManagerContact;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -66,17 +61,15 @@ public class ManagerContactQueryDsl {
         // 5-1 [필] 어르신 필요 서비스 필터링 (일상 제외)
         BooleanExpression serviceFilter = resume.mealLevel.goe(elder.getMealLevel())
                 .or(resume.toiletingLevel.goe(elder.getToiletingLevel()))
-                .or(resume.mobilityLevel.goe(elder.getMobilityLevel()))
-                .or(resume.dailyLevel.goe(elder.getDailyLevel()));
+                .or(resume.mobilityLevel.goe(elder.getMobilityLevel()));
 
-        // 5-2 [필] 어르신 필요 서비스 필터링 (일상)
-        BooleanExpression dailyFilter = Expressions.numberTemplate(
-                Integer.class,
-                "function('bitand', {0}, {1})",
-                elder.getDailyLevel(),
-                resume.dailyLevel
-
-        ).eq(elder.getDailyLevel());
+        // 5-2 [필] 일상 6요소에 대한 쿼리 - 단 elder의 필드가 1일때만 1이면 괜찮다.
+        BooleanExpression dailyFilter = resume.dailyFilter1.goe(elder.isDailyFilter1())
+                .and(resume.dailyFilter2.goe(elder.isDailyFilter2()))
+                .and(resume.dailyFilter3.goe(elder.isDailyFilter3()))
+                .and(resume.dailyFilter4.goe(elder.isDailyFilter4()))
+                .and(resume.dailyFilter5.goe(elder.isDailyFilter5()))
+                .and(resume.dailyFilter6.goe(elder.isDailyFilter6()));
 
         // 6. 거리 조건 - 어르신의 주소지 위치와 요양사의 주소지 위치를 계산하고 이력서상 요양사의 가능 근무범위 (예시 : 5 Km 이내) 에 해당되는지 체크 후 필터링
         NumberExpression<Double> distanceFilter = Expressions.numberTemplate(
@@ -212,8 +205,8 @@ public class ManagerContactQueryDsl {
                         .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.caregiver.eq(caregiver);
+       //         .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         // 가능한 업무 개수
         NumberExpression<Integer> mealCount = Expressions.numberTemplate(
@@ -234,8 +227,8 @@ public class ManagerContactQueryDsl {
         // 일치도 총합
         NumberExpression<Integer> totalDifference = resume.mealLevel.subtract(QElder.elder.mealLevel)
                 .add(resume.toiletingLevel.subtract(QElder.elder.toiletingLevel))
-                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel))
-                .add(resume.dailyLevel.subtract(QElder.elder.dailyLevel));
+                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel));
+        // 삭제
 
         // 북마크 여부
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
@@ -304,8 +297,8 @@ public class ManagerContactQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.caregiver.eq(caregiver);
+                //.and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()

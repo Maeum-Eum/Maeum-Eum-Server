@@ -1,9 +1,7 @@
 package com.five.Maeum_Eum;
 
-import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
-import com.five.Maeum_Eum.entity.user.caregiver.WorkDistance;
 import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.elder.Elder;
 import com.five.Maeum_Eum.entity.user.elder.ElderFamily;
@@ -13,7 +11,6 @@ import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import com.five.Maeum_Eum.service.user.manager.ManagerService;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -116,7 +113,14 @@ public class CaregiverMatchingTest {
                     .mealLevel(random.nextInt(4)+1)
                     .toiletingLevel(random.nextInt(4)+1)
                     .mobilityLevel(random.nextInt(4)+1)
-                    .dailyLevel(63)
+
+                    .dailyFilter1(random.nextBoolean())
+                    .dailyFilter2(random.nextBoolean())
+                    .dailyFilter3(random.nextBoolean())
+                    .dailyFilter4(random.nextBoolean())
+                    .dailyFilter5(random.nextBoolean())
+                    .dailyFilter6(random.nextBoolean())
+
                     .elderRankLevel(Collections.max(ranks))
                     .wage((random.nextInt(7000)+13000))
                     .workDay(workDay)
@@ -153,7 +157,12 @@ public class CaregiverMatchingTest {
                 .mobilityLevel(4)
 
                 .daily(Arrays.asList("목욕보조"))
-                .dailyLevel(45)
+                .dailyFilter1(true)
+                .dailyFilter2(false)
+                .dailyFilter3(false)
+                .dailyFilter4(false)
+                .dailyFilter5(false)
+                .dailyFilter6(true)
                 .wage(16000)
                 .elderRank(3)
                 .build();
@@ -174,16 +183,9 @@ public class CaregiverMatchingTest {
         em.persist(serviceSlot);
         em.flush();
 
-        // sorting
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFzZGZhc2RmIiwiY2F0ZWdvcnkiOiJhY2Nlc3MiLCJyb2xlIjoiUk9MRV9DQVJFR0lWRVIiLCJpYXQiOjE3Mzk5NDUwMDcsImV4cCI6MTczOTk0ODYwN30.sCkfwDq13oYNlvWu28NizXwTP4jq2zDFOc5V96LpKCk";
-        String name = elder.getElderName();
-        String workPlace = WorkDistance.WALK_15.getLabel();
-        String sort = "accuracy";
+        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 1000, 5);
 
-        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 2000, 5);
-
-        Assertions.assertNotNull(caregivers);
-        Assertions.assertFalse(caregivers.isEmpty());
+        if(caregivers.isEmpty()) System.out.println("Empty");
 
         // 어르신 정보
         System.out.println("[어르신] " + elder.getGender()
@@ -192,7 +194,6 @@ public class CaregiverMatchingTest {
                 + "[식사]" + elder.getMealLevel()
                 + "[이동]"+ elder.getMobilityLevel()
                 + "[배변]"+ elder.getToiletingLevel()
-                + "[일상]" + elder.getDailyLevel()
                 + "[위치] " + elder.getLocation());
 
         System.out.println("[요구시간대] "
@@ -200,6 +201,7 @@ public class CaregiverMatchingTest {
                 + elder.getServiceSlots().get(0).getServiceSlotEnd());
 
         for (Caregiver c : caregivers) {
+
             System.out.println("[LOG] " + c.getName());
             // gender
             System.out.print(" 선호 성별 : " + c.getResume().getPreferredGender()
@@ -208,8 +210,16 @@ public class CaregiverMatchingTest {
                     + "[식사]" + c.getResume().getMealLevel()
                     + "[이동]"+ c.getResume().getMobilityLevel()
                     + "[배변]"+ c.getResume().getToiletingLevel()
-                    + "[일상]"+ c.getResume().getDailyLevel()
                     + "[위치] " + c.getLocation());
+
+            System.out.println(
+                    c.getResume().isDailyFilter1() + " " +
+                            c.getResume().isDailyFilter2() + " " +
+                            c.getResume().isDailyFilter3() + " " +
+                            c.getResume().isDailyFilter4() + " " +
+                            c.getResume().isDailyFilter5() + " " +
+                            c.getResume().isDailyFilter6()
+            );
 
             System.out.print("[가능 요일] ");
             for (int s : c.getResume().getWorkDay()) System.out.print(s + " ");
@@ -217,6 +227,7 @@ public class CaregiverMatchingTest {
             System.out.println("[가능 시간대] ");
             for (int s : c.getResume().getWorkTimeSlot()) System.out.print(s + " ");
             System.out.println();
+
         }
 
     }

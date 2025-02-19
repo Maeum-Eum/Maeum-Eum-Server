@@ -8,8 +8,6 @@ import org.hibernate.type.StandardBasicTypes;
 public class CustomFunctionContributor implements FunctionContributor {
     @Override
     public void contributeFunctions(FunctionContributions functionContributions) {
-        functionContributions.getFunctionRegistry()
-                .register("bitand", new StandardSQLFunction("bitand", StandardBasicTypes.INTEGER));
 
         functionContributions.getFunctionRegistry()
                 .register("bit_count", new StandardSQLFunction("bit_count", StandardBasicTypes.INTEGER));
