@@ -85,7 +85,13 @@ public class Resume extends BaseTimeEntity {
     private int mealLevel = 0;
     private int toiletingLevel = 0;
     private int mobilityLevel = 0;
-    private int dailyLevel = 0;
+
+    private boolean dailyFilter1;
+    private boolean dailyFilter2;
+    private boolean dailyFilter3;
+    private boolean dailyFilter4;
+    private boolean dailyFilter5;
+    private boolean dailyFilter6;
 
     @Convert(converter = GenericListConverter.class)
     private List<Integer> elderRank;

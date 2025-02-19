@@ -61,7 +61,13 @@ public class Elder {
     private int mealLevel;
     private int toiletingLevel;
     private int mobilityLevel;
-    private int dailyLevel;
+
+    private boolean dailyFilter1;
+    private boolean dailyFilter2;
+    private boolean dailyFilter3;
+    private boolean dailyFilter4;
+    private boolean dailyFilter5;
+    private boolean dailyFilter6;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")

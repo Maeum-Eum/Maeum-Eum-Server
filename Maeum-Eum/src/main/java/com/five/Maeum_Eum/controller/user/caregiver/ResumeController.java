@@ -1,6 +1,7 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
 import com.five.Maeum_Eum.common.WorkCalculator;
+import com.five.Maeum_Eum.controller.user.service.DailyElderType;
 import com.five.Maeum_Eum.controller.work.DailyType;
 import com.five.Maeum_Eum.controller.work.MealType;
 import com.five.Maeum_Eum.controller.work.MobilityType;
@@ -129,13 +130,23 @@ public class ResumeController {
                                 .max()
                                 .orElse(0)
                 )
-                .dailyLevel(
-                        resumeSaveDTO.getDaily().stream()
-                                .map(DailyType::fromLabel)
-                                .mapToInt(DailyType::getLevel)
-                                .max()
-                                .orElse(0)
-
+                .dailyFilter1(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.ONE.getLabel())
+                )
+                .dailyFilter2(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.TWO.getLabel())
+                )
+                .dailyFilter3(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.THREE.getLabel())
+                )
+                .dailyFilter4(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.FOUR.getLabel())
+                )
+                .dailyFilter5(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.FIVE.getLabel())
+                )
+                .dailyFilter6(
+                        resumeSaveDTO.getDaily().contains(DailyElderType.SIX.getLabel())
                 )
                 .mobilityLevel(
                         resumeSaveDTO.getMobility().stream()
