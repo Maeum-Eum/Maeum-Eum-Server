@@ -205,8 +205,12 @@ public class ManagerContactQueryDsl {
                         .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
-       //         .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.dailyFilter1.goe(QElder.elder.dailyFilter1)
+                .and(resume.dailyFilter2.goe(QElder.elder.dailyFilter2))
+                .and(resume.dailyFilter3.goe(QElder.elder.dailyFilter3))
+                .and(resume.dailyFilter4.goe(QElder.elder.dailyFilter4))
+                .and(resume.dailyFilter5.goe(QElder.elder.dailyFilter5))
+                .and(resume.dailyFilter6.goe(QElder.elder.dailyFilter6));
 
         // 가능한 업무 개수
         NumberExpression<Integer> mealCount = Expressions.numberTemplate(
@@ -224,11 +228,30 @@ public class ManagerContactQueryDsl {
                 .add(mobilityCount)
                 .add(dailyCount);
 
+
+
         // 일치도 총합
+        NumberExpression<Integer> resumeTrueCount =
+                Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter1)
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter2))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter3))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter4))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter5))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", resume.dailyFilter6));
+
+        NumberExpression<Integer> elderTrueCount =
+                Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter1)
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter2))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter3))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter4))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter5))
+                        .add(Expressions.numberTemplate(Integer.class, "CASE WHEN {0} THEN 1 ELSE 0 END", QElder.elder.dailyFilter6));
+
+        NumberExpression<Integer> trueCountDifference = resumeTrueCount.subtract(elderTrueCount);
         NumberExpression<Integer> totalDifference = resume.mealLevel.subtract(QElder.elder.mealLevel)
                 .add(resume.toiletingLevel.subtract(QElder.elder.toiletingLevel))
-                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel));
-        // 삭제
+                .add(resume.mobilityLevel.subtract(QElder.elder.mobilityLevel))
+                .add(trueCountDifference);
 
         // 북마크 여부
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
@@ -297,8 +320,12 @@ public class ManagerContactQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver);
-                //.and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.dailyFilter1.goe(QElder.elder.dailyFilter1)
+                .and(resume.dailyFilter2.goe(QElder.elder.dailyFilter2))
+                .and(resume.dailyFilter3.goe(QElder.elder.dailyFilter3))
+                .and(resume.dailyFilter4.goe(QElder.elder.dailyFilter4))
+                .and(resume.dailyFilter5.goe(QElder.elder.dailyFilter5))
+                .and(resume.dailyFilter6.goe(QElder.elder.dailyFilter6));
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
