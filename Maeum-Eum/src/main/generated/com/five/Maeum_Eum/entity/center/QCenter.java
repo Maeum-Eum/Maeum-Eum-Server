@@ -28,8 +28,6 @@ public class QCenter extends EntityPathBase<Center> {
 
     public final StringPath centerName = createString("centerName");
 
-    public final ListPath<com.five.Maeum_Eum.entity.user.manager.Manager, com.five.Maeum_Eum.entity.user.manager.QManager> contents = this.<com.five.Maeum_Eum.entity.user.manager.Manager, com.five.Maeum_Eum.entity.user.manager.QManager>createList("contents", com.five.Maeum_Eum.entity.user.manager.Manager.class, com.five.Maeum_Eum.entity.user.manager.QManager.class, PathInits.DIRECT2);
-
     public final DatePath<java.time.LocalDate> designatedTime = createDate("designatedTime", java.time.LocalDate.class);
 
     public final StringPath detailAddress = createString("detailAddress");
@@ -41,6 +39,8 @@ public class QCenter extends EntityPathBase<Center> {
     public final DatePath<java.time.LocalDate> installationTime = createDate("installationTime", java.time.LocalDate.class);
 
     public final ComparablePath<org.locationtech.jts.geom.Point> location = createComparable("location", org.locationtech.jts.geom.Point.class);
+
+    public final ListPath<com.five.Maeum_Eum.entity.user.manager.Manager, com.five.Maeum_Eum.entity.user.manager.QManager> managers = this.<com.five.Maeum_Eum.entity.user.manager.Manager, com.five.Maeum_Eum.entity.user.manager.QManager>createList("managers", com.five.Maeum_Eum.entity.user.manager.Manager.class, com.five.Maeum_Eum.entity.user.manager.QManager.class, PathInits.DIRECT2);
 
     public final StringPath oneLineIntro = createString("oneLineIntro");
 
