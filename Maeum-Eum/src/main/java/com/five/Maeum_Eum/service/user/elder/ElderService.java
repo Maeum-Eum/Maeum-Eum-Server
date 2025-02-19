@@ -64,7 +64,7 @@ public class ElderService {
         Point location = kakaoAddressService.getCoordinates(dto.getAddress());
 
         // 성명 중복 검사
-        long cnt = elderRepository.countByElderName(dto.getName());
+        long cnt = elderRepository.countByElderNameContaining(dto.getName());
         if ( cnt > 0)
             dto.setName(dto.getName() + " (" + cnt + ")");
 
