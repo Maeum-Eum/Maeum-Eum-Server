@@ -99,4 +99,20 @@ public class Elder {
         this.serviceSlots = serviceSlots;
     }
 
+    public void update(String gender, LocalDate elderBirth, String elderAddress, Integer elderRank, Boolean negotiable, Integer wage, Manager manager, List<String> meal, List<String> toileting, List<String> mobility, List<String> daily, ElderFamily elder_family, Boolean elder_pet, Point location) {
+        this.gender = gender == null ? this.gender : gender ;
+        this.elderBirth = elderBirth == null ? this.elderBirth : elderBirth ;
+        this.elderAddress = elderAddress == null ? this.elderAddress : elderAddress ;
+        this.elderRank = elderRank == null ? this.elderRank : elderRank;
+        this.negotiable = negotiable == null ? this.negotiable : negotiable ;
+        this.wage = wage == null ? this.wage : wage ;
+        this.manager = manager == null ? this.manager : manager ;
+        this.meal = meal == null ? this.meal : meal ;
+        this.toileting = toileting == null ? this.toileting : toileting ;
+        this.mobility = mobility == null ? this.mobility : mobility ;
+        this.daily = daily == null ? this.daily : daily ;
+        this.elder_family = elder_family == null ? this.elder_family : elder_family ;
+        this.elder_pet = elder_pet == null ? this.elder_pet : elder_pet ;
+        this.location = location == null ? this.location : location ;
+    }
 }
