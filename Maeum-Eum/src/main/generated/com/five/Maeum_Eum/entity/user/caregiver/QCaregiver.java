@@ -24,6 +24,8 @@ public class QCaregiver extends EntityPathBase<Caregiver> {
 
     public final StringPath address = createString("address");
 
+    public final ListPath<Apply, QApply> applys = this.<Apply, QApply>createList("applys", Apply.class, QApply.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> caregiverId = createNumber("caregiverId", Long.class);
 
     public final ListPath<WorkExperience, QWorkExperience> experience = this.<WorkExperience, QWorkExperience>createList("experience", WorkExperience.class, QWorkExperience.class, PathInits.DIRECT2);

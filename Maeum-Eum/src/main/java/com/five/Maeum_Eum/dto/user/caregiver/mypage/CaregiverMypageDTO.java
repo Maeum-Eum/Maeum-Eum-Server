@@ -15,5 +15,6 @@ public class CaregiverMypageDTO {
     private boolean isResumeRegistered; // 이력서 등록 여부
     private boolean isJobOpen; // 구인 공개 여부
     private int savedEldersCount; // 저장한 어르신 수
-    private int managerContactCount; // 연락 온 관리자 수
+    private int managerContactCount; // 연락 온 관리자 수 (받은 연락함)
+    private int applyCount; // 보낸 지원함
 }

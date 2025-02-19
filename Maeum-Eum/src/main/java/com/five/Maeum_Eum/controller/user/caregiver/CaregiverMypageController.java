@@ -9,6 +9,7 @@ import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
+import com.five.Maeum_Eum.service.user.caregiver.CaregiverMypageService;
 import com.five.Maeum_Eum.service.user.caregiver.CaregiverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.Map;
 @RequestMapping("/api/caregiver/mypage")
 public class CaregiverMypageController {
 
+    private final CaregiverMypageService caregiverMypageService;
     private final CaregiverService caregiverService;
     private final JWTUtil jwtUtil;
 
@@ -41,16 +43,7 @@ public class CaregiverMypageController {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "유저 정보를 가져오지 못했습니다.");
         }
 
-        CaregiverMypageDTO dto = CaregiverMypageDTO.builder()
-                .name(findCaregiver.getName())
-                .address(findCaregiver.getAddress())
-                .savedEldersCount(findCaregiver.getSavedElders().size())
-                .managerContactCount(findCaregiver.getManagerContact().size())
-                .isJobOpen(findCaregiver.isJobOpen())
-                .ProfileImage(findCaregiver.getResume() != null ? findCaregiver.getResume().getProfileImage() : "")
-                .isResumeRegistered(findCaregiver.isResumeRegistered())
-                .build();
-
+        CaregiverMypageDTO dto = caregiverMypageService.getDto(findCaregiver);
         return ResponseEntity.ok(dto);
     }
 
