@@ -136,7 +136,6 @@ public class CaregiverMainService {
                 .meal(resume.getMealLevel() >= elder.getMealLevel())
                 .toileting(resume.getToiletingLevel() >= elder.getToiletingLevel())
                 .mobility(resume.getMobilityLevel() >= elder.getMobilityLevel())
-                .daily(resume.getDailyLevel() >= elder.getDailyLevel())
                 .build();
 
     }
@@ -280,7 +279,6 @@ public class CaregiverMainService {
                 .meal(resume.getMealLevel() >= elder.getMealLevel())
                 .toileting(resume.getToiletingLevel() >= elder.getToiletingLevel())
                 .mobility(resume.getMobilityLevel() >= elder.getMobilityLevel())
-                .daily(resume.getDailyLevel() >= elder.getDailyLevel())
                 .build();
 
     }

@@ -4,6 +4,7 @@ import com.five.Maeum_Eum.controller.user.service.DailyElderType;
 import com.five.Maeum_Eum.controller.user.service.MealElderType;
 import com.five.Maeum_Eum.controller.user.service.MobilityElderType;
 import com.five.Maeum_Eum.controller.user.service.ToiletingElderType;
+import com.five.Maeum_Eum.controller.work.DailyType;
 import com.five.Maeum_Eum.controller.work.MobilityType;
 import com.five.Maeum_Eum.dto.user.elder.request.ElderCreateDTO;
 import com.five.Maeum_Eum.dto.user.elder.request.TimeDTO;
@@ -92,12 +93,23 @@ public class ElderService {
                                 .max()
                                 .orElse(0)
                 )
-                .dailyLevel(
-                        dto.getDaily().stream()
-                                .map(DailyElderType::fromLabel)
-                                .mapToInt(DailyElderType::getLevel)
-                                .max()
-                                .orElse(0)
+                .dailyFilter1(
+                        dto.getDaily().contains(DailyType.ONE.getLabel())
+                )
+                .dailyFilter2(
+                        dto.getDaily().contains(DailyType.TWO.getLabel())
+                )
+                .dailyFilter3(
+                        dto.getDaily().contains(DailyType.THREE.getLabel())
+                )
+                .dailyFilter4(
+                        dto.getDaily().contains(DailyType.FOUR.getLabel())
+                )
+                .dailyFilter5(
+                        dto.getDaily().contains(DailyType.FIVE.getLabel())
+                )
+                .dailyFilter6(
+                        dto.getDaily().contains(DailyType.SIX.getLabel())
                 )
                 .mobilityLevel(
                         dto.getMobility().stream()

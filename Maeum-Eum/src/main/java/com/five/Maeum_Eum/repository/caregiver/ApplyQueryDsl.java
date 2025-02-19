@@ -43,8 +43,7 @@ public class ApplyQueryDsl {
                 .and(resume.toiletingLevel.goe(QElder.elder.toiletingLevel));
         BooleanExpression mobility = resume.caregiver.eq(caregiver)
                 .and(resume.mobilityLevel.goe(QElder.elder.mobilityLevel));
-        BooleanExpression daily = resume.caregiver.eq(caregiver)
-                .and(resume.dailyLevel.goe(QElder.elder.dailyLevel));
+        BooleanExpression daily = resume.caregiver.eq(caregiver);
 
         BooleanExpression bookmarked = caregiver != null ? JPAExpressions
                 .selectOne()
