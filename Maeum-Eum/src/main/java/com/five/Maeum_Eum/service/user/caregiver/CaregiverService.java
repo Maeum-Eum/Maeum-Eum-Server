@@ -15,9 +15,12 @@ import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
 import com.five.Maeum_Eum.jwt.JWTUtil;
+import com.five.Maeum_Eum.repository.caregiver.ApplyQueryDsl;
 import com.five.Maeum_Eum.repository.caregiver.ApplyRepository;
 import com.five.Maeum_Eum.repository.caregiver.CaregiverRepository;
 import com.five.Maeum_Eum.repository.caregiver.ResumeRepository;
+import com.five.Maeum_Eum.repository.elder.ElderQueryDsl;
+import com.five.Maeum_Eum.repository.manager.ManagerContactQueryDsl;
 import com.five.Maeum_Eum.repository.manager.ManagerContactRepository;
 import com.five.Maeum_Eum.service.aws.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +45,10 @@ public class CaregiverService {
     private final ResumeRepository resumeRepository;
     private final S3Uploader s3Uploader;
     private final JWTUtil jwtUtil;
-    private final ManagerContactRepository managerContactRepository;
     private final CaregiverMainService caregiverMainService;
-    private final ApplyRepository applyRepository;
+    private final ManagerContactQueryDsl managerContactQueryDsl;
+    private final ApplyQueryDsl applyQueryDsl;
+    private final ElderQueryDsl elderQueryDsl;
 
 
     public Caregiver findCaregiverByLoginId(String loginId) {
@@ -150,11 +154,11 @@ public class CaregiverService {
         if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Page<ManagerContact> page = managerContactRepository.findAllByCaregiverAndApprovalStatus(pageable,caregiver,approvalStatus);
+        Page<SimpleContactDTO> page = managerContactQueryDsl.findMyContacts(caregiver,pageable, approvalStatus);
 
-        List<ManagerContact> managerContacts = page.getContent();
-        List<SimpleContactDTO> contents = managerContacts.stream()
-                .map(caregiverMainService::toDTO)
+        // 엔티티를 DTO로 변환
+        List<SimpleContactDTO> contents = page.getContent()
+                .stream().map(caregiverMainService::toDTO)
                 .toList();
 
         return PageResponse.<SimpleContactDTO>builder()
@@ -174,11 +178,34 @@ public class CaregiverService {
         if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Page<Apply> page = applyRepository.findAllByCaregiverAndApprovalStatus(pageable,caregiver,approvalStatus);
-        List<Apply> applies = page.getContent();
+        Page<SimpleContactDTO> page = applyQueryDsl.findMyApplies(caregiver,pageable, approvalStatus);
 
-        List<SimpleContactDTO> contents = applies.stream()
-                .map(caregiverMainService::toDTO)
+        // 엔티티를 DTO로 변환
+        List<SimpleContactDTO> contents = page.getContent()
+                .stream().map(caregiverMainService::toDTOApply)
+                .toList();
+
+        return PageResponse.<SimpleContactDTO>builder()
+                .first(page.isFirst())
+                .last(page.isLast())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(contents)
+                .build();
+    }
+
+    public PageResponse<SimpleContactDTO> getBookmark(Pageable pageable) {
+        String caregiverId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Caregiver caregiver = caregiverRepository.findByLoginId(caregiverId).orElse(null);
+        if (caregiver == null) { throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Page<SimpleContactDTO> page = elderQueryDsl.findMyBookmark(caregiver,pageable);
+
+        // 엔티티를 DTO로 변환
+        List<SimpleContactDTO> contents = page.getContent()
+                .stream().map(caregiverMainService::toDTOBookmark)
                 .toList();
 
         return PageResponse.<SimpleContactDTO>builder()

@@ -3,6 +3,8 @@ package com.five.Maeum_Eum.dto.user.caregiver.main.response;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.entity.user.manager.ManagerContact;
 
+import java.util.List;
+
 /*제목 , 협의 여부 , updateAt , 센터 이름 , 시급 , 일상 , 이동, 식사?*/
 public record ContactCaregiverDto(
 
@@ -14,11 +16,12 @@ public record ContactCaregiverDto(
         Long centerId,
         String centerName ,
         int wage ,
-        String workRequirement
+        String address ,
+        List<String> possibleTasks
 
 ) {
 
-    public static ContactCaregiverDto from(ManagerContact managerContact , String title){
+    public static ContactCaregiverDto from(ManagerContact managerContact , String title , List<String> possibleTasks){
         return new ContactCaregiverDto(
                 managerContact.getContactId(),
                 managerContact.getApprovalStatus(),
@@ -28,7 +31,8 @@ public record ContactCaregiverDto(
                 managerContact.getManager().getCenter().getCenterId(),
                 managerContact.getManager().getCenter().getCenterName(),
                 managerContact.getWage(),
-                managerContact.getWorkRequirement()
+                managerContact.getCaregiver().getAddress(),
+                possibleTasks
         );
     }
 }
