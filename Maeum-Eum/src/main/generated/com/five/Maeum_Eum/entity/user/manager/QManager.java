@@ -24,6 +24,8 @@ public class QManager extends EntityPathBase<Manager> {
 
     public final com.five.Maeum_Eum.entity.center.QCenter center;
 
+    public final ListPath<com.five.Maeum_Eum.entity.user.elder.Elder, com.five.Maeum_Eum.entity.user.elder.QElder> elders = this.<com.five.Maeum_Eum.entity.user.elder.Elder, com.five.Maeum_Eum.entity.user.elder.QElder>createList("elders", com.five.Maeum_Eum.entity.user.elder.Elder.class, com.five.Maeum_Eum.entity.user.elder.QElder.class, PathInits.DIRECT2);
+
     public final StringPath loginId = createString("loginId");
 
     public final ListPath<ManagerContact, QManagerContact> managerContacts = this.<ManagerContact, QManagerContact>createList("managerContacts", ManagerContact.class, QManagerContact.class, PathInits.DIRECT2);
