@@ -4,6 +4,7 @@ import com.five.Maeum_Eum.dto.center.request.ChangeCenterReq;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ApplyCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.BookmarkCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.ContactCaregiverDto;
+import com.five.Maeum_Eum.dto.user.caregiver.main.response.RecommendedCaregiverDto;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.dto.user.manager.request.BookmarkReqDto;
 import com.five.Maeum_Eum.dto.user.manager.request.ContactReqDto;
@@ -27,6 +28,7 @@ public class ManagerController {
 
     private final ManagerService managerService;
     private final CaregiverService caregiverService;
+
 
     private String extractToken(String authHeader){
         return authHeader.substring(7).trim();
@@ -88,9 +90,9 @@ public class ManagerController {
 
     /* 연락 보낸 대기 목록 */
     @GetMapping("/contact")
-    public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name) {
+    public ResponseEntity<?> getContact(@RequestHeader("Authorization") String authHeader ,@RequestParam(name ="name") String name, @RequestParam(name="tab") ApprovalStatus approvalStatus) {
         String token = extractToken(authHeader);
-        List<ContactCaregiverDto> contactCaregiverDtoList = managerService.getContactList(token , name , ApprovalStatus.PENDING);
+        List<ContactCaregiverDto> contactCaregiverDtoList = managerService.getContactList(token , name , approvalStatus);
         return ResponseEntity.ok(contactCaregiverDtoList);
     }
 
@@ -119,6 +121,16 @@ public class ManagerController {
         String token = extractToken(authHeader);
         List<ApplyCaregiverDto> applyCaregiverDtoList = managerService.getApplyList(token , name , ApprovalStatus.PENDING);
         return ResponseEntity.ok(applyCaregiverDtoList);
+    }
+
+
+    /* 어르신 별 추천 요양보호사*/
+    @GetMapping("/elder/individual")
+    public ResponseEntity<?> getRecommendedList(@RequestHeader("Authorization") String authHeader , @RequestParam(name ="name") String name,
+                                                                      @RequestParam(name ="distance")String workPlace , @RequestParam(name ="sort") String sort){
+        String token = extractToken(authHeader);
+        List<RecommendedCaregiverDto> recommendedCaregiverDtoList = managerService.getRecommendedList(token , name , workPlace , sort);
+        return ResponseEntity.ok(recommendedCaregiverDtoList);
     }
 
 

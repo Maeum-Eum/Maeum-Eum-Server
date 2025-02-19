@@ -1,6 +1,10 @@
 package com.five.Maeum_Eum.controller.user.caregiver;
 
 import com.five.Maeum_Eum.common.WorkCalculator;
+import com.five.Maeum_Eum.controller.work.DailyType;
+import com.five.Maeum_Eum.controller.work.MealType;
+import com.five.Maeum_Eum.controller.work.MobilityType;
+import com.five.Maeum_Eum.controller.work.ToiletingType;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ExperienceDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
@@ -65,9 +69,6 @@ public class ResumeController {
         return ResponseEntity.ok(responseDTO);
     }
 
-
-
-
     /* 요양보호사 이력서 저장 */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_CAREGIVER')")
@@ -119,6 +120,47 @@ public class ResumeController {
                 .workPlace(resumeSaveDTO.getWorkPlace())
                 .workDay(resumeSaveDTO.getWorkDay())
                 .workTimeSlot(resumeSaveDTO.getWorkTimeSlot())
+
+                // 4개의 등급 수준 결정
+                .mealLevel(
+                        resumeSaveDTO.getMeal().stream()
+                                .map(MealType::fromLabel)
+                                .mapToInt(MealType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
+                .dailyLevel(
+                        resumeSaveDTO.getDaily().stream()
+                                .map(DailyType::fromLabel)
+                                .mapToInt(DailyType::getLevel)
+                                .max()
+                                .orElse(0)
+
+                )
+                .mobilityLevel(
+                        resumeSaveDTO.getMobility().stream()
+                                .map(MobilityType::fromLabel)
+                                .mapToInt(MobilityType::getLevel)
+                                .max()
+                                .orElse(0)
+
+                )
+                .toiletingLevel(
+                        resumeSaveDTO.getToileting().stream()
+                                .map(ToiletingType::fromLabel)
+                                .mapToInt(ToiletingType::getLevel)
+                                .max()
+                                .orElse(0)
+                )
+
+                // 인지 지원 가능 등급 결정
+                .elderRankLevel(
+                        resumeSaveDTO.getElderRank().stream()
+                                .mapToInt(Integer::intValue)
+                                .max()
+                                .orElse(0)
+                )
+
                 .build();
 
         workExperienceService.saveAll(findCaregiver, resumeSaveDTO);
