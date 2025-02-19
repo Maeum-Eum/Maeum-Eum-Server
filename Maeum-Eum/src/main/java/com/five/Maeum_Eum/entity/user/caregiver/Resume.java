@@ -1,6 +1,10 @@
 package com.five.Maeum_Eum.entity.user.caregiver;
 
 import com.five.Maeum_Eum.common.BaseTimeEntity;
+import com.five.Maeum_Eum.controller.work.DailyType;
+import com.five.Maeum_Eum.controller.work.MealType;
+import com.five.Maeum_Eum.controller.work.MobilityType;
+import com.five.Maeum_Eum.controller.work.ToiletingType;
 import com.five.Maeum_Eum.converter.GenericListConverter;
 import com.five.Maeum_Eum.dto.user.caregiver.resume.request.ResumeSaveDTO;
 import jakarta.persistence.*;
@@ -136,5 +140,34 @@ public class Resume extends BaseTimeEntity {
         this.preferredGender = resumeSaveDTO.getPreferredGender();
         this.familyPreferred = resumeSaveDTO.getIsFamilyPreferred();
         this.introduction = resumeSaveDTO.getIntroduction();
+
+        // 4개의 등급 수준 결정
+        this.mealLevel =
+                resumeSaveDTO.getMeal().stream()
+                        .map(MealType::fromLabel)
+                        .mapToInt(MealType::getLevel)
+                        .max()
+                        .orElse(0);
+        this.dailyFilter1 = resumeSaveDTO.getDaily().contains(DailyType.ONE.getLabel());
+        this.dailyFilter2 = resumeSaveDTO.getDaily().contains(DailyType.TWO.getLabel());
+        this.dailyFilter3 = resumeSaveDTO.getDaily().contains(DailyType.THREE.getLabel());
+        this.dailyFilter4 = resumeSaveDTO.getDaily().contains(DailyType.FOUR.getLabel());
+        this.dailyFilter5 = resumeSaveDTO.getDaily().contains(DailyType.FIVE.getLabel());
+        this.dailyFilter6 = resumeSaveDTO.getDaily().contains(DailyType.SIX.getLabel());
+        this.mobilityLevel = resumeSaveDTO.getMobility().stream()
+                                .map(MobilityType::fromLabel)
+                                .mapToInt(MobilityType::getLevel)
+                                .max()
+                                .orElse(0);
+        this.toiletingLevel = resumeSaveDTO.getToileting().stream()
+                                .map(ToiletingType::fromLabel)
+                                .mapToInt(ToiletingType::getLevel)
+                                .max()
+                                .orElse(0);
+                // 인지 지원 가능 등급 결정
+        this.elderRankLevel = resumeSaveDTO.getElderRank().stream()
+                                .mapToInt(Integer::intValue)
+                                .max()
+                                .orElse(0);
     }
 }
