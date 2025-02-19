@@ -116,7 +116,7 @@ public class CaregiverMatchingTest {
                     .mealLevel(random.nextInt(4)+1)
                     .toiletingLevel(random.nextInt(4)+1)
                     .mobilityLevel(random.nextInt(4)+1)
-                    .dailyLevel(random.nextInt(6)+1)
+                    .dailyLevel(63)
                     .elderRankLevel(Collections.max(ranks))
                     .wage((random.nextInt(7000)+13000))
                     .workDay(workDay)
@@ -153,7 +153,7 @@ public class CaregiverMatchingTest {
                 .mobilityLevel(4)
 
                 .daily(Arrays.asList("목욕보조"))
-                .dailyLevel(2)
+                .dailyLevel(45)
                 .wage(16000)
                 .elderRank(3)
                 .build();
@@ -180,15 +180,7 @@ public class CaregiverMatchingTest {
         String workPlace = WorkDistance.WALK_15.getLabel();
         String sort = "accuracy";
 
-        List<RecommendedCaregiverDto> dtoList = managerService.getRecommendedList(token, name, workPlace, sort);
-        List<Caregiver> caregivers = new ArrayList<>();
-
-        for (RecommendedCaregiverDto dto : dtoList) {
-            caregivers.add(caregiverRepository.findById(dto.caregiverId()).orElse(null));
-        }
-
-        // 쿼리 조회 - 어르신에 맞는 10명 가져옴, 반경 5KM 이내
-//      List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 100, 5);
+        List<Caregiver> caregivers = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder, 2000, 5);
 
         Assertions.assertNotNull(caregivers);
         Assertions.assertFalse(caregivers.isEmpty());

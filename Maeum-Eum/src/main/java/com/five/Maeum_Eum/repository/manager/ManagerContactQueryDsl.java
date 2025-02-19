@@ -1,5 +1,6 @@
 package com.five.Maeum_Eum.repository.manager;
 
+import com.five.Maeum_Eum.controller.user.service.DailyElderType;
 import com.five.Maeum_Eum.dto.manager.CaregiverWithOverlapDto;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.QSimpleContactDTO;
 import com.five.Maeum_Eum.dto.user.caregiver.main.response.SimpleContactDTO;
@@ -62,11 +63,20 @@ public class ManagerContactQueryDsl {
         BooleanExpression genderFilter = resume.preferredGender.stringValue().eq(elder.getGender())
                 .or(resume.preferredGender.eq(Resume.PreferredGender.EVERY));
 
-        // 5. [필] 어르신 필요 서비스 필터링
+        // 5-1 [필] 어르신 필요 서비스 필터링 (일상 제외)
         BooleanExpression serviceFilter = resume.mealLevel.goe(elder.getMealLevel())
                 .or(resume.toiletingLevel.goe(elder.getToiletingLevel()))
-                .or(resume.dailyLevel.goe(elder.getDailyLevel()))
-                .or(resume.mobilityLevel.goe(elder.getMobilityLevel()));
+                .or(resume.mobilityLevel.goe(elder.getMobilityLevel()))
+                .or(resume.dailyLevel.goe(elder.getDailyLevel()));
+
+        // 5-2 [필] 어르신 필요 서비스 필터링 (일상)
+        BooleanExpression dailyFilter = Expressions.numberTemplate(
+                Integer.class,
+                "function('bitand', {0}, {1})",
+                elder.getDailyLevel(),
+                resume.dailyLevel
+
+        ).eq(elder.getDailyLevel());
 
         // 6. 거리 조건 - 어르신의 주소지 위치와 요양사의 주소지 위치를 계산하고 이력서상 요양사의 가능 근무범위 (예시 : 5 Km 이내) 에 해당되는지 체크 후 필터링
         NumberExpression<Double> distanceFilter = Expressions.numberTemplate(
@@ -157,6 +167,7 @@ public class ManagerContactQueryDsl {
 
                         // 5. [필] 어르신 필요 서비스 필터링
                         serviceFilter,
+                        dailyFilter,
 
                         // 6. [중] 거리 조건 필터링
                         distanceFilter.loe(distance * 1000.0),
