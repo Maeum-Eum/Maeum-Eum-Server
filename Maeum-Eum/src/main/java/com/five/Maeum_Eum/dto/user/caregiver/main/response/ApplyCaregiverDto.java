@@ -15,6 +15,8 @@ import java.util.List;
 public record ApplyCaregiverDto(
         Long applyId,
         ApprovalStatus approvalStatus,
+
+        Long caregiverId,
         Long centerId,
         String centerName,
         Long elderId,
@@ -32,6 +34,7 @@ public record ApplyCaregiverDto(
           return new ApplyCaregiverDto(
                   apply.getApplyId(),
                   apply.getApprovalStatus(),
+                  caregiver.getCaregiverId(),
                   manager.getCenter().getCenterId(),
                   manager.getCenter().getCenterName(),
                   apply.getElder().getElderId(),

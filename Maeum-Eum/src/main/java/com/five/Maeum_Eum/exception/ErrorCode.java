@@ -23,6 +23,9 @@ public enum ErrorCode {
     //elder
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 어르신을 찾을 수 없습니다."),
 
+    //apply
+    APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 지원 내역을 찾을 수 없습니다."),
+
 
     CENTER_NOT_FOUND(HttpStatus.NOT_FOUND, "센터가 존재하지 않습니다."),
     INVALID_ROLE(HttpStatus.UNAUTHORIZED, "해당 경로에 대한 권한이 없습니다."),
