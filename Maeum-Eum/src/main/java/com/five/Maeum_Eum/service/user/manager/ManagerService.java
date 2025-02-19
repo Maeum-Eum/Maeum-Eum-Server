@@ -236,7 +236,7 @@ public class ManagerService {
         return "관리자의 북마크가 삭제되었습니다.";
     }
 
-    /* 요양보호사에게 연락한 목록 중 아직 대기 상태인 거 */
+    /* 요양보호사에게 연락한 목록 중 아직 상태인 거 */
     public List<ContactCaregiverDto> getContactList(String token, String name, ApprovalStatus approvalStatus) {
 
         Manager manager = findManager(token);
@@ -244,7 +244,7 @@ public class ManagerService {
         Elder elder = elderRepository.findByElderName(name)
                 .orElseThrow(() -> new CustomException(ErrorCode.ELDER_NOT_FOUND));
 
-        List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatusAndManagerIdAndElderId(manager.getManagerId(),elder.getElderId() ,ApprovalStatus.PENDING);
+        List<ManagerContact> managerContacts = managerContactRepository.findByApprovalStatusAndManagerIdAndElderId(manager.getManagerId(),elder.getElderId() ,approvalStatus);
 
             List<ContactCaregiverDto> contactCaregiverDtos = managerContacts.stream()
                     .map(managerContact -> {

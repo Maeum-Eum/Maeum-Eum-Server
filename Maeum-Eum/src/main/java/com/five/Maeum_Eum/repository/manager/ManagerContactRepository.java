@@ -18,7 +18,7 @@ public interface ManagerContactRepository extends JpaRepository<ManagerContact, 
     @Query("SELECT COUNT(mc) FROM ManagerContact mc WHERE mc.manager.managerId = :managerId")
     int countManagerContactByManagerId(@Param("managerId") Long managerId);
 
-    @Query("SELECT mc FROM ManagerContact mc WHERE mc.approvalStatus = :state AND mc.manager.managerId = :managerId AND mc.elder.elderId =:elderId")
+    @Query("SELECT mc FROM ManagerContact mc WHERE mc.approvalStatus =:state AND mc.manager.managerId =:managerId AND mc.elder.elderId =:elderId")
     List<ManagerContact> findByApprovalStatusAndManagerIdAndElderId(@Param("managerId") Long managerId, @Param("elderId") Long elderId ,@Param("state") ApprovalStatus state);
 
     Page<ManagerContact> findAllByCaregiverAndApprovalStatus(Pageable pageable, Caregiver caregiver
