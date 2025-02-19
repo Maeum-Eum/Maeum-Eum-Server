@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ElderRepository extends JpaRepository<Elder, Long> {
-    long countByElderName(String elderName);
+    long countByElderNameContaining(String elderName);
     Optional<Elder> findByElderName(String elderName);
 
     @Query("select e from Elder e where e.manager.managerId =:managerId")
