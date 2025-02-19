@@ -80,6 +80,7 @@ public class CaregiverMainService {
                 .totalPages(page.getTotalPages())
                 .totalElements(page.getTotalElements())
                 .content(contents)
+                .address(caregiver.getAddress())
                 .build();
     }
 
