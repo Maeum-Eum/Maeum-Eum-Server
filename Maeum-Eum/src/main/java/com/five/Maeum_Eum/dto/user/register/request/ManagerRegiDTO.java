@@ -32,4 +32,7 @@ public class ManagerRegiDTO {
 
     @NotNull
     private Boolean hasCar;
+
+    @NotNull
+    private Long centerId;
 }
