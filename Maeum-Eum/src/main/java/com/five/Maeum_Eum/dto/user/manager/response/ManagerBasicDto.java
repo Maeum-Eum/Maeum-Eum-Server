@@ -14,9 +14,11 @@ public record ManagerBasicDto(
         boolean hasCar,
         String oneLineIntro,
         int sentContacts, // 관리자가 연락한 요양보호사 수
-        int bookmarks // 관리자가 한 요양보호사 북마크 개수
+        int bookmarks ,// 관리자가 한 요양보호사 북마크 개수
+
+        int applys // 관리자가 받은 지원서 수
 ) {
-    public static ManagerBasicDto from(Manager manager , Center center , int sentContacts , int bookmarks){
+    public static ManagerBasicDto from(Manager manager , Center center , int sentContacts , int bookmarks , int applys){
         return new ManagerBasicDto(
                 manager.getManagerId(),
                 manager.getName(),
@@ -26,7 +28,8 @@ public record ManagerBasicDto(
                 center.isHasCar(),
                 center.getOneLineIntro(),
                 sentContacts,
-                bookmarks
+                bookmarks,
+                applys
         );
     }
 
@@ -39,6 +42,7 @@ public record ManagerBasicDto(
                 center.getCenterName(),
                 center.isHasCar(),
                 center.getOneLineIntro(),
+                0,
                 0,
                 0
         );

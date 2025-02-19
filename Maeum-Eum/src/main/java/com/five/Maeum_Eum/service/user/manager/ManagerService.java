@@ -92,7 +92,14 @@ public class ManagerService {
         // 요양보호사 북마크 개수
         int bookmarks = managerBookmarkRepository.countManagerBookmarkByManagerId(manager.getManagerId());
 
-        return ManagerBasicDto.from(manager , manager.getCenter() , sentContacts , bookmarks);
+        // 지원 목록 - 매니저가 소속된 센터에 소속된 어르신 목록
+        List<Elder> elders = elderRepository.findByManagerId(manager.getManagerId());
+
+        int applys = elders.stream()
+                .mapToInt(elder -> applyRepository.countByElderId(elder.getElderId()))
+                .sum();
+
+        return ManagerBasicDto.from(manager , manager.getCenter() , sentContacts , bookmarks , applys);
     }
 
     /* 센터 정보 수정 */
@@ -158,8 +165,14 @@ public class ManagerService {
 
         // 요양보호사 북마크 개수
         int bookmarks = managerBookmarkRepository.countManagerBookmarkByManagerId(manager.getManagerId());
+        // 지원 목록 - 매니저가 소속된 센터에 소속된 어르신 목록
+        List<Elder> elders = elderRepository.findByManagerId(manager.getManagerId());
 
-        ManagerBasicDto managerBasicDto = ManagerBasicDto.from(manager , center , sentContacts , bookmarks);
+        int applys = elders.stream()
+                .mapToInt(elder -> applyRepository.countByElderId(elder.getElderId()))
+                .sum();
+
+        ManagerBasicDto managerBasicDto = ManagerBasicDto.from(manager , center , sentContacts , bookmarks, applys);
 
         return managerBasicDto;
     }

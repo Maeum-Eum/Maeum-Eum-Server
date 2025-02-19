@@ -23,4 +23,7 @@ public interface ApplyRepository extends JpaRepository<Apply,Long> {
 
     @Query("select a.caregiver from Apply a where a.applyId =:applyId")
     Caregiver findCaregiverByApplyId(@Param("applyId") Long applyId);
+
+    @Query("SELECT COUNT(a) FROM Apply a WHERE a.elder.elderId = :elderId")
+    int countByElderId(@Param("elderId") Long elderId);
 }
