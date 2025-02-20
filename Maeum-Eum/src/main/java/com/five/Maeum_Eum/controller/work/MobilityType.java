@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum MobilityType {
-    ONE("null",1),
+    ONE("모두가능",5),
     TWO("이동 도움",2),
     THREE("휠체어 이동 보조",3),
     FOUR("침대에서 휠체어 이동 돕기",4);
@@ -26,7 +26,7 @@ public enum MobilityType {
             }
         }
         throw new CustomException(ErrorCode.INVALID_INPUT, "잘못된 Mobility 입력입니다 : " + label
-        + "맞는 입력 : null / 이동 도움 / 휠체어 이동 보조 / 침대에서 휠체어 이동 돕기"
+        + "맞는 입력 : 모두가능 / 이동 도움 / 휠체어 이동 보조 / 침대에서 휠체어 이동 돕기"
         );
     }
 }

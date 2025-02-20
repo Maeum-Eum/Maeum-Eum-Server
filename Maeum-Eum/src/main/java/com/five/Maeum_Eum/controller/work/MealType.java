@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum MealType {
-    ONE("null",1),
+    ONE("모두가능",5),
     TWO("식사 도움",2),
     THREE("요리 가능",3),
     FOUR("콧줄 식사",4);
@@ -25,6 +25,6 @@ public enum MealType {
                 return place;
             }
         }
-        throw new CustomException(ErrorCode.INVALID_INPUT, "잘못된 Meal 입력입니다 : " + label + " 필요한 입력 null / 식사 도움 / 요리 가능 / 콧줄 식사");
+        throw new CustomException(ErrorCode.INVALID_INPUT, "잘못된 Meal 입력입니다 : " + label + " 필요한 입력 모두가능 / 식사 도움 / 요리 가능 / 콧줄 식사");
     }
 }
