@@ -42,9 +42,6 @@ public class ElderService {
 
     public boolean createElder (ElderCreateDTO dto) {
 
-        String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
-        if (!role.equals("ROLE_MANAGER")) { throw new CustomException(ErrorCode.INVALID_ROLE);
-        }
 
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
         Manager manager = managerRepository.findByLoginId(managerId).orElse(null);
