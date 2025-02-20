@@ -40,6 +40,32 @@ public class ManagerContactQueryDsl {
     private final JPAQueryFactory jpaQueryFactory;
 
     // 최종
+    public List<Caregiver> findCaregiverByLowMatchingSystem(Elder elder, int count, double distance){
+
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QResume resume = QResume.resume;
+
+        // 1. [필] 이력서 등록 여부
+        BooleanExpression isResumeRegistred = caregiver.isResumeRegistered.eq(true);
+
+        // 2. [필] 요양보호사 자격증 번호 등록 여부
+        BooleanExpression isCertificateRegistred = caregiver.isResumeRegistered.eq(true);
+
+        return jpaQueryFactory
+                .select(caregiver)
+                .from(resume)
+                .join(resume.caregiver, caregiver)
+                .where(
+                        // 1. [필] 이력서 등록 여부
+                        isResumeRegistred,
+                        // 2. [필] 요양보호사 자격증 번호 등록 여부
+                        isCertificateRegistred
+                )
+                .limit(count)
+                .fetch();
+    }
+
+    // 최종
     public List<Caregiver> findCaregiverByFullMatchingSystem(Elder elder, int count, double distance){
 
         QCaregiver caregiver = QCaregiver.caregiver;

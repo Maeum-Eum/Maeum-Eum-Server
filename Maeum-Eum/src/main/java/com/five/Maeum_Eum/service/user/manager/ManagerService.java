@@ -442,7 +442,11 @@ public class ManagerService {
         List<Caregiver> caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
 
         if(caregiverList.isEmpty()){
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "매칭으로 조회된 유저가 아예 없습니다.");
+            caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
+        }
+
+        if(caregiverList.isEmpty()){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND,"서버 내에 요양사가 등록되지 않았습니다");
         }
 
         // 정렬 및 변환
