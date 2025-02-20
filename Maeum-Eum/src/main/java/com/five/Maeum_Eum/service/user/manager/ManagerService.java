@@ -442,7 +442,7 @@ public class ManagerService {
         List<Caregiver> caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
 
         if(caregiverList.isEmpty()){
-            caregiverList = managerContactQueryDsl.findCaregiverByFullMatchingSystem(elder , 30 , distance);
+            caregiverList = managerContactQueryDsl.findCaregiverByLowMatchingSystem(elder , 30 , distance);
         }
 
         if(caregiverList.isEmpty()){
