@@ -8,7 +8,6 @@ import com.five.Maeum_Eum.dto.user.caregiver.resume.response.ResumeResponseDTO;
 import com.five.Maeum_Eum.entity.user.caregiver.Caregiver;
 import com.five.Maeum_Eum.entity.user.caregiver.Resume;
 import com.five.Maeum_Eum.entity.user.caregiver.WorkExperience;
-import com.five.Maeum_Eum.entity.user.elder.DayOfWeek;
 import com.five.Maeum_Eum.entity.user.manager.ApprovalStatus;
 import com.five.Maeum_Eum.exception.CustomException;
 import com.five.Maeum_Eum.exception.ErrorCode;
@@ -30,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -57,16 +55,24 @@ public class CaregiverService {
         resumeRepository.save(resume);
     }
 
+    public void updateResume(Resume resume, ResumeSaveDTO dto) {
+        resume.updateResume(dto);
+    }
+
+    public void setResumeOk(Caregiver caregiver) {
+        caregiver.setHasCaregiverCertificate(true);
+    }
+
+    public void setResumeNotOk(Caregiver caregiver) {
+        caregiver.setHasCaregiverCertificate(false);
+    }
+
     // token으로  사용자 role 알아내기
     private String findRole(String token){
         return jwtUtil.getRole(token);
     }
     public void toggleJobOpenState(Caregiver caregiver) {
         caregiver.toggleJobOpenState();
-    }
-
-    public void updateResume(Resume resume, ResumeSaveDTO dto) {
-        resume.updateResume(dto);
     }
 
     public String uploadProfileImage(MultipartFile file, Caregiver caregiver) throws IllegalAccessException {
