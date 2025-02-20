@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum ToiletingType {
-    ONE("null",1),
+    ONE("모두가능",5),
     TWO("화장실 이용하기",2),
     THREE("기저귀 교환",3),
     FOUR("배뇨배변보조",4);
@@ -26,7 +26,7 @@ public enum ToiletingType {
             }
         }
         throw new CustomException(ErrorCode.INVALID_INPUT, "잘못된 Toilet 입력입니다 : " + label
-                + "맞는 입력 : null / 화장실 이용하기 / 기저귀 교환 / 배뇨배변보조"
+                + "맞는 입력 : 모두가능 / 화장실 이용하기 / 기저귀 교환 / 배뇨배변보조"
         );
     }
 }
