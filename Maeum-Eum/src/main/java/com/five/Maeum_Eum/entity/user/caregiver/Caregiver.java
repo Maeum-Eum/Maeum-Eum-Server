@@ -86,6 +86,10 @@ public class Caregiver {
         this.resume = resume;
     }
 
+    public void setHasCaregiverCertificate(boolean b) {
+        hasCaregiverCertificate = b;
+    }
+
     // 매칭 상태
     public enum JobState {
         IDLE, MATCHING, MATCHED

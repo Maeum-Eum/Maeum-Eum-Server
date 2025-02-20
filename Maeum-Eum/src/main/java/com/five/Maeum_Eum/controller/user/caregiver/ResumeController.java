@@ -84,6 +84,10 @@ public class ResumeController {
         {
             caregiverService.updateResume(findCaregiver.getResume(), resumeSaveDTO);
             workExperienceService.saveAll(findCaregiver, resumeSaveDTO);
+
+            if(findCaregiver.getResume().getCertificate().getCertificateCode().isEmpty()) caregiverService.setResumeNotOk(findCaregiver);
+            else caregiverService.setResumeOk(findCaregiver);
+
             return ResponseEntity
                     .status(200)
                     .body(ErrorResponse.builder()
@@ -92,6 +96,9 @@ public class ResumeController {
                             .message("이력서 수정 완료")
                             .build());
         }
+
+        if(findCaregiver.getResume().getCertificate().getCertificateCode().isEmpty()) caregiverService.setResumeNotOk(findCaregiver);
+        else caregiverService.setResumeOk(findCaregiver);
 
         Certificate certificate = Certificate.builder()
                 .certificateCode(resumeSaveDTO.getCertificateCode())

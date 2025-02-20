@@ -271,7 +271,7 @@ public class CaregiverMainService {
         return DetailContactDTO.builder()
                 .elderId(id)
                 .center(centerDTO)
-                .title(getTitle(elder, "test"))
+                .title(getTitle(elder, ""))
                 .wage(elder.getWage())
                 .negotiable(elder.isNegotiable())
                 .bookmarked(savedEldersRepository.findByElderAndCaregiver(elder, caregiver).isPresent())
